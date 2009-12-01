@@ -1,0 +1,45 @@
+## This file saves all the configuration of QTDCM compilation
+# This file is to be included from outside projects which uses QtM3d
+
+#path to the source of QTDCM
+SET(QTDCM_SOURCE_DIR "@QTDCM_SOURCE_DIR@/Code")
+
+#path to cmake files of Vistal
+SET(QTDCM_CMAKE_DIR "@QTDCM_CMAKE_DIR@")
+
+#path to binary dir of QTDCM
+SET(QTDCM_BINARY_DIR "@QTDCM_BIN_DIR@")
+
+# all include dirs pour QTDCM
+SET(QTDCM_INCLUDE_DIRS  "@QTDCM_INCLUDE_DIRS@")
+
+# all library dirs pour QTDCM
+SET(QTDCM_LIBRARY_DIRS  "@QTDCM_LIBRARY_DIRS@")
+
+# The C and C++ flags added by Vistal to the cmake-configured flags.
+#SET(QTDCM_REQUIRED_C_FLAGS "@QTDCM_REQUIRED_C_FLAGS@")
+#SET(QTDCM_REQUIRED_CXX_FLAGS "@QTDCM_REQUIRED_CXX_FLAGS@")
+#SET(QTDCM_REQUIRED_LINK_FLAGS "@QTDCM_REQUIRED_LINK_FLAGS@")
+SET(QTDCM_CMAKE_MODULE_PATH "@QTDCM_CMAKE_MODULE_PATH@")
+
+# The Vistal version number
+SET(QTDCM_VERSION_MAJOR "@QTDCM_VERSION_MAJOR@")
+SET(QTDCM_VERSION_MINOR "@QTDCM_VERSION_MINOR@")
+SET(QTDCM_VERSION_PATCH "@QTDCM_VERSION_PATCH@")
+
+# The location of the UseVistal.cmake file.
+SET(QTDCM_USE_FILE "@QTDCM_USE_FILE@")
+
+# The build settings file.
+SET(QTDCM_BUILD_SETTINGS_FILE "@QTDCM_BUILD_SETTINGS_FILE@")
+
+# The library depends file.
+SET(QTDCM_LIBRARY_DEPENDS_FILE "@QTDCM_LIBRARY_DEPENDS_FILE@")
+
+# Whether Vistal was built with shared libraries.
+SET(QTDCM_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+
+# all QTDCM libs
+SET(QTDCM_LIBS "@QTDCM_LIBS@")
+
+SET(USE_VISTAL "@USE_VISTAL@")

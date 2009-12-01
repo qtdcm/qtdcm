@@ -1,0 +1,23 @@
+#
+# This file sets up include directories, link directories, and
+# compiler settings for a project to use Vistal.  It should not be
+# included directly, but rather through the QTDCM_USE_FILE setting
+# obtained from QtDCMConfig.cmake.
+#
+
+IF(QTDCM_BUILD_SETTINGS_FILE)
+  INCLUDE("${CMAKE_ROOT}/Modules/CMakeImportBuildSettings.cmake")
+  CMAKE_IMPORT_BUILD_SETTINGS(${QTDCM_BUILD_SETTINGS_FILE})
+ENDIF(QTDCM_BUILD_SETTINGS_FILE)
+
+# Add include directories needed to use Vistal.
+INCLUDE_DIRECTORIES(${QTDCM_INCLUDE_DIRS})
+
+# Add link directories needed to use Vistal.
+LINK_DIRECTORIES(${QTDCM_LIBRARY_DIRS})
+SET(CMAKE_MODULE_PATH "${QTDCM_CMAKE_MODULE_PATH}")
+
+find_package( Qt4 REQUIRED )
+if(QT4_FOUND)
+  include(${QT_USE_FILE})
+endif(QT4_FOUND)

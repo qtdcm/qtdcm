@@ -1,0 +1,53 @@
+string(TOLOWER ${SITE} SITE)
+set(CTEST_PROJECT_NAME "QtM3d")
+set(CTEST_NIGHTLY_START_TIME "01:00:00 CEST")
+
+set(CTEST_DROP_METHOD "http")
+set(CTEST_DROP_SITE "cdash.inria.fr")
+set(CTEST_DROP_LOCATION "/CDash/submit.php?project=QtM3d")
+set(CTEST_DROP_SITE_CDASH TRUE)
+
+set (PROJECT_BUILDNAME:INTERNAL "${PROJECT_NAME}")
+#O.S.
+set (BUILDNAME "QtM3d-${CMAKE_SYSTEM_NAME}-${SPECIAL_BUILDNAME}")
+#Compiler
+#get_filename_component(CMAKE_BASE_NAME ${CMAKE_CXX_COMPILER} NAME_WE)
+
+if (NOT WIN32)
+  exec_program(${CMAKE_CXX_COMPILER}
+                    ARGS -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION
+                )
+  set (BUILDNAME "${BUILDNAME}-GCC${GCC_VERSION}")
+else(NOT WIN32)
+  if(MINGW)
+    exec_program(${CMAKE_CXX_COMPILER}
+                    ARGS -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION
+                )
+    set (BUILDNAME "${BUILDNAME}-GCC${GCC_VERSION}")
+  else(MINGW)
+    set(BUILDNAME "${BUILDNAME} ${CMAKE_BASE_NAME}")
+  endif(MINGW)
+endif (NOT WIN32)
+
+#VTK
+if(VTK_FOUND)
+  set( VTK_STRING "-VTK${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+  set(BUILDNAME ${BUILDNAME}${VTK_STRING})
+endif(VTK_FOUND)
+
+#VTK
+if(ITK_FOUND)
+  set( ITK_STRING "-ITK${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}")
+  set(BUILDNAME ${BUILDNAME}${ITK_STRING})
+endif(ITK_FOUND)
+
+if(BUILD_SHARED_LIBS)
+#   set(BUILDNAME "${BUILDNAME} ${CMAKE_BASE_NAME} Dynamic")
+  set(BUILDNAME "${BUILDNAME}-Dynamic")
+else(BUILD_SHARED_LIBS)
+  set(BUILDNAME "${BUILDNAME}-Static")
+endif(BUILD_SHARED_LIBS)
+
+set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of build on the dashboard")
