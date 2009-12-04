@@ -39,12 +39,27 @@ if(QT4_FOUND)
   include(${QT_USE_FILE})
 endif(QT4_FOUND)
 
+find_package(DCMTK REQUIRED)
+#if(DCMTK_FOUND)
+#    include(${DCMTK_USE_FILE})
+#endif(DCMTK_FOUND)
+
 set(SAMPLE_SRCS
-  ${QTDCM_SOURCE_DIR}/Code/qtdcm.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmImage.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.cpp
 )
 
 set(SAMPLE_HDRS
-  ${QTDCM_SOURCE_DIR}/Code/qtdcm.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcm.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmImage.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.h
 )
 
 set(SAMPLE_UIS
@@ -59,9 +74,9 @@ set(QTDCM_SRCS
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
-include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
+include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})
-target_link_libraries( qtdcm ${QT_LIBRARIES})
+target_link_libraries( qtdcm ${DCMTK_LIBRARIES} ${QT_LIBRARIES})
 
 
 # External inclusion stuff :
