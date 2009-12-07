@@ -44,6 +44,10 @@ find_package(DCMTK REQUIRED)
 #    include(${DCMTK_USE_FILE})
 #endif(DCMTK_FOUND)
 
+find_path(DCM2NII_DIR dcm2nii REQUIRED
+    /home/aabadie/Softs/builds/mricron
+)
+
 set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
@@ -73,6 +77,8 @@ set(QTDCM_SRCS
 
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
+
+configure_file(${QTDCM_SOURCE_DIR}/Code/QtDcmConfig.h.in ${QTDCM_BINARY_DIR}/QtDcmConfig.h)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})

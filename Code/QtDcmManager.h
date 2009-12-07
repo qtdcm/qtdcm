@@ -45,6 +45,7 @@
 #endif
 
 #include <QtDcmPatient.h>
+//#include <QtDcmConfig.h>
 /*
  *
  */
@@ -58,6 +59,7 @@ class QtDcmManager : QObject
     DcmFileFormat _dfile;
     QList<QtDcmPatient *> _patients;
     QProcess * _process;
+    QString _dcm2niiPath;
 
   public:
     QtDcmManager();
@@ -77,6 +79,18 @@ class QtDcmManager : QObject
     setDicomdir( QString _dicomdir )
       {
         this->_dicomdir = _dicomdir;
+      }
+
+    QString
+    getDcm2niiPath() const
+      {
+        return _dcm2niiPath;
+      }
+
+    void
+    setDcm2niiPath( QString path )
+      {
+        this->_dcm2niiPath = path;
       }
 
     QString

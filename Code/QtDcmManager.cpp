@@ -13,6 +13,8 @@ QtDcmManager::QtDcmManager()
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
+    //    _dcm2niiPath = dcm2nii_dir;
+    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
   }
 
 QtDcmManager::~QtDcmManager()
@@ -184,9 +186,9 @@ QtDcmManager::exportSerie( QList<QString> images )
     QDir tempDir = QDir(tmp);
     tmp = tmp + QDir::separator() + "qtdcm";
     tempDir.mkdir("qtdcm");
-
     tempDir = QDir(tmp);
 
+    // Calcul d'un nom aléatoire pour le répertoire temporaire
     QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     QString randdir = "";
     qsrand(time(0));
@@ -197,33 +199,41 @@ QtDcmManager::exportSerie( QList<QString> images )
       }
     tmp += QDir::separator() + randdir;
     tempDir.mkdir(randdir);
+    if (!tempDir.exists("logs"))
+      tempDir.mkdir("logs");
+
+    QDir tempDir2 = QDir(tmp);
 
     //Copie des fichiers images dans le répertoire temporaire
     for (int i = 0; i < images.size(); i++)
       {
         QFile image(images.at(i));
-        image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
+        if (image.exists())
+          image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
       }
+    QStringList listFiles = tempDir2.entryList(QDir::Files, QDir::Name);
+    if (listFiles.size() != 0)
+      {
+        //Conversion de la serie avec dcm2nii
+        QString program = _dcm2niiPath + QDir::separator() + "dcm2nii";
+        QStringList arguments;
+        arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << tmp;
+        _process->setStandardOutputFile(tempDir.absolutePath() + QDir::separator() + "logs" + QDir::separator() + "log" + randdir + ".txt");
+        _process->start(program, arguments);
+        _process->waitForFinished();
 
-    QDir::setCurrent(tmp);
-
-    //Conversion de la serie avec dcm2nii
-    QString program = "/home/aabadie/Softs/builds/mricron/dcm2nii";
-    QString arguments = "-g N -o " + _outputDir + " " + tmp + QDir::separator() +  "\*";
-//    QStringList arguments;
-//    arguments << "-g" << "N" << "-o" << _outputDir << "\"" + tmp + QDir::separator() + "*\"";
-//    arguments << "-g" << "N" << "-o" << _outputDir << "ima*";
-    QString command = program + " " + arguments;
-//    QProcess::execute("ls .");
-//    _process->setStandardOutputFile("/home/aabadie/Bureau/temp.txt");
-//    _process->start(program, arguments);
-//    _process->waitForFinished();
-    system(command.toAscii().data());
-
-//    qDebug() << "Command : " << command;
-
-
-    //Suppression des fichiers temporaires
-
-
+        //Suppression des fichiers temporaires
+        for (int i = 0; i < listFiles.size(); i++)
+          {
+            tempDir2.remove(listFiles.at(i));
+          }
+        //Suppression du répertoire temporaire
+        if (!tempDir.rmdir(randdir))
+          qDebug() << "Probleme lors de la suppression du répertoire temporaire";
+      }
+    else
+      {
+        //message d'erreur !
+        qDebug() << "Pas d'images copiees, verifiez le contenu de votre CD";
+      }
   }
