@@ -17,7 +17,7 @@ QtDcmManager::QtDcmManager()
     _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
   }
 
-QtDcmManager::QtDcmManager(QWidget * parent)
+QtDcmManager::QtDcmManager( QWidget * parent )
   {
     // TODO Auto-generated constructor stub
     _dicomdir = "";
@@ -232,7 +232,7 @@ QtDcmManager::exportSerie( QList<QString> images )
         if (image.exists())
           {
             image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
-            _progress->setValue(100 * i/images.size());
+            _progress->setValue(100 * i / images.size());
             qApp->processEvents();
           }
       }
@@ -261,7 +261,10 @@ QtDcmManager::exportSerie( QList<QString> images )
     else
       {
         //message d'erreur !
-        qDebug() << "Pas d'images copiees, verifiez le contenu de votre CD";
+        QMessageBox * msgBox = new QMessageBox(_parent);
+        msgBox->setIcon(QMessageBox::Critical);
+        msgBox->setText("Pas d'images copiees, reessayez.");
+        msgBox->exec();
       }
     _progress->close();
   }
