@@ -12,6 +12,7 @@ class QtDCM : public QLabel
   private:
     QString _mode;
     QtDcmManager * _manager;
+    QList<QString> _imagesList;
 
   public:
     Ui::QtDCM widget;
@@ -29,7 +30,16 @@ class QtDCM : public QLabel
         return _manager;
       }
 
-    void display();
+    void
+    display();
+    void
+    initConnections();
+    QList<QString> getImagesList();
+
+  public slots:
+    void
+    itemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+//    void progressCopy(int i);
 
   };
 

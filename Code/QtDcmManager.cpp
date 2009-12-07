@@ -11,6 +11,8 @@ QtDcmManager::QtDcmManager()
   {
     // TODO Auto-generated constructor stub
     _dicomdir = "";
+    _outputDir = "";
+    _process = new QProcess(this);
   }
 
 QtDcmManager::~QtDcmManager()
@@ -167,5 +169,60 @@ QtDcmManager::loadDicomdir()
           }
         items.pop();
       }
+
+  }
+
+void
+QtDcmManager::exportSerie( QList<QString> images )
+  {
+    //Vérification du repertoire de sortie
+    if (_outputDir == "")
+      return;
+
+    //Creation d'un répertoire temporaire pour la série
+    QString tmp = QDir::tempPath();
+    QDir tempDir = QDir(tmp);
+    tmp = tmp + QDir::separator() + "qtdcm";
+    tempDir.mkdir("qtdcm");
+
+    tempDir = QDir(tmp);
+
+    QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    QString randdir = "";
+    qsrand(time(0));
+    for (int i = 0; i < 10; i++)
+      {
+        int pos = qrand() % 62;//j'ai 26*2 +10 caractères dans acceptes
+        randdir += acceptes[pos];
+      }
+    tmp += QDir::separator() + randdir;
+    tempDir.mkdir(randdir);
+
+    //Copie des fichiers images dans le répertoire temporaire
+    for (int i = 0; i < images.size(); i++)
+      {
+        QFile image(images.at(i));
+        image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
+      }
+
+    QDir::setCurrent(tmp);
+
+    //Conversion de la serie avec dcm2nii
+    QString program = "/home/aabadie/Softs/builds/mricron/dcm2nii";
+//    QString arguments = "-g N -o " + _outputDir + " " + tmp + QDir::separator() +  "\*";
+    QStringList arguments;
+//    arguments << "-g" << "N" << "-o" << _outputDir << "\"" + tmp + QDir::separator() + "*\"";
+    arguments << "-g" << "N" << "-o" << _outputDir << "ima*";
+//    QString command = program + " " + arguments;
+    QProcess::execute("ls .");
+    _process->setStandardOutputFile("/home/aabadie/Bureau/temp.txt");
+    _process->start(program, arguments);
+    _process->waitForFinished();
+
+//    qDebug() << "Command : " << command;
+
+
+    //Suppression des fichiers temporaires
+
 
   }

@@ -49,36 +49,57 @@
  *
  */
 class QtDcmManager : QObject
-{
-Q_OBJECT
-private:
-  QString _dicomdir;
-  DcmItem * _dcmObject;
-  DcmFileFormat _dfile;
-  QList<QtDcmPatient *> _patients;
-
-public:
-  QtDcmManager();
-  virtual
-  ~QtDcmManager();
-
-  void
-  loadDicomdir();
-
-  QString
-  getDicomdir() const
   {
-    return _dicomdir;
-  }
+  Q_OBJECT
+  private:
+    QString _dicomdir;
+    QString _outputDir;
+    DcmItem * _dcmObject;
+    DcmFileFormat _dfile;
+    QList<QtDcmPatient *> _patients;
+    QProcess * _process;
 
-  void
-  setDicomdir(QString _dicomdir)
-  {
-    this->_dicomdir = _dicomdir;
-  }
+  public:
+    QtDcmManager();
+    virtual
+    ~QtDcmManager();
 
-  QList<QtDcmPatient *> getPatients() {return _patients;}
+    void
+    loadDicomdir();
 
-};
+    QString
+    getDicomdir() const
+      {
+        return _dicomdir;
+      }
+
+    void
+    setDicomdir( QString _dicomdir )
+      {
+        this->_dicomdir = _dicomdir;
+      }
+
+    QString
+    getOutputDirectory() const
+      {
+        return _outputDir;
+      }
+
+    void
+    setOutputDirectory( QString directory )
+      {
+        this->_outputDir = directory;
+      }
+
+    QList<QtDcmPatient *>
+    getPatients()
+      {
+        return _patients;
+      }
+
+    void
+    exportSerie( QList<QString> images );
+
+  };
 
 #endif /* QTDCMMANAGER_H_ */
