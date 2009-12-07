@@ -5,6 +5,7 @@ QtDCM::QtDCM( QWidget *parent ) :
   {
     widget.setupUi(this);
     widget.treeWidget->setColumnCount(1);
+    widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     _manager = new QtDcmManager(this);
     initConnections();
   }
@@ -13,6 +14,7 @@ void
 QtDCM::initConnections()
   {
     QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
+    QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
   }
 
 void
@@ -68,9 +70,44 @@ QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
   {
     _imagesList.clear();
     QVariant v;
-    for (int i=0; i < current->childCount(); i++)
+    for (int i = 0; i < current->childCount(); i++)
       {
         _imagesList.append(current->child(i)->data(1, 1).toStringList());
       }
   }
 
+void
+QtDCM::contextExportMenu( const QPoint point )
+  {
+    QTreeWidgetItem * item = 0;
+    item = widget.treeWidget->itemAt(point);
+    if (_imagesList.size() != 0)
+      {
+        QMenu menu(widget.treeWidget);
+        QAction * action = new QAction(this);
+        action->setText("Export");
+        QObject::connect(action, SIGNAL(activated()), this, SLOT(exportList()));
+        menu.addAction(action);
+        menu.exec(widget.treeWidget->mapToGlobal(point));
+      }
+  }
+
+void
+QtDCM::exportList()
+  {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setDirectory(QDir::home().dirName());
+    dialog.setWindowTitle("Export directory");
+    QString directory;
+    if (dialog.exec())
+      {
+        directory = dialog.selectedFiles()[0];
+      }
+    dialog.close();
+    if (!directory.isEmpty()) // A file has been chosen
+      {
+        _manager->setOutputDirectory(directory);
+        _manager->exportSerie(_imagesList);
+      }
+  }

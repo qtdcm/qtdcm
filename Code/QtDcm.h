@@ -34,13 +34,17 @@ class QtDCM : public QLabel
     display();
     void
     initConnections();
-    QList<QString> getImagesList();
+    QList<QString>
+    getImagesList();
 
   public slots:
     void
-    itemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
-//    void progressCopy(int i);
-
+    itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
+    //    void progressCopy(int i);
+    void
+    contextExportMenu( const QPoint point );
+    void
+    exportList();
   };
 
 #endif
