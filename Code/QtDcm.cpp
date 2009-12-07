@@ -5,7 +5,7 @@ QtDCM::QtDCM( QWidget *parent ) :
   {
     widget.setupUi(this);
     widget.treeWidget->setColumnCount(1);
-    _manager = new QtDcmManager();
+    _manager = new QtDcmManager(this);
     initConnections();
   }
 

@@ -53,6 +53,8 @@ class QtDcmManager : QObject
   {
   Q_OBJECT
   private:
+    QWidget * _parent;
+    QProgressDialog * _progress;
     QString _dicomdir;
     QString _outputDir;
     DcmItem * _dcmObject;
@@ -63,6 +65,7 @@ class QtDcmManager : QObject
 
   public:
     QtDcmManager();
+    QtDcmManager(QWidget * parent);
     virtual
     ~QtDcmManager();
 

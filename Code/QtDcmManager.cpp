@@ -17,6 +17,17 @@ QtDcmManager::QtDcmManager()
     _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
   }
 
+QtDcmManager::QtDcmManager(QWidget * parent)
+  {
+    // TODO Auto-generated constructor stub
+    _dicomdir = "";
+    _outputDir = "";
+    _process = new QProcess(this);
+    //    _dcm2niiPath = dcm2nii_dir;
+    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
+    _parent = parent;
+  }
+
 QtDcmManager::~QtDcmManager()
   {
     // TODO Auto-generated destructor stub
@@ -177,16 +188,26 @@ QtDcmManager::loadDicomdir()
 void
 QtDcmManager::exportSerie( QList<QString> images )
   {
+    _progress = new QProgressDialog("Dicom extraction in progress...", "", 0, 100, _parent);
+    _progress->setWindowModality(Qt::WindowModal);
+    QPushButton * cancelButton = new QPushButton;
+    _progress->setCancelButton(cancelButton);
+    cancelButton->hide();
+    _progress->show();
+    qApp->processEvents();
+
     //Vérification du repertoire de sortie
     if (_outputDir == "")
       return;
 
     //Creation d'un répertoire temporaire pour la série
     QString tmp = QDir::tempPath();
-    QDir tempDir = QDir(tmp);
+    QDir tempDir = QDir(tmp); //tempDir = /tmp
+    if (!tempDir.exists("qtdcm"))
+      tempDir.mkdir("qtdcm");
+
     tmp = tmp + QDir::separator() + "qtdcm";
-    tempDir.mkdir("qtdcm");
-    tempDir = QDir(tmp);
+    tempDir = QDir(tmp); // tempDir = /tmp/qtdcm
 
     // Calcul d'un nom aléatoire pour le répertoire temporaire
     QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -194,23 +215,29 @@ QtDcmManager::exportSerie( QList<QString> images )
     qsrand(time(0));
     for (int i = 0; i < 10; i++)
       {
-        int pos = qrand() % 62;//j'ai 26*2 +10 caractères dans acceptes
+        int pos = qrand() % 62;
         randdir += acceptes[pos];
       }
-    tmp += QDir::separator() + randdir;
+    tmp = tmp + QDir::separator() + randdir;
     tempDir.mkdir(randdir);
     if (!tempDir.exists("logs"))
       tempDir.mkdir("logs");
 
-    QDir tempDir2 = QDir(tmp);
+    QDir tempDir2 = QDir(tmp); //tempDir2 = /tmp/qtdcm/A3E5feafgg
 
     //Copie des fichiers images dans le répertoire temporaire
     for (int i = 0; i < images.size(); i++)
       {
         QFile image(images.at(i));
         if (image.exists())
-          image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
+          {
+            image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
+            _progress->setValue(100 * i/images.size());
+            qApp->processEvents();
+          }
       }
+    _progress->setValue(100);
+    qApp->processEvents();
     QStringList listFiles = tempDir2.entryList(QDir::Files, QDir::Name);
     if (listFiles.size() != 0)
       {
@@ -236,4 +263,5 @@ QtDcmManager::exportSerie( QList<QString> images )
         //message d'erreur !
         qDebug() << "Pas d'images copiees, verifiez le contenu de votre CD";
       }
+    _progress->close();
   }
