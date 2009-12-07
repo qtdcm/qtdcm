@@ -1,0 +1,6 @@
+#ifndef QTDCMCONFIG_H_
+#define QTDCMCONFIG_H_
+
+QString dcm2nii_dir("@DCM2NII_DIR@");
+
+#endif
