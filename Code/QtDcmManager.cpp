@@ -209,15 +209,16 @@ QtDcmManager::exportSerie( QList<QString> images )
 
     //Conversion de la serie avec dcm2nii
     QString program = "/home/aabadie/Softs/builds/mricron/dcm2nii";
-//    QString arguments = "-g N -o " + _outputDir + " " + tmp + QDir::separator() +  "\*";
-    QStringList arguments;
+    QString arguments = "-g N -o " + _outputDir + " " + tmp + QDir::separator() +  "\*";
+//    QStringList arguments;
 //    arguments << "-g" << "N" << "-o" << _outputDir << "\"" + tmp + QDir::separator() + "*\"";
-    arguments << "-g" << "N" << "-o" << _outputDir << "ima*";
-//    QString command = program + " " + arguments;
-    QProcess::execute("ls .");
-    _process->setStandardOutputFile("/home/aabadie/Bureau/temp.txt");
-    _process->start(program, arguments);
-    _process->waitForFinished();
+//    arguments << "-g" << "N" << "-o" << _outputDir << "ima*";
+    QString command = program + " " + arguments;
+//    QProcess::execute("ls .");
+//    _process->setStandardOutputFile("/home/aabadie/Bureau/temp.txt");
+//    _process->start(program, arguments);
+//    _process->waitForFinished();
+    system(command.toAscii().data());
 
 //    qDebug() << "Command : " << command;
 
