@@ -157,16 +157,17 @@ QtDCM::openDicomdir()
 void
 QtDCM::exportList()
   {
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::Directory);
-    dialog.setDirectory(QDir::home().dirName());
-    dialog.setWindowTitle("Export directory");
+    QFileDialog * dialog = new QFileDialog(this);
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->setDirectory(QDir::home().dirName());
+    dialog->setWindowTitle("Export directory");
     QString directory;
-    if (dialog.exec())
+    if (dialog->exec())
       {
-        directory = dialog.selectedFiles()[0];
+        directory = dialog->selectedFiles()[0];
       }
-    dialog.close();
+    dialog->close();
     if (!directory.isEmpty()) // A file has been chosen
       {
         _manager->setOutputDirectory(directory);

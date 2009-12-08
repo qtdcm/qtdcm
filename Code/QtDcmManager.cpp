@@ -188,83 +188,98 @@ QtDcmManager::loadDicomdir()
 void
 QtDcmManager::exportSerie( QList<QString> images )
   {
-    _progress = new QProgressDialog("Dicom extraction in progress...", "", 0, 100, _parent);
-    _progress->setWindowModality(Qt::WindowModal);
-    QPushButton * cancelButton = new QPushButton;
-    _progress->setCancelButton(cancelButton);
-    cancelButton->hide();
-    _progress->show();
-    qApp->processEvents();
-
-    //Vérification du repertoire de sortie
-    if (_outputDir == "")
-      return;
-
-    //Creation d'un répertoire temporaire pour la série
-    QString tmp = QDir::tempPath();
-    QDir tempDir = QDir(tmp); //tempDir = /tmp
-    if (!tempDir.exists("qtdcm"))
-      tempDir.mkdir("qtdcm");
-
-    tmp = tmp + QDir::separator() + "qtdcm";
-    tempDir = QDir(tmp); // tempDir = /tmp/qtdcm
-
-    // Calcul d'un nom aléatoire pour le répertoire temporaire
-    QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    QString randdir = "";
-    qsrand(time(0));
-    for (int i = 0; i < 10; i++)
+#ifdef Q_WS_WIN
+    QString program = _dcm2niiPath + QDir::separator() + "dcm2nii.exe";
+#else
+    QString program = _dcm2niiPath + QDir::separator() + "dcm2nii";
+#endif
+    if (QFile(program).exists())
       {
-        int pos = qrand() % 62;
-        randdir += acceptes[pos];
-      }
-    tmp = tmp + QDir::separator() + randdir;
-    tempDir.mkdir(randdir);
-    if (!tempDir.exists("logs"))
-      tempDir.mkdir("logs");
+        _progress = new QProgressDialog("Dicom extraction in progress...", "", 0, 100, _parent);
+        _progress->setWindowModality(Qt::WindowModal);
+        QPushButton * cancelButton = new QPushButton;
+        _progress->setCancelButton(cancelButton);
+        cancelButton->hide();
+        _progress->show();
+        qApp->processEvents();
 
-    QDir tempDir2 = QDir(tmp); //tempDir2 = /tmp/qtdcm/A3E5feafgg
+        //Vérification du repertoire de sortie
+        if (_outputDir == "")
+          return;
 
-    //Copie des fichiers images dans le répertoire temporaire
-    for (int i = 0; i < images.size(); i++)
-      {
-        QFile image(images.at(i));
-        if (image.exists())
+        //Creation d'un répertoire temporaire pour la série
+        QString tmp = QDir::tempPath();
+        QDir tempDir = QDir(tmp); //tempDir = /tmp
+        if (!tempDir.exists("qtdcm"))
+          tempDir.mkdir("qtdcm");
+
+        tmp = tmp + QDir::separator() + "qtdcm";
+        tempDir = QDir(tmp); // tempDir = /tmp/qtdcm
+
+        // Calcul d'un nom aléatoire pour le répertoire temporaire
+        QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        QString randdir = "";
+        qsrand(time(0));
+        for (int i = 0; i < 10; i++)
           {
-            image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
-            _progress->setValue(100 * i / images.size());
-            qApp->processEvents();
+            int pos = qrand() % 62;
+            randdir += acceptes[pos];
           }
-      }
-    _progress->setValue(100);
-    qApp->processEvents();
-    QStringList listFiles = tempDir2.entryList(QDir::Files, QDir::Name);
-    if (listFiles.size() != 0)
-      {
-        //Conversion de la serie avec dcm2nii
-        QString program = _dcm2niiPath + QDir::separator() + "dcm2nii";
-        QStringList arguments;
-        arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << tmp;
-        _process->setStandardOutputFile(tempDir.absolutePath() + QDir::separator() + "logs" + QDir::separator() + "log" + randdir + ".txt");
-        _process->start(program, arguments);
-        _process->waitForFinished();
+        tmp = tmp + QDir::separator() + randdir;
+        tempDir.mkdir(randdir);
+        if (!tempDir.exists("logs"))
+          tempDir.mkdir("logs");
 
-        //Suppression des fichiers temporaires
-        for (int i = 0; i < listFiles.size(); i++)
+        QDir tempDir2 = QDir(tmp); //tempDir2 = /tmp/qtdcm/A3E5feafgg
+
+        //Copie des fichiers images dans le répertoire temporaire
+        for (int i = 0; i < images.size(); i++)
           {
-            tempDir2.remove(listFiles.at(i));
+            QFile image(images.at(i));
+            if (image.exists())
+              {
+                image.copy(tmp + QDir::separator() + "ima" + QString::number(i));
+                _progress->setValue(100 * i / images.size());
+                qApp->processEvents();
+              }
           }
-        //Suppression du répertoire temporaire
-        if (!tempDir.rmdir(randdir))
-          qDebug() << "Probleme lors de la suppression du répertoire temporaire";
+        _progress->setValue(100);
+        qApp->processEvents();
+        QStringList listFiles = tempDir2.entryList(QDir::Files, QDir::Name);
+        if (listFiles.size() != 0)
+          {
+            //Conversion de la serie avec dcm2nii
+            QStringList arguments;
+            arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << tmp;
+            _process->setStandardOutputFile(tempDir.absolutePath() + QDir::separator() + "logs" + QDir::separator() + "log" + randdir + ".txt");
+            _process->start(program, arguments);
+            _process->waitForFinished();
+
+            //Suppression des fichiers temporaires
+            for (int i = 0; i < listFiles.size(); i++)
+              {
+                tempDir2.remove(listFiles.at(i));
+              }
+            //Suppression du répertoire temporaire
+            if (!tempDir.rmdir(randdir))
+              qDebug() << "Probleme lors de la suppression du répertoire temporaire";
+          }
+        else
+          {
+            //message d'erreur !
+            QMessageBox * msgBox = new QMessageBox(_parent);
+            msgBox->setIcon(QMessageBox::Critical);
+            msgBox->setText("Pas d'images copiees, reessayez.");
+            msgBox->exec();
+          }
+        _progress->close();
       }
     else
       {
         //message d'erreur !
         QMessageBox * msgBox = new QMessageBox(_parent);
         msgBox->setIcon(QMessageBox::Critical);
-        msgBox->setText("Pas d'images copiees, reessayez.");
+        msgBox->setText("Impossible de trouver dcm2nii, verifiez votre installation");
         msgBox->exec();
       }
-    _progress->close();
   }
