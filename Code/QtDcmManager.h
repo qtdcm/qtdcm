@@ -45,7 +45,6 @@
 #endif
 
 #include <QtDcmPatient.h>
-//#include <QtDcmConfig.h>
 /*
  *
  */

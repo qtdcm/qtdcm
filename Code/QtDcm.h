@@ -5,8 +5,6 @@
 
 #include "ui_qtdcm.h"
 #include <QtDcmManager.h>
-//QString dcm2nii;
-//#include <QtDcmConfig.h>
 
 class QtDCM : public QLabel
   {
