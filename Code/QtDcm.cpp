@@ -1,6 +1,6 @@
 #include "QtDcm.h"
 
-QtDCM::QtDCM( QWidget *parent ) :
+QtDCM::QtDCM( QWidget *parent) :
   QLabel(parent)
   {
     widget.setupUi(this);
@@ -11,6 +11,7 @@ QtDCM::QtDCM( QWidget *parent ) :
     widget.treeWidget->setHeaderLabels(labels);
     widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     _manager = new QtDcmManager(this);
+//    _manager->setDcm2niiPath(dcm2nii);
     initConnections();
   }
 

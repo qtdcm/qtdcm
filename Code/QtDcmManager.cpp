@@ -14,7 +14,7 @@ QtDcmManager::QtDcmManager()
     _outputDir = "";
     _process = new QProcess(this);
     //    _dcm2niiPath = dcm2nii_dir;
-    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
+//    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
   }
 
 QtDcmManager::QtDcmManager( QWidget * parent )
@@ -24,7 +24,7 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _outputDir = "";
     _process = new QProcess(this);
     //    _dcm2niiPath = dcm2nii_dir;
-    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
+//    _dcm2niiPath = "/home/aabadie/Softs/builds/mricron";
     _parent = parent;
   }
 
