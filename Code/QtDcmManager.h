@@ -64,7 +64,7 @@ class QtDcmManager : QObject
 
   public:
     QtDcmManager();
-    QtDcmManager(QWidget * parent);
+    QtDcmManager( QWidget * parent );
     virtual
     ~QtDcmManager();
 

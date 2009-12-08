@@ -9,7 +9,6 @@
 
 QtDcmManager::QtDcmManager()
   {
-    // TODO Auto-generated constructor stub
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
@@ -17,7 +16,6 @@ QtDcmManager::QtDcmManager()
 
 QtDcmManager::QtDcmManager( QWidget * parent )
   {
-    // TODO Auto-generated constructor stub
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
@@ -26,7 +24,7 @@ QtDcmManager::QtDcmManager( QWidget * parent )
 
 QtDcmManager::~QtDcmManager()
   {
-    // TODO Auto-generated destructor stub
+    delete _process;
   }
 
 void
@@ -188,6 +186,7 @@ QtDcmManager::loadDicomdir()
 void
 QtDcmManager::exportSerie( QList<QString> images )
   {
+
 #ifdef Q_WS_WIN
     QString program = _dcm2niiPath + QDir::separator() + "dcm2nii.exe";
 #else

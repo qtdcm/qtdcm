@@ -44,8 +44,9 @@ find_package(DCMTK REQUIRED)
 #    include(${DCMTK_USE_FILE})
 #endif(DCMTK_FOUND)
 
-find_path(DCM2NII_DIR dcm2nii REQUIRED
+find_path(DCM2NII_DIR dcm2nii
     /home/aabadie/Softs/builds/mricron
+    REQUIRED
 )
 
 set(SAMPLE_SRCS
