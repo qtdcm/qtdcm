@@ -158,7 +158,11 @@ QtDcmManager::loadDicomdir()
                   {
                     OFString strDescription;
                     lelt->getOFStringArray(strDescription);
-                    tmpSerie.last()->setDescription(QString(strDescription.c_str()));
+                    QString description = QString(strDescription.c_str());
+                    if (description == "")
+                      tmpSerie.last()->setDescription("No description");
+                    else
+                      tmpSerie.last()->setDescription(description);
                   }
               }
             else // C'est une image

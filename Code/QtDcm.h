@@ -45,6 +45,8 @@ class QtDCM : public QLabel
     contextExportMenu( const QPoint point );
     void
     exportList();
+    void
+    openDicomdir();
   };
 
 #endif
