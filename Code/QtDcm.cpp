@@ -4,12 +4,20 @@ QtDCM::QtDCM( QWidget *parent) :
   QLabel(parent)
   {
     widget.setupUi(this);
+    //Initialisation of QTreeWidget
     widget.treeWidget->setColumnWidth(0, 250);
     widget.treeWidget->setColumnWidth(1, 80);
     QStringList labels;
     labels << "Description" << "Type" << "ID";
     widget.treeWidget->setHeaderLabels(labels);
     widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+
+    //Initialisation des widgets
+    widget.dateEndButton->hide();
+    widget.labelTiret->hide();
+    widget.dateBeginButton->hide();
+
     _manager = new QtDcmManager(this);
     initConnections();
   }

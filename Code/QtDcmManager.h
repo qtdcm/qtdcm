@@ -56,11 +56,24 @@ class QtDcmManager : QObject
     QProgressDialog * _progress;
     QString _dicomdir;
     QString _outputDir;
+    QString _randDirName;
+    QDir _tempRandDir;
+    QDir _tempDir;
+    QDir _logsDir;
     DcmItem * _dcmObject;
     DcmFileFormat _dfile;
     QList<QtDcmPatient *> _patients;
     QProcess * _process;
     QString _dcm2niiPath;
+
+    void
+    generateRandomDir();
+    void
+    deleteRandomDir();
+    void
+    createTemporaryDirs();
+    void
+    deleteTemporaryDirs();
 
   public:
     QtDcmManager();
@@ -70,6 +83,9 @@ class QtDcmManager : QObject
 
     void
     loadDicomdir();
+
+    void
+    displayErrorMessage( QString message );
 
     QString
     getDicomdir() const
