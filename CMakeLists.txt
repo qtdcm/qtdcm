@@ -49,6 +49,11 @@ find_path(DCM2NII_DIR dcm2nii
     REQUIRED
 )
 
+find_path(DCM4CHE_DIR dcmqr
+    /usr/bin
+    REQUIRED
+)
+
 set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
@@ -56,6 +61,10 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
 )
 
 set(SAMPLE_HDRS
@@ -65,10 +74,16 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
+    ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
 )
 
 set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
 )
 
 set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})

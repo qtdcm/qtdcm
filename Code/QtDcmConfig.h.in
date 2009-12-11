@@ -3,5 +3,6 @@
 #pragma once
 
 QString dcm2nii("@DCM2NII_DIR@");
+QString dcm4che("@DCM4CHE_DIR@");
 
 #endif

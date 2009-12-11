@@ -4,6 +4,7 @@
 #include <QtGui>
 
 #include "ui_qtdcm.h"
+#include "QtDcmDateDialog.h"
 #include <QtDcmManager.h>
 
 class QtDCM : public QLabel
@@ -13,6 +14,7 @@ class QtDCM : public QLabel
     QString _mode;
     QtDcmManager * _manager;
     QList<QString> _imagesList;
+    QDate _beginDate, _endDate;
 
   public:
     Ui::QtDCM widget;
@@ -38,6 +40,12 @@ class QtDCM : public QLabel
     getImagesList();
 
   public slots:
+    void
+    updateDateButtons( int index );
+    void
+    chooseBeginDate();
+    void
+    chooseEndDate();
     void
     itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
     //    void progressCopy(int i);

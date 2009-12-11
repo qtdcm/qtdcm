@@ -65,6 +65,7 @@ class QtDcmManager : QObject
     QList<QtDcmPatient *> _patients;
     QProcess * _process;
     QString _dcm2niiPath;
+    QString _dcm4chePath;
 
     void
     generateRandomDir();
@@ -109,6 +110,18 @@ class QtDcmManager : QObject
     setDcm2niiPath( QString path )
       {
         this->_dcm2niiPath = path;
+      }
+
+    QString
+    getDcm4chePath() const
+      {
+        return _dcm4chePath;
+      }
+
+    void
+    setDcm4chePath( QString path )
+      {
+        this->_dcm4chePath = path;
       }
 
     QString
