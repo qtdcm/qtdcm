@@ -7,13 +7,31 @@
 
 #include <QtDcmPreferencesDialog.h>
 
-QtDcmPreferencesDialog::QtDcmPreferencesDialog()
+QtDcmPreferencesDialog::QtDcmPreferencesDialog(QWidget * parent)
   {
-    // TODO Auto-generated constructor stub
+    widget.setupUi(this);
+    this->setModal(true);
+    this->setParent(parent,Qt::Dialog);
+  }
+
+void QtDcmPreferencesDialog::initConnections()
+  {
 
   }
 
-QtDcmPreferencesDialog::~QtDcmPreferencesDialog()
+void
+QtDcmPreferencesDialog::setPreferences( QtDcmPreferences * prefs )
   {
-    // TODO Auto-generated destructor stub
+    _preferences = prefs;
+    widget.localAetitleEdit->setText(_preferences->getAetitle());
+    widget.localPortEdit->setText(_preferences->getPort());
   }
+
+void QtDcmPreferencesDialog::updatePreferences()
+  {
+    _preferences->setAetitle(widget.localAetitleEdit->text());
+    _preferences->setPort(widget.localPortEdit->text());
+    _preferences->writeSettings();
+  }
+
+QtDcmPreferencesDialog::~QtDcmPreferencesDialog() {}

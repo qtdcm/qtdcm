@@ -31,6 +31,8 @@ class QtDcmDateDialog : public QDialog
         return _date;
       }
 
+    void initConnections();
+
   public slots:
     void
     setDate( const QDate & date );

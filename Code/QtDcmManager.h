@@ -45,6 +45,7 @@
 #endif
 
 #include <QtDcmPatient.h>
+#include <QtDcmPreferences.h>
 /*
  *
  */
@@ -66,6 +67,7 @@ class QtDcmManager : QObject
     QProcess * _process;
     QString _dcm2niiPath;
     QString _dcm4chePath;
+    QtDcmPreferences * _preferences;
 
     void
     generateRandomDir();
@@ -134,6 +136,18 @@ class QtDcmManager : QObject
     setOutputDirectory( QString directory )
       {
         this->_outputDir = directory;
+      }
+
+    QtDcmPreferences *
+    getPreferences()
+      {
+        return _preferences;
+      }
+
+    void
+    setPreferences( QtDcmPreferences * prefs )
+      {
+        _preferences = prefs;
       }
 
     QList<QtDcmPatient *>

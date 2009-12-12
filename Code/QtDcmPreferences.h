@@ -24,14 +24,17 @@ class QtDcmPreferences : public QObject
     QList<QtDcmServer *> _servers;
 
     void
-    readSettings();
-    void
     setDefaultIniFile();
 
   public:
     QtDcmPreferences();
     virtual
     ~QtDcmPreferences();
+
+    void
+    readSettings();
+    void
+    writeSettings();
 
     QString
     getAetitle() const

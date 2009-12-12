@@ -4,7 +4,8 @@
 #include <QtGui>
 
 #include "ui_qtdcm.h"
-#include "QtDcmDateDialog.h"
+#include <QtDcmDateDialog.h>
+#include <QtDcmPreferencesDialog.h>
 #include <QtDcmManager.h>
 
 class QtDCM : public QLabel
@@ -15,6 +16,7 @@ class QtDCM : public QLabel
     QtDcmManager * _manager;
     QList<QString> _imagesList;
     QDate _beginDate, _endDate;
+
 
   public:
     Ui::QtDCM widget;
@@ -55,6 +57,8 @@ class QtDCM : public QLabel
     exportList();
     void
     openDicomdir();
+    void
+    editPreferences();
   };
 
 #endif

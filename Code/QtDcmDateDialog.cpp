@@ -12,7 +12,10 @@ QtDcmDateDialog::QtDcmDateDialog( QWidget * parent )
     widget.setupUi(this);
     this->setModal(true);
     this->setParent(parent,Qt::Dialog);
-    // TODO Auto-generated constructor stub
+  }
+
+void QtDcmDateDialog::initConnections()
+  {
     QObject::connect(widget.calendarWidget, SIGNAL(clicked(QDate)), this, SLOT(setDate(QDate)));
   }
 

@@ -13,6 +13,7 @@ QtDcmManager::QtDcmManager()
     _outputDir = "";
     _process = new QProcess(this);
     this->createTemporaryDirs();
+    _preferences = new QtDcmPreferences();
   }
 
 QtDcmManager::QtDcmManager( QWidget * parent )
@@ -22,6 +23,7 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _process = new QProcess(this);
     _parent = parent;
     this->createTemporaryDirs();
+    _preferences = new QtDcmPreferences();
   }
 
 QtDcmManager::~QtDcmManager()
