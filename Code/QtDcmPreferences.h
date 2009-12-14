@@ -55,7 +55,7 @@ class QtDcmPreferences : public QObject
       }
 
     QList<QtDcmServer *>
-    getServers() const
+    getServers()
       {
         return _servers;
       }
@@ -77,6 +77,12 @@ class QtDcmPreferences : public QObject
       {
         this->_port = _port;
       }
+
+    void
+    addServer();
+
+    void
+    removeServer(int index);
 
     void
     setServers( QList<QtDcmServer *> servers )

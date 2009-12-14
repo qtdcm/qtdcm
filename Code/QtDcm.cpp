@@ -278,7 +278,8 @@ QtDCM::chooseEndDate()
     delete dialog;
   }
 
-void QtDCM::editPreferences()
+void
+QtDCM::editPreferences()
   {
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog(this);
     dialog->setPreferences(_manager->getPreferences());
@@ -287,4 +288,5 @@ void QtDCM::editPreferences()
         dialog->updatePreferences();
       }
     dialog->close();
+    delete dialog;
   }

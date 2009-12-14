@@ -26,6 +26,18 @@ QtDcmPreferences::~QtDcmPreferences()
   }
 
 void
+QtDcmPreferences::addServer()
+  {
+    _servers.append(new QtDcmServer);
+  }
+
+void
+QtDcmPreferences::removeServer( int index)
+  {
+    _servers.removeAt(index);
+  }
+
+void
 QtDcmPreferences::readSettings()
   {
     QSettings prefs(_iniFile.fileName(), QSettings::IniFormat);
@@ -49,6 +61,8 @@ QtDcmPreferences::readSettings()
 void
 QtDcmPreferences::writeSettings()
   {
+    QFile ini(_iniFile.fileName());
+    ini.remove();
     QSettings prefs(_iniFile.fileName(), QSettings::IniFormat);
     prefs.beginGroup("LocalSettings");
     prefs.setValue("AETitle", _aetitle);
@@ -56,7 +70,7 @@ QtDcmPreferences::writeSettings()
     prefs.setValue("Encoding", _encoding);
     prefs.endGroup();
     prefs.beginGroup("Servers");
-    for (int i = prefs.childGroups().size(); i < _servers.size(); i++)
+    for (int i = 0; i < _servers.size(); i++)
       {
         prefs.beginGroup("Server" + QString::number(i + 1));
         prefs.setValue("AETitle", _servers.at(i)->getAetitle());

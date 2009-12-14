@@ -29,7 +29,10 @@ class QtDcmPreferencesDialog : public QDialog
     Ui::PreferencesDialog widget;
     QtDcmPreferencesDialog( QWidget * parent );
     virtual
-    ~QtDcmPreferencesDialog();
+    ~QtDcmPreferencesDialog()
+      {
+      }
+    ;
 
     QtDcmPreferences *
     getPreferences()
@@ -42,6 +45,22 @@ class QtDcmPreferencesDialog : public QDialog
 
     void
     updatePreferences();
+
+  public slots:
+    void
+    itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
+    void
+    serverHostnameChanged( QString text );
+    void
+    serverNameChanged( QString text );
+    void
+    serverAetitleChanged( QString text );
+    void
+    serverPortChanged( QString text );
+    void
+    removeServer();
+    void
+    addServer();
   };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */

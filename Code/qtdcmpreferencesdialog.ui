@@ -150,12 +150,6 @@
             <attribute name="headerHighlightSections">
              <bool>true</bool>
             </attribute>
-            <attribute name="headerCascadingSectionResizes">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="headerHighlightSections">
-             <bool>true</bool>
-            </attribute>
             <column>
              <property name="text">
               <string>Name</string>
@@ -283,7 +277,7 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
-               <widget class="QLineEdit" name="lineEdit_3">
+               <widget class="QLineEdit" name="serverHostnameEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -293,7 +287,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_4">
+               <widget class="QLineEdit" name="serverAetitleEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -303,7 +297,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_5">
+               <widget class="QLineEdit" name="serverPortEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -313,7 +307,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_6">
+               <widget class="QLineEdit" name="serverNameEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
