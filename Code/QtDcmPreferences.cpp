@@ -20,11 +20,6 @@ QtDcmPreferences::QtDcmPreferences()
       this->readSettings();
   }
 
-QtDcmPreferences::~QtDcmPreferences()
-  {
-
-  }
-
 void
 QtDcmPreferences::addServer()
   {

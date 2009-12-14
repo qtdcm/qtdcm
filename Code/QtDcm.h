@@ -8,55 +8,126 @@
 #include <QtDcmPreferencesDialog.h>
 #include <QtDcmManager.h>
 
+
+/**
+ * This class contains the widget for managing Dicom data. It is possible to read and display in a QTreeWidget
+ * the content of a DICOMDIR. It is also possible to query and retrieve data from a PACS.
+ * Once read/retrieve, each serie can be reconstructed, using the QtDcmManager.
+ */
 class QtDCM : public QLabel
   {
   Q_OBJECT
   private:
-    QString _mode;
-    QtDcmManager * _manager;
-    QList<QString> _imagesList;
-    QDate _beginDate, _endDate;
+    QtDcmManager * _manager;    /** For managing preferences, data queries and volumes reconstructions */
+    QList<QString> _imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
+    QDate _beginDate, _endDate; /** Begin and end for Q/R retrieve parameters */
 
 
   public:
-    Ui::QtDCM widget;
-    QtDCM( QWidget *parent = 0 );
+    Ui::QtDCM widget; /** Global widget generating by Designer*/
+    QtDCM( QWidget *parent = 0 ); /** Classic constructor */
 
+    /**
+     * Get the pointer of the treewidget
+     *
+     * @return the pointer on the QTreeWidget
+     */
     QTreeView *
     getTreeView()
       {
         return widget.treeWidget;
       }
 
+    /**
+     * Get the pointer of the QtDcm manager
+     *
+     * @return Pointer on QtDcmManager
+     */
     QtDcmManager *
     getManager()
       {
         return _manager;
       }
 
+    /**
+     * Display in the QTreeWidget the content of the list of patients from the manager
+     *
+     */
     void
     display();
+
+    /**
+     * Initialize SIGNAL/SLOTS connections of the different widget
+     *
+     */
     void
     initConnections();
+
+    /**
+     * Get the images filenames list of the current serie
+     *
+     */
     QList<QString>
     getImagesList();
 
   public slots:
+
+    /**
+     * Slot called when dateComboBox is changed. This slots change the display parameters of the 2 date buttons
+     *
+     */
     void
     updateDateButtons( int index );
+
+    /**
+     * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
+     *
+     */
     void
     chooseBeginDate();
+
+    /**
+     * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
+     *
+     */
     void
     chooseEndDate();
+
+    /**
+     * Slot called when a selected is made on the QTreeWidget. If a serie is selected, corresponding images filenames
+     * are copied in _imagesList
+     *
+     */
     void
     itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
-    //    void progressCopy(int i);
+
+    /**
+     * Slot called when right clicking on the QTreeWidget. User can export or open a dicomdir from the context menu
+     *
+     */
     void
     contextExportMenu( const QPoint point );
+
+    /**
+     * Slot that launch a QFileDialog for choosing an output directory
+     * where the current serie will be exported with dcm2nii (This is done by the _manager).
+     *
+     */
     void
     exportList();
+
+    /**
+     * Slot that launch a QFileDialog for choosing a dicomdir
+     *
+     *
+     */
     void
     openDicomdir();
+
+    /**
+     * Slot that launch the PACS preferences dialog
+     *
+     */
     void
     editPreferences();
   };

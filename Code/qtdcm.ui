@@ -196,7 +196,7 @@
       </sizepolicy>
      </property>
      <property name="animated">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="columnCount">
       <number>3</number>

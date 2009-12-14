@@ -46,6 +46,7 @@
 
 #include <QtDcmPatient.h>
 #include <QtDcmPreferences.h>
+
 /*
  *
  */
@@ -53,21 +54,21 @@ class QtDcmManager : QObject
   {
   Q_OBJECT
   private:
-    QWidget * _parent;
-    QProgressDialog * _progress;
-    QString _dicomdir;
-    QString _outputDir;
-    QString _randDirName;
-    QDir _tempRandDir;
-    QDir _tempDir;
-    QDir _logsDir;
-    DcmItem * _dcmObject;
-    DcmFileFormat _dfile;
-    QList<QtDcmPatient *> _patients;
-    QProcess * _process;
-    QString _dcm2niiPath;
-    QString _dcm4chePath;
-    QtDcmPreferences * _preferences;
+    QWidget * _parent;               /** Here the parent is corresponding to the QtDCM object */
+    QProgressDialog * _progress;     /** Dialog window showing file copy in progress */
+    QString _dicomdir;               /** Dicomdir absolute file path */
+    QString _outputDir;              /** Output directory for reconstructed serie absolute path */
+    QString _randDirName;            /** Randomly generated name where the slices of a serie are temporarily copied */
+    QDir _tempRandDir;               /** Directory containing current serie dicom slice */
+    QDir _tempDir;                   /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
+    QDir _logsDir;                   /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
+    DcmItem * _dcmObject;            /** This attribute is usefull for parsing the dicomdir */
+    DcmFileFormat _dfile;            /** This attribute is usefull for parsing the dicomdir */
+    QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
+    QProcess * _process;             /** This attribute launch the reconstruction process */
+    QString _dcm2niiPath;            /** Absolute path where to find dcm2nii */
+    QString _dcm4chePath;            /** Absolute path where to find dcm4chee */
+    QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
 
     void
     generateRandomDir();

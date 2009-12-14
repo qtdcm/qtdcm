@@ -29,7 +29,7 @@ class QtDcmPreferences : public QObject
   public:
     QtDcmPreferences();
     virtual
-    ~QtDcmPreferences();
+    ~QtDcmPreferences() {};
 
     void
     readSettings();

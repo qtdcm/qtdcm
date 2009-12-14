@@ -7,7 +7,7 @@ QtDCM::QtDCM( QWidget *parent ) :
     _beginDate = QDate::currentDate();
     _endDate = QDate::currentDate();
 
-    //Initialisation of QTreeWidget
+    //Initialize QTreeWidget
     widget.treeWidget->setColumnWidth(0, 250);
     widget.treeWidget->setColumnWidth(1, 80);
     QStringList labels;
@@ -15,7 +15,7 @@ QtDCM::QtDCM( QWidget *parent ) :
     widget.treeWidget->setHeaderLabels(labels);
     widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    //Initialisation des widgets
+    //Initialize widgets
     widget.dateEndButton->hide();
     widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
     widget.labelTiret->hide();
@@ -29,6 +29,7 @@ QtDCM::QtDCM( QWidget *parent ) :
 void
 QtDCM::initConnections()
   {
+    // Initialize des connections
     QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
     QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
     QObject::connect(widget.dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
@@ -99,6 +100,7 @@ QtDCM::display()
               }
           }
       }
+    widget.treeWidget->setAnimated(true);
   }
 
 QList<QString>
@@ -110,6 +112,7 @@ QtDCM::getImagesList()
 void
 QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
   {
+    //Empty _imagesList;
     _imagesList.clear();
     if (current->data(2, 1).toString() == "SERIE")
       {
@@ -124,23 +127,29 @@ QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
 void
 QtDCM::contextExportMenu( const QPoint point )
   {
+    // Get the QTreeWidgetItem corresponding to the clic
     QTreeWidgetItem * item = 0;
     item = widget.treeWidget->itemAt(point);
     QMenu menu(widget.treeWidget);
     QAction * actionDicomdir = new QAction(this);
     QAction * actionExp = new QAction(this);
+    // If no item selected (object empty)
     if (item != 0)
       {
+        // If the selected item is a SERIE
         if (item->data(2, 1) == "SERIE")
           {
+            // If the selected serie contains images
             if (_imagesList.size() != 0)
               {
+                // If the serie is exportable, create export command in the menu
                 actionExp->setText("Export");
                 QObject::connect(actionExp, SIGNAL(activated()), this, SLOT(exportList()));
                 menu.addAction(actionExp);
               }
           }
       }
+    // By default the context menu contains an open dicomdir command.
     actionDicomdir->setText("Open dicomdir");
     QObject::connect(actionDicomdir, SIGNAL(activated()), this, SLOT(openDicomdir()));
     menu.addAction(actionDicomdir);
@@ -150,6 +159,7 @@ QtDCM::contextExportMenu( const QPoint point )
 void
 QtDCM::openDicomdir()
   {
+    // Open a QFileDialog for choosing a Dicomdir
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setDirectory(QDir::home().dirName());
@@ -163,6 +173,7 @@ QtDCM::openDicomdir()
     dialog.close();
     if (!fileName.isEmpty()) // A file has been chosen
       {
+        // Set the choosed file to the _manager and update the display
         _manager->setDicomdir(fileName);
         _manager->loadDicomdir();
         display();
@@ -172,6 +183,7 @@ QtDCM::openDicomdir()
 void
 QtDCM::exportList()
   {
+    // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::Directory);
     dialog->setOption(QFileDialog::ShowDirsOnly, true);
@@ -185,6 +197,7 @@ QtDCM::exportList()
     dialog->close();
     if (!directory.isEmpty()) // A file has been chosen
       {
+        // The the output directory to the manager and launch the conversion process
         _manager->setOutputDirectory(directory);
         _manager->exportSerie(_imagesList);
       }
@@ -195,11 +208,13 @@ QtDCM::updateDateButtons( int index )
   {
     switch (index)
       {
+      //No date is used in the query
       case 0:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
         widget.dateBeginButton->hide();
         break;
+      //Query on current date Dicom data
       case 1:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -209,6 +224,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate();
         break;
+      //Query on yesterday date Dicom data
       case 2:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -218,6 +234,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate().addDays(-1);
         break;
+      //Query on specified date (use date dialog window)
       case 3:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -227,6 +244,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->show();
         break;
       case 4:
+        //Query on a range of date (use date dialog window)
         widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
         widget.dateEndButton->show();
         widget.labelTiret->show();
@@ -241,6 +259,7 @@ QtDCM::updateDateButtons( int index )
 void
 QtDCM::chooseBeginDate()
   {
+    //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
     dialog->getCalendarWidget()->setSelectedDate(_beginDate);
     QDate date;
@@ -261,6 +280,7 @@ QtDCM::chooseBeginDate()
 void
 QtDCM::chooseEndDate()
   {
+    //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
     dialog->getCalendarWidget()->setSelectedDate(_endDate);
     QDate date;
@@ -281,6 +301,7 @@ QtDCM::chooseEndDate()
 void
 QtDCM::editPreferences()
   {
+    //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog(this);
     dialog->setPreferences(_manager->getPreferences());
     if (dialog->exec())
