@@ -6,14 +6,3 @@
  */
 
 #include <QtDcmImage.h>
-
-QtDcmImage::QtDcmImage()
-{
-  // TODO Auto-generated constructor stub
-
-}
-
-QtDcmImage::~QtDcmImage()
-{
-  // TODO Auto-generated destructor stub
-}

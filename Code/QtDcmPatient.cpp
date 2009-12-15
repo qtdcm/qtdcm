@@ -6,14 +6,3 @@
  */
 
 #include <QtDcmPatient.h>
-
-QtDcmPatient::QtDcmPatient()
-{
-  // TODO Auto-generated constructor stub
-
-}
-
-QtDcmPatient::~QtDcmPatient()
-{
-  // TODO Auto-generated destructor stub
-}
