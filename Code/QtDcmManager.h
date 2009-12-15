@@ -47,116 +47,220 @@
 #include <QtDcmPatient.h>
 #include <QtDcmPreferences.h>
 
-/*
+/**
+ * This class is in charge of the different process (dcm2nii), pacs query/retrieve (dcm4chee),
+ * temporary directory creation and removing, PACS server settings.
  *
  */
 class QtDcmManager : QObject
   {
   Q_OBJECT
   private:
-    QWidget * _parent;               /** Here the parent is corresponding to the QtDCM object */
-    QProgressDialog * _progress;     /** Dialog window showing file copy in progress */
-    QString _dicomdir;               /** Dicomdir absolute file path */
-    QString _outputDir;              /** Output directory for reconstructed serie absolute path */
-    QString _randDirName;            /** Randomly generated name where the slices of a serie are temporarily copied */
-    QDir _tempRandDir;               /** Directory containing current serie dicom slice */
-    QDir _tempDir;                   /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
-    QDir _logsDir;                   /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
-    DcmItem * _dcmObject;            /** This attribute is usefull for parsing the dicomdir */
-    DcmFileFormat _dfile;            /** This attribute is usefull for parsing the dicomdir */
+    QWidget * _parent; /** Here the parent is corresponding to the QtDCM object */
+    QProgressDialog * _progress; /** Dialog window showing file copy in progress */
+    QString _dicomdir; /** Dicomdir absolute file path */
+    QString _outputDir; /** Output directory for reconstructed serie absolute path */
+    QString _randDirName; /** Randomly generated name where the slices of a serie are temporarily copied */
+    QDir _tempRandDir; /** Directory containing current serie dicom slice */
+    QDir _tempDir; /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
+    QDir _logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
+    DcmItem * _dcmObject; /** This attribute is usefull for parsing the dicomdir */
+    DcmFileFormat _dfile; /** This attribute is usefull for parsing the dicomdir */
     QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
-    QProcess * _process;             /** This attribute launch the reconstruction process */
-    QString _dcm2niiPath;            /** Absolute path where to find dcm2nii */
-    QString _dcm4chePath;            /** Absolute path where to find dcm4chee */
+    QProcess * _process; /** This attribute launch the reconstruction process */
+    QString _dcm2niiPath; /** Absolute path where to find dcm2nii */
+    QString _dcm4chePath; /** Absolute path where to find dcm4chee */
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
 
+    /**
+     * Generate random directory name and create it
+     */
     void
     generateRandomDir();
+
+    /**
+     * Delete random directory after data has been reconstructed
+     */
     void
     deleteRandomDir();
+
+    /**
+     * Create the temporary directory (/tmp/qtdcm on Unix) and the logging directory.
+     * (/tmp/qtdcm/logs)
+     */
     void
     createTemporaryDirs();
+
+    /**
+     * This method try to delete the temporary directory when closing the QtDcm widget
+     * (Doesn't work for the moment)
+     */
     void
     deleteTemporaryDirs();
 
   public:
+    /**
+     * Default constructor. Instantiate the internal pointers and create the temporary directory.
+     */
     QtDcmManager();
+
+    /**
+     * Default constructor. Instantiate the internal pointers and create the temporary directory.
+     * @param parent the parent widget (the qtdcm object)
+     */
     QtDcmManager( QWidget * parent );
+
+    /**
+     * The default destructor
+     */
     virtual
     ~QtDcmManager();
 
+    /**
+     * This method read the dicomdir file and populate the different lists (Patients, Studies, Series and Images)
+     *
+     * @see QtDcmPatient, QtDcmStudy, QtDcmSerie, QtDcmImage
+     */
     void
     loadDicomdir();
 
+    /**
+     * Convenience method that display error message in a QMessageBox window.
+     *
+     * @param message the error message to display
+     */
     void
     displayErrorMessage( QString message );
 
+    /**
+     * Return the dicomdir absolute path name
+     *
+     * @return _dicomdir the dicomdir file name.
+     */
     QString
     getDicomdir() const
       {
         return _dicomdir;
       }
 
+    /**
+     * Set the dicomdir file name
+     *
+     * @param dicomdir the dicomdir file name
+     */
     void
-    setDicomdir( QString _dicomdir )
+    setDicomdir( QString dicomdir )
       {
-        this->_dicomdir = _dicomdir;
+        this->_dicomdir = dicomdir;
       }
 
+    /**
+     * Return the path where is located the dcm2nii binary
+     *
+     * @return _dcm2niiPath the dcm2nii path
+     */
     QString
     getDcm2niiPath() const
       {
         return _dcm2niiPath;
       }
 
+    /**
+     * Set the dcm2nii path
+     *
+     * @param path the dcm2nii path
+     */
     void
     setDcm2niiPath( QString path )
       {
         this->_dcm2niiPath = path;
       }
 
+    /**
+     * Return the dcm4che binary path
+     *
+     * @return _dcm4chePath the dcm4chee path
+     */
     QString
     getDcm4chePath() const
       {
         return _dcm4chePath;
       }
 
+    /**
+     * Sets the dcm4che path
+     *
+     * @param path the dcm4che path
+     */
     void
     setDcm4chePath( QString path )
       {
         this->_dcm4chePath = path;
       }
 
+    /**
+     * Return the output directory where the current serie will be reconstructed
+     *
+     * @return _outputdir the output directory path
+     */
     QString
     getOutputDirectory() const
       {
         return _outputDir;
       }
 
+    /**
+     * Set the output directory
+     *
+     * @param directory the output directory
+     */
     void
     setOutputDirectory( QString directory )
       {
         this->_outputDir = directory;
       }
 
+    /**
+     * Return the pointer to the QtDcmPreferences instance
+     *
+     * @return _preferences
+     * @see QtDcmPreferences
+     */
     QtDcmPreferences *
     getPreferences()
       {
         return _preferences;
       }
 
+    /**
+     * Set the pointer to the QtDcmPreferences instance
+     *
+     * @param prefs
+     * @see QtDcmPreferences
+     */
     void
     setPreferences( QtDcmPreferences * prefs )
       {
         _preferences = prefs;
       }
 
+    /**
+     * Return the current patient list
+     *
+     * @return QList<QtDcmPatient *> the list of patient loaded
+     * @see QtDcmPatient
+     */
     QList<QtDcmPatient *>
     getPatients()
       {
         return _patients;
       }
 
+    /**
+     * Call dcm2nii in a QProcess object to reconstruct the given list of images
+     *
+     * @param images
+     */
     void
     exportSerie( QList<QString> images );
 

@@ -9,21 +9,27 @@
 
 QtDcmManager::QtDcmManager()
   {
+    //Initialization of the private attributes
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
-    this->createTemporaryDirs();
     _preferences = new QtDcmPreferences();
+
+    //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
+    this->createTemporaryDirs();
   }
 
 QtDcmManager::QtDcmManager( QWidget * parent )
   {
+    //Initialization of the private attributes
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
-    _parent = parent;
-    this->createTemporaryDirs();
     _preferences = new QtDcmPreferences();
+    _parent = parent;
+
+    //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
+    this->createTemporaryDirs();
   }
 
 QtDcmManager::~QtDcmManager()
@@ -35,39 +41,45 @@ QtDcmManager::~QtDcmManager()
 void
 QtDcmManager::displayErrorMessage( QString message )
   {
+    //Instanciate a message from the parent i.e qtdcm
     QMessageBox * msgBox = new QMessageBox(_parent);
     msgBox->setIcon(QMessageBox::Critical);
     msgBox->setText(message);
     msgBox->exec();
-
   }
 
 void
 QtDcmManager::loadDicomdir()
   {
+    //Convenience declarations for DCMTK
     static const OFString Patient("PATIENT");
     static const OFString Image("IMAGE");
     static const OFString Series("SERIES");
     static const OFString Study("STUDY");
 
+    //Load dicomdir in a DCMTK DicomFileFormat object
     OFCondition status;
     if (!(status = _dfile.loadFile(_dicomdir.toLatin1().data())).good())
       {
         return;
       }
+    //Get the dicomdir dataset in a DCMTK DcmObject
     _dcmObject = _dfile.getDataset();
 
-    // Find the item containing patients
+    // Loading all the dicomdir items in a stack
     DcmStack items;
     if (!_dcmObject->findAndGetElements(DCM_Item, items).good())
       {
         return;
       }
+    //Using temporary lists for storing detected studies, series and images
     QList<QtDcmStudy *> tmpStudy;
     QList<QtDcmSerie *> tmpSerie;
     QList<QtDcmImage *> tmpImage;
     _patients.clear();
 
+
+    //Unstacking and loading the different lists
     while (items.card() > 0)
       {
         DcmItem* lobj = (DcmItem*) items.top();
@@ -259,14 +271,16 @@ QtDcmManager::deleteRandomDir()
 void
 QtDcmManager::exportSerie( QList<QString> images )
   {
-
+//If system is windows or Unix binary extension is not the same
 #ifdef Q_WS_WIN
     QString program = _dcm2niiPath + QDir::separator() + "dcm2nii.exe";
 #else
     QString program = _dcm2niiPath + QDir::separator() + "dcm2nii";
 #endif
+    //If program exist, launch the process
     if (QFile(program).exists())
       {
+        // Launch progress dialog window, to follow reconstruction process
         _progress = new QProgressDialog("Dicom extraction in progress...", "", 0, 100, _parent);
         _progress->setWindowModality(Qt::WindowModal);
         QPushButton * cancelButton = new QPushButton;
