@@ -6,14 +6,3 @@
  */
 
 #include <QtDcmStudy.h>
-
-QtDcmStudy::QtDcmStudy()
-{
-  // TODO Auto-generated constructor stub
-
-}
-
-QtDcmStudy::~QtDcmStudy()
-{
-  // TODO Auto-generated destructor stub
-}

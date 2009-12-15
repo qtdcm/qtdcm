@@ -32,13 +32,13 @@ class QtDcmSerie : public QObject
     /**
      * Default constructor
      */
-    QtDcmSerie();
+    QtDcmSerie() {};
 
     /**
      * Default destructor
      */
     virtual
-    ~QtDcmSerie();
+    ~QtDcmSerie() {};
 
     /**
      * Serie Id getter
@@ -54,7 +54,7 @@ class QtDcmSerie : public QObject
     /**
      * Serie Id setter
      *
-     * @param is a QString
+     * @param id is a QString
      */
     void
     setId( QString id )
