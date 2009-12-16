@@ -68,9 +68,11 @@ class QtDcmManager : QObject
     DcmFileFormat _dfile; /** This attribute is usefull for parsing the dicomdir */
     QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
     QProcess * _process; /** This attribute launch the reconstruction process */
-    QString _dcm2niiPath; /** Absolute path where to find dcm2nii */
-    QString _dcm4chePath; /** Absolute path where to find dcm4chee */
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
+    QString _patientName; /** Attribute representing the patient name used for query PACS */
+    QString _patientId; /** Attribute representing the patient id used for query PACS */
+    QString _serieDescription; /** Attibute representing the serie description used for query PACS */
+    QString _studyDescription; /** Attibute representing the study description used for query PACS */
 
     /**
      * Generate random directory name and create it
@@ -97,6 +99,12 @@ class QtDcmManager : QObject
      */
     void
     deleteTemporaryDirs();
+
+    /**
+     * This method parse and fill all the list with the result of C-FIND
+     */
+    void
+    parseQueryResult();
 
   public:
     /**
@@ -155,50 +163,6 @@ class QtDcmManager : QObject
       }
 
     /**
-     * Return the path where is located the dcm2nii binary
-     *
-     * @return _dcm2niiPath the dcm2nii path
-     */
-    QString
-    getDcm2niiPath() const
-      {
-        return _dcm2niiPath;
-      }
-
-    /**
-     * Set the dcm2nii path
-     *
-     * @param path the dcm2nii path
-     */
-    void
-    setDcm2niiPath( QString path )
-      {
-        this->_dcm2niiPath = path;
-      }
-
-    /**
-     * Return the dcm4che binary path
-     *
-     * @return _dcm4chePath the dcm4chee path
-     */
-    QString
-    getDcm4chePath() const
-      {
-        return _dcm4chePath;
-      }
-
-    /**
-     * Sets the dcm4che path
-     *
-     * @param path the dcm4che path
-     */
-    void
-    setDcm4chePath( QString path )
-      {
-        this->_dcm4chePath = path;
-      }
-
-    /**
      * Return the output directory where the current serie will be reconstructed
      *
      * @return _outputdir the output directory path
@@ -245,6 +209,94 @@ class QtDcmManager : QObject
       }
 
     /**
+     * Patient name getter
+     *
+     * @return _patientName as a QString
+     */
+    QString
+    getPatientName()
+      {
+        return _patientName;
+      }
+
+    /**
+     * Patient name setter
+     *
+     * @param patientName as a QString
+     */
+    void
+    setPatientName( QString patientName )
+      {
+        _patientName = patientName;
+      }
+
+    /**
+     * Patient id getter
+     *
+     * @return _patientId as a QString
+     */
+    QString
+    getPatientId()
+      {
+        return _patientId;
+      }
+
+    /**
+     * Patient id setter
+     *
+     * @param patientId as a QString
+     */
+    void
+    setPatientId( QString patientId )
+      {
+        _patientId = patientId;
+      }
+
+    /**
+     * Serie description getter
+     *
+     * @return _serieDescription as a QString
+     */
+    QString
+    getSerieDescription()
+      {
+        return _serieDescription;
+      }
+
+    /**
+     * Serie description setter
+     *
+     * @param serieDescription as a QString
+     */
+    void
+    setSerieDescription( QString serieDescription )
+      {
+        _serieDescription = serieDescription;
+      }
+
+    /**
+     * Study description getter
+     *
+     * @return _studyDescription as a QString
+     */
+    QString
+    getStudyDescription()
+      {
+        return _studyDescription;
+      }
+
+    /**
+     * Study description setter
+     *
+     * @param studyDescription as a QString
+     */
+    void
+    setStudyDescription( QString studyDescription )
+      {
+        _studyDescription = studyDescription;
+      }
+
+    /**
      * Return the current patient list
      *
      * @return QList<QtDcmPatient *> the list of patient loaded
@@ -264,6 +316,12 @@ class QtDcmManager : QObject
     void
     exportSerie( QList<QString> images );
 
+    /**
+     * Call dcmqr on the list of server with parameters. Load the results in the patient list
+     *
+     */
+    void
+    queryPACS();
   };
 
 #endif /* QTDCMMANAGER_H_ */

@@ -44,16 +44,6 @@ find_package(DCMTK REQUIRED)
 #    include(${DCMTK_USE_FILE})
 #endif(DCMTK_FOUND)
 
-find_path(DCM2NII_DIR dcm2nii
-    /home/aabadie/Softs/builds/mricron
-    REQUIRED
-)
-
-find_path(DCM4CHE_DIR dcmqr
-    /usr/bin
-    REQUIRED
-)
-
 set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp

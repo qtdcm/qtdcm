@@ -16,6 +16,7 @@ QtDCM::QtDCM( QWidget *parent ) :
     widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     //Initialize widgets
+    widget.advancedFrame->hide();
     widget.dateEndButton->hide();
     widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
     widget.labelTiret->hide();
@@ -35,6 +36,12 @@ QtDCM::initConnections()
     QObject::connect(widget.dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
     QObject::connect(widget.dateBeginButton, SIGNAL(clicked()), this, SLOT(chooseBeginDate()));
     QObject::connect(widget.dateEndButton, SIGNAL(clicked()), this, SLOT(chooseEndDate()));
+    QObject::connect(widget.searchButton, SIGNAL(clicked()), this, SLOT(queryPACS()));
+    QObject::connect(widget.nameEdit, SIGNAL(textChanged(QString)), this, SLOT(patientNameTextChanged(QString)));
+    QObject::connect(widget.patientIdEdit, SIGNAL(textChanged(QString)), this, SLOT(patientIdTextChanged(QString)));
+    QObject::connect(widget.serieDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(serieDescriptionTextChanged(QString)));
+    QObject::connect(widget.studyDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(studyDescriptionTextChanged(QString)));
+    QObject::connect(widget.advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedView()));
   }
 
 void
@@ -95,7 +102,6 @@ QtDCM::display()
 
                     llchild->setText(1, "Image");
                     llchild->setData(2, 1, QVariant("IMAGES"));
-
                   }
               }
           }
@@ -174,6 +180,7 @@ QtDCM::openDicomdir()
     if (!fileName.isEmpty()) // A file has been chosen
       {
         // Set the choosed file to the _manager and update the display
+        widget.treeWidget->setAnimated(false);
         _manager->setDicomdir(fileName);
         _manager->loadDicomdir();
         display();
@@ -204,6 +211,12 @@ QtDCM::exportList()
   }
 
 void
+QtDCM::queryPACS()
+  {
+    _manager->queryPACS();
+  }
+
+void
 QtDCM::updateDateButtons( int index )
   {
     switch (index)
@@ -214,7 +227,7 @@ QtDCM::updateDateButtons( int index )
         widget.labelTiret->hide();
         widget.dateBeginButton->hide();
         break;
-      //Query on current date Dicom data
+        //Query on current date Dicom data
       case 1:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -224,7 +237,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate();
         break;
-      //Query on yesterday date Dicom data
+        //Query on yesterday date Dicom data
       case 2:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -234,7 +247,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate().addDays(-1);
         break;
-      //Query on specified date (use date dialog window)
+        //Query on specified date (use date dialog window)
       case 3:
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
@@ -266,6 +279,7 @@ QtDCM::chooseBeginDate()
     if (dialog->exec())
       {
         _beginDate = dialog->getDate();
+        qDebug() << _beginDate;
         widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
         if (_endDate < _beginDate)
           {
@@ -310,4 +324,64 @@ QtDCM::editPreferences()
       }
     dialog->close();
     delete dialog;
+  }
+
+void
+QtDCM::patientNameTextChanged( QString name )
+  {
+    if (name.isEmpty())
+      {
+      _manager->setPatientName("*");
+      }
+    else
+      _manager->setPatientName("*" + name + "*");
+  }
+
+void
+QtDCM::patientIdTextChanged( QString id )
+  {
+    if (id.isEmpty())
+      {
+      _manager->setPatientId("*");
+      }
+    else
+      _manager->setPatientId("*" + id + "*");
+  }
+
+void
+QtDCM::serieDescriptionTextChanged( QString desc )
+  {
+    if (desc.isEmpty())
+      {
+      _manager->setSerieDescription("*");
+      }
+    else
+      _manager->setSerieDescription("*" + desc + "*");
+  }
+
+void
+QtDCM::studyDescriptionTextChanged( QString desc )
+  {
+    if (desc.isEmpty())
+      {
+      _manager->setStudyDescription("*");
+      }
+    else
+      _manager->setStudyDescription("*" + desc + "*");
+  }
+
+void
+QtDCM::toggleAdvancedView()
+  {
+    if (widget.advancedFrame->isHidden())
+      {
+        widget.advancedFrame->show();
+      }
+    else
+      {
+        widget.advancedFrame->hide();
+        widget.studyDescriptionEdit->setText("");
+        widget.serieDescriptionEdit->setText("");
+        widget.patientIdEdit->setText("");
+      }
   }

@@ -36,12 +36,16 @@ QtDcmPreferencesDialog::initConnections()
     QObject::connect(widget.serverPortEdit, SIGNAL(textChanged(QString)), this, SLOT(serverPortChanged(QString)));
     QObject::connect(widget.addButton, SIGNAL(clicked()), this, SLOT(addServer()));
     QObject::connect(widget.removeButton, SIGNAL(clicked()), this, SLOT(removeServer()));
+    QObject::connect(widget.dcm2niiButton, SIGNAL(clicked()), this, SLOT(setDcm2niiPath()));
+    QObject::connect(widget.dcm4cheButton, SIGNAL(clicked()), this, SLOT(setDcm4chePath()));
   }
 
 void
 QtDcmPreferencesDialog::setPreferences( QtDcmPreferences * prefs )
   {
     _preferences = prefs;
+    widget.dcm2niiPathEdit->setText(_preferences->getDcm2niiPath());
+    widget.dcm4chePathEdit->setText(_preferences->getDcm4chePath());
     widget.localAetitleEdit->setText(_preferences->getAetitle());
     widget.localPortEdit->setText(_preferences->getPort());
     for (int i = 0; i < _preferences->getServers().size(); i++)
@@ -61,9 +65,10 @@ QtDcmPreferencesDialog::setPreferences( QtDcmPreferences * prefs )
 void
 QtDcmPreferencesDialog::updatePreferences()
   {
+    _preferences->setDcm2niiPath(widget.dcm2niiPathEdit->text());
+    _preferences->setDcm4chePath(widget.dcm4chePathEdit->text());
     _preferences->setAetitle(widget.localAetitleEdit->text());
     _preferences->setPort(widget.localPortEdit->text());
-
     QTreeWidgetItem * root = widget.treeWidget->invisibleRootItem();
     for (int i = 0; i < _preferences->getServers().size(); i++)
       {
@@ -154,3 +159,46 @@ QtDcmPreferencesDialog::removeServer()
       }
   }
 
+void QtDcmPreferencesDialog::setDcm2niiPath()
+  {
+    // Open aa QFileDialog in directory mode.
+    QFileDialog * dialog = new QFileDialog(this);
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->setDirectory(QDir::home().dirName());
+    dialog->setWindowTitle("Choose dcm2nii path");
+    QString directory;
+    if (dialog->exec())
+      {
+        directory = dialog->selectedFiles()[0];
+      }
+    dialog->close();
+    if (!directory.isEmpty()) // A file has been chosen
+      {
+        // The the output directory to the manager and launch the conversion process
+        _preferences->setDcm2niiPath(directory);
+        widget.dcm2niiPathEdit->setText(directory);
+      }
+  }
+
+void QtDcmPreferencesDialog::setDcm4chePath()
+  {
+    // Open aa QFileDialog in directory mode.
+    QFileDialog * dialog = new QFileDialog(this);
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->setDirectory(QDir::home().dirName());
+    dialog->setWindowTitle("Choose dcm4che path");
+    QString directory;
+    if (dialog->exec())
+      {
+        directory = dialog->selectedFiles()[0];
+      }
+    dialog->close();
+    if (!directory.isEmpty()) // A file has been chosen
+      {
+        // The the output directory to the manager and launch the conversion process
+        _preferences->setDcm4chePath(directory);
+        widget.dcm4chePathEdit->setText(directory);
+      }
+  }

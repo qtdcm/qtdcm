@@ -13,6 +13,21 @@
 /**
  * Class that manages the settings of QtDcm
  *
+ * The Settings are organized like this :\n
+ * [LocalSettings]\n
+ * AETitle=""\n
+ * Port=""\n
+ * Encoding=""\n
+ *\n
+ * [Servers]\n
+ * Server1\\AETitle=""\n
+ * Server1\\Hostname=""\n
+ * Server1\\Port=""\n
+ * Server1\\Name=""\n
+ * ...\n
+ *\n
+ *
+ *
  * @todo Add path to dcm2nii and dcm4che in the preferences
  */
 class QtDcmPreferences : public QObject
@@ -23,6 +38,10 @@ class QtDcmPreferences : public QObject
     QString _aetitle; /** Local aetitle of QtDcm */
     QString _port; /** Local port of qtdcm */
     QString _encoding; /** Local character encoding */
+
+    QString _dcm2niiPath; /** Absolute path where to find the dcm2nii binary on the system */
+    QString _dcm4chePath; /** Absolute path where to find the dcm4che binary on the system */
+
     QList<QtDcmServer *> _servers; /** List of server that QtDcm can query */
 
     /**
@@ -100,6 +119,50 @@ class QtDcmPreferences : public QObject
     getServers()
       {
         return _servers;
+      }
+
+    /**
+     * Dcm2nii path getter
+     *
+     * @return _dcm2niiPath as a QString
+     */
+    QString
+    getDcm2niiPath()
+      {
+        return _dcm2niiPath;
+      }
+
+    /**
+     * Dcm4che path getter
+     *
+     * @return _dcm4chePath as a QString
+     */
+    QString
+    getDcm4chePath()
+      {
+        return _dcm4chePath;
+      }
+
+    /**
+     * Dcm2nii path setter
+     *
+     * @param path as a QString
+     */
+    void
+    setDcm2niiPath(QString path)
+      {
+        _dcm2niiPath = path;
+      }
+
+    /**
+     * Dcm4che path setter
+     *
+     * @param path as a QString
+     */
+    void
+    setDcm4chePath(QString path)
+      {
+        _dcm4chePath = path;
       }
 
     /**

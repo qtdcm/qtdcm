@@ -8,7 +8,6 @@
 #include <QtDcmPreferencesDialog.h>
 #include <QtDcmManager.h>
 
-
 /**
  * This class contains the widget for managing Dicom data. It is possible to read and display in a QTreeWidget
  * the content of a DICOMDIR. It is also possible to query and retrieve data from a PACS.
@@ -18,10 +17,9 @@ class QtDCM : public QLabel
   {
   Q_OBJECT
   private:
-    QtDcmManager * _manager;    /** For managing preferences, data queries and volumes reconstructions */
+    QtDcmManager * _manager; /** For managing preferences, data queries and volumes reconstructions */
     QList<QString> _imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
     QDate _beginDate, _endDate; /** Begin and end for Q/R retrieve parameters */
-
 
   public:
     Ui::QtDCM widget; /** Global widget generating by Designer*/
@@ -117,6 +115,12 @@ class QtDCM : public QLabel
     exportList();
 
     /**
+     * Slot that query the list of server with the user specified parameters
+     */
+    void
+    queryPACS();
+
+    /**
      * Slot that launch a QFileDialog for choosing a dicomdir
      *
      *
@@ -130,6 +134,36 @@ class QtDCM : public QLabel
      */
     void
     editPreferences();
+
+    /**
+     * Slot called when user modify patient name edit line
+     */
+    void
+    patientNameTextChanged( QString );
+
+    /**
+     * Slot called when user modify patient id edit line
+     */
+    void
+    patientIdTextChanged( QString );
+
+    /**
+     * Slot called when user modify serie description edit line
+     */
+    void
+    serieDescriptionTextChanged( QString );
+
+    /**
+     * Slot called when user modify study description edit line
+     */
+    void
+    studyDescriptionTextChanged( QString );
+
+    /**
+     * Slot called when advanced button is clicked
+     */
+    void
+    toggleAdvancedView();
   };
 
 #endif

@@ -25,6 +25,9 @@ class QtDcmDateDialog : public QDialog
     ~QtDcmDateDialog();
     QCalendarWidget * getCalendarWidget() {return widget.calendarWidget;}
 
+    /**
+     * Call this method to get the selected date in the calendar widget
+     */
     QDate
     getDate()
       {

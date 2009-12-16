@@ -13,7 +13,13 @@ QtDcmManager::QtDcmManager()
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
+    _patientName = "*";
+    _patientId = "*";
+    _serieDescription = "*";
+    _studyDescription = "*";
+
     _preferences = new QtDcmPreferences();
+
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -25,6 +31,11 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _dicomdir = "";
     _outputDir = "";
     _process = new QProcess(this);
+    _patientName = "*";
+    _patientId = "*";
+    _serieDescription = "*";
+    _studyDescription = "*";
+
     _preferences = new QtDcmPreferences();
     _parent = parent;
 
@@ -77,7 +88,6 @@ QtDcmManager::loadDicomdir()
     QList<QtDcmSerie *> tmpSerie;
     QList<QtDcmImage *> tmpImage;
     _patients.clear();
-
 
     //Unstacking and loading the different lists
     while (items.card() > 0)
@@ -271,11 +281,11 @@ QtDcmManager::deleteRandomDir()
 void
 QtDcmManager::exportSerie( QList<QString> images )
   {
-//If system is windows or Unix binary extension is not the same
+    //If system is windows or Unix binary extension is not the same
 #ifdef Q_WS_WIN
-    QString program = _dcm2niiPath + QDir::separator() + "dcm2nii.exe";
+    QString program = _preferences->getDcm2niiPath() + QDir::separator() + "dcm2nii.exe";
 #else
-    QString program = _dcm2niiPath + QDir::separator() + "dcm2nii";
+    QString program = _preferences->getDcm2niiPath() + QDir::separator() + "dcm2nii";
 #endif
     //If program exist, launch the process
     if (QFile(program).exists())
@@ -332,4 +342,40 @@ QtDcmManager::exportSerie( QList<QString> images )
         //message d'erreur !
         this->displayErrorMessage("Impossible de trouver dcm2nii, verifiez votre installation");
       }
+  }
+
+
+void
+QtDcmManager::queryPACS()
+  {
+#ifdef Q_WS_WIN
+    QString program = _preferences->getDcm4chePath() + QDir::separator() + "bin" + QDir::separator() +"dcmqr.bat";
+#else
+    QString program = _preferences->getDcm4chePath() + QDir::separator() + "bin" + QDir::separator() + "dcmqr";
+#endif
+    QStringList arguments;
+
+    QString serverPACSParam = _preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort();
+    QString serieDescription = "-qSeriesDescription=" + _serieDescription;
+    QString patientName = "-qPatientName=" + _patientName;
+    QString patientId = "-qPatientId=" + _patientId;
+    QString studyDescription = "-qStudyDescription=" + _studyDescription;
+
+    arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription;
+
+    QProcess * process = new QProcess(this);
+    process->setStandardOutputFile( _logsDir.absolutePath() + QDir::separator() + "pacs.txt", QIODevice::ReadWrite);
+    process->start(program, arguments);
+
+    QByteArray compressed;
+    while (process->waitForReadyRead())
+        compressed += process->readAll();
+
+    qDebug() << compressed;
+  }
+
+void
+QtDcmManager::parseQueryResult()
+  {
+
   }
