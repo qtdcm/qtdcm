@@ -158,6 +158,22 @@ class QtDcmPatient : public QObject
         _studies = studies;
       }
 
+    /**
+     * Add study in the list
+     */
+    void addStudy(QtDcmStudy * study)
+      {
+        _studies.append(study);
+      }
+
+    /**
+     * Remove study at position index
+     */
+    void removeStudy(int index)
+      {
+        _studies.removeAt(index);
+      }
+
   };
 
 #endif /* QTDCMPATIENT_H_ */

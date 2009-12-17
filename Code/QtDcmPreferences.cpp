@@ -41,8 +41,8 @@ QtDcmPreferences::readSettings()
     QSettings prefs(_iniFile.fileName(), QSettings::IniFormat);
     //Load local settings
     prefs.beginGroup("LocalSettings");
-    _dcm2niiPath = prefs.value("Dcm2nii").toString();
-    _dcm4chePath = prefs.value("Dcm4che").toString();
+    _dcm2nii = prefs.value("Dcm2nii").toString();
+    _dcm4che = prefs.value("Dcm4che").toString();
     _aetitle = prefs.value("AETitle").toString();
     _port = prefs.value("Port").toString();
     _encoding = prefs.value("Encoding").toString();
@@ -70,8 +70,8 @@ QtDcmPreferences::writeSettings()
     QSettings prefs(_iniFile.fileName(), QSettings::IniFormat);
     //Write local settings from the private attributes
     prefs.beginGroup("LocalSettings");
-    prefs.setValue("Dcm2nii", _dcm2niiPath);
-    prefs.setValue("Dcm4che", _dcm4chePath);
+    prefs.setValue("Dcm2nii", _dcm2nii);
+    prefs.setValue("Dcm4che", _dcm4che);
     prefs.setValue("AETitle", _aetitle);
     prefs.setValue("Port", _port);
     prefs.setValue("Encoding", _encoding);
@@ -94,8 +94,8 @@ void
 QtDcmPreferences::setDefaultIniFile()
   {
     //Create an ini file with default parameters
-    _dcm2niiPath = "";
-    _dcm4chePath = "";
+    _dcm2nii = "";
+    _dcm4che = "";
     _aetitle = "QTDCM";
     _port = "2010";
     _encoding = "ISO_IR 100";

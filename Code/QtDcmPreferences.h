@@ -39,8 +39,8 @@ class QtDcmPreferences : public QObject
     QString _port; /** Local port of qtdcm */
     QString _encoding; /** Local character encoding */
 
-    QString _dcm2niiPath; /** Absolute path where to find the dcm2nii binary on the system */
-    QString _dcm4chePath; /** Absolute path where to find the dcm4che binary on the system */
+    QString _dcm2nii; /** Absolute filename of the dcm2nii binary on the system */
+    QString _dcm4che; /** Absolute filename of the dcm4che binary on the system */
 
     QList<QtDcmServer *> _servers; /** List of server that QtDcm can query */
 
@@ -122,47 +122,47 @@ class QtDcmPreferences : public QObject
       }
 
     /**
-     * Dcm2nii path getter
+     * Dcm2nii  getter
      *
-     * @return _dcm2niiPath as a QString
+     * @return _dcm2nii as a QString
      */
     QString
-    getDcm2niiPath()
+    getDcm2nii()
       {
-        return _dcm2niiPath;
+        return _dcm2nii;
       }
 
     /**
-     * Dcm4che path getter
+     * Dcm4che getter
      *
-     * @return _dcm4chePath as a QString
+     * @return _dcm4che as a QString
      */
     QString
-    getDcm4chePath()
+    getDcm4che()
       {
-        return _dcm4chePath;
+        return _dcm4che;
       }
 
     /**
      * Dcm2nii path setter
      *
-     * @param path as a QString
+     * @param as a QString
      */
     void
-    setDcm2niiPath(QString path)
+    setDcm2nii(QString path)
       {
-        _dcm2niiPath = path;
+        _dcm2nii = path;
       }
 
     /**
-     * Dcm4che path setter
+     * Dcm4che setter
      *
-     * @param path as a QString
+     * @param as a QString
      */
     void
-    setDcm4chePath(QString path)
+    setDcm4che(QString path)
       {
-        _dcm4chePath = path;
+        _dcm4che = path;
       }
 
     /**

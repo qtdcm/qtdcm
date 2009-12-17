@@ -22,7 +22,7 @@ class QtDcmDateDialog : public QDialog
     Ui::DateDialog widget;
     QtDcmDateDialog( QWidget * parent );
     virtual
-    ~QtDcmDateDialog();
+    ~QtDcmDateDialog() {};
     QCalendarWidget * getCalendarWidget() {return widget.calendarWidget;}
 
     /**

@@ -173,6 +173,22 @@ class QtDcmStudy : public QObject
       {
         _p_patient = patient;
       }
+
+    /**
+     * Add serie in the list
+     */
+    void addSerie(QtDcmSerie * serie)
+      {
+        _series.append(serie);
+      }
+
+    /**
+     * Remove serie at position index
+     */
+    void removeSerie(int index)
+      {
+        _series.removeAt(index);
+      }
   };
 
 #endif /* QTDCMSTUDY_H_ */

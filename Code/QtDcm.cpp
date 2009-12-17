@@ -45,13 +45,22 @@ QtDCM::initConnections()
   }
 
 void
+QtDCM::clearDisplay()
+  {
+    _imagesList.clear();
+    widget.treeWidget->clear();
+    widget.treeWidget->setAnimated(false);
+  }
+
+void
 QtDCM::display()
   {
-    QTreeWidgetItem * child = new QTreeWidgetItem(widget.treeWidget);
-    QTreeWidgetItem * root = NULL;
-
+    //Clear view
+    this->clearDisplay();
     for (int i = 0; i < _manager->getPatients().size(); i++)
       {
+        QTreeWidgetItem * child = new QTreeWidgetItem(widget.treeWidget);
+        QTreeWidgetItem * root = NULL;
         // Fill in the QTreeWidget the patient information
         child->setText(0, _manager->getPatients().at(i)->getName());
         child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getName()));
@@ -62,6 +71,7 @@ QtDCM::display()
         child->setText(2, _manager->getPatients().at(i)->getId());
         child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getId()));
         root = child;
+        //        if (_manager->getMode() == "CD")
         widget.treeWidget->expandItem(child);
         for (int j = 0; j < _manager->getPatients().at(i)->getStudies().size(); j++)
           {
@@ -75,7 +85,8 @@ QtDCM::display()
 
             child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getId());
             child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getId()));
-            widget.treeWidget->expandItem(child);
+            if (_manager->getMode() == "CD")
+              widget.treeWidget->expandItem(child);
             for (int k = 0; k < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().size(); k++)
               {
                 //Serie information
@@ -120,12 +131,16 @@ QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
   {
     //Empty _imagesList;
     _imagesList.clear();
-    if (current->data(2, 1).toString() == "SERIE")
+    if (current != 0) // Avoid crash when clearDisplay is called
       {
-        // If a serie is selected, copy all images filenames in a list
-        for (int i = 0; i < current->childCount(); i++)
+        if (current->data(2, 1).toString() == "SERIE")
           {
-            _imagesList.append(current->child(i)->data(1, 1).toStringList());
+            // If a serie is selected, copy all images filenames in a list
+            _currentSerieId = current->data(3, 1).toString();
+            for (int i = 0; i < current->childCount(); i++)
+              {
+                _imagesList.append(current->child(i)->data(1, 1).toStringList());
+              }
           }
       }
   }
@@ -145,19 +160,15 @@ QtDCM::contextExportMenu( const QPoint point )
         // If the selected item is a SERIE
         if (item->data(2, 1) == "SERIE")
           {
-            // If the selected serie contains images
-            if (_imagesList.size() != 0)
-              {
-                // If the serie is exportable, create export command in the menu
-                actionExp->setText("Export");
-                QObject::connect(actionExp, SIGNAL(activated()), this, SLOT(exportList()));
-                menu.addAction(actionExp);
-              }
+            // If the serie is exportable, create export command in the menu
+            actionExp->setText("Export");
+            QObject::connect(actionExp, SIGNAL(triggered()), this, SLOT(exportList()));
+            menu.addAction(actionExp);
           }
       }
     // By default the context menu contains an open dicomdir command.
     actionDicomdir->setText("Open dicomdir");
-    QObject::connect(actionDicomdir, SIGNAL(activated()), this, SLOT(openDicomdir()));
+    QObject::connect(actionDicomdir, SIGNAL(triggered()), this, SLOT(openDicomdir()));
     menu.addAction(actionDicomdir);
     menu.exec(widget.treeWidget->mapToGlobal(point));
   }
@@ -206,7 +217,11 @@ QtDCM::exportList()
       {
         // The the output directory to the manager and launch the conversion process
         _manager->setOutputDirectory(directory);
-        _manager->exportSerie(_imagesList);
+        if (_manager->getMode() == "CD")
+          _manager->setImagesList(_imagesList);
+        else
+          _manager->setSerieId(_currentSerieId);
+        _manager->exportSerie();
       }
   }
 
@@ -214,6 +229,7 @@ void
 QtDCM::queryPACS()
   {
     _manager->queryPACS();
+    this->display();
   }
 
 void
@@ -279,7 +295,6 @@ QtDCM::chooseBeginDate()
     if (dialog->exec())
       {
         _beginDate = dialog->getDate();
-        qDebug() << _beginDate;
         widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
         if (_endDate < _beginDate)
           {
@@ -331,7 +346,7 @@ QtDCM::patientNameTextChanged( QString name )
   {
     if (name.isEmpty())
       {
-      _manager->setPatientName("*");
+        _manager->setPatientName("*");
       }
     else
       _manager->setPatientName("*" + name + "*");
@@ -342,7 +357,7 @@ QtDCM::patientIdTextChanged( QString id )
   {
     if (id.isEmpty())
       {
-      _manager->setPatientId("*");
+        _manager->setPatientId("*");
       }
     else
       _manager->setPatientId("*" + id + "*");
@@ -353,7 +368,7 @@ QtDCM::serieDescriptionTextChanged( QString desc )
   {
     if (desc.isEmpty())
       {
-      _manager->setSerieDescription("*");
+        _manager->setSerieDescription("*");
       }
     else
       _manager->setSerieDescription("*" + desc + "*");
@@ -364,7 +379,7 @@ QtDCM::studyDescriptionTextChanged( QString desc )
   {
     if (desc.isEmpty())
       {
-      _manager->setStudyDescription("*");
+        _manager->setStudyDescription("*");
       }
     else
       _manager->setStudyDescription("*" + desc + "*");

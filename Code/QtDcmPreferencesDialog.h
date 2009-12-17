@@ -62,9 +62,9 @@ class QtDcmPreferencesDialog : public QDialog
     void
     addServer();
     void
-    setDcm2niiPath();
+    setDcm2nii();
     void
-    setDcm4chePath();
+    setDcm4che();
   };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */

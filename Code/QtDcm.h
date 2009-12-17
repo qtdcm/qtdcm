@@ -19,6 +19,7 @@ class QtDCM : public QLabel
   private:
     QtDcmManager * _manager; /** For managing preferences, data queries and volumes reconstructions */
     QList<QString> _imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
+    QString _currentSerieId; /** Id of the current selected serie */
     QDate _beginDate, _endDate; /** Begin and end for Q/R retrieve parameters */
 
   public:
@@ -46,6 +47,12 @@ class QtDCM : public QLabel
       {
         return _manager;
       }
+
+    /**
+     * Clear the content of the QTreeWidget
+     */
+    void
+    clearDisplay();
 
     /**
      * Display in the QTreeWidget the content of the list of patients from the manager

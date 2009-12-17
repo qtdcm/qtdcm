@@ -67,12 +67,17 @@ class QtDcmManager : QObject
     DcmItem * _dcmObject; /** This attribute is usefull for parsing the dicomdir */
     DcmFileFormat _dfile; /** This attribute is usefull for parsing the dicomdir */
     QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
+    QList<QString> _images; /** List of image filename to export from a CD */
+    QString _serieId; /** Id of the serie to export from the PACS */
     QProcess * _process; /** This attribute launch the reconstruction process */
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
     QString _patientName; /** Attribute representing the patient name used for query PACS */
     QString _patientId; /** Attribute representing the patient id used for query PACS */
     QString _serieDescription; /** Attibute representing the serie description used for query PACS */
     QString _studyDescription; /** Attibute representing the study description used for query PACS */
+    QString _mode; /** Mode that determine the type of media (CD or PACS) */
+    QString _dcm2nii; /** Absolute filename of the dcm2nii program */
+    QString _dcm4che; /** Absolute filename of the dcm4che program */
 
     /**
      * Generate random directory name and create it
@@ -104,7 +109,7 @@ class QtDcmManager : QObject
      * This method parse and fill all the list with the result of C-FIND
      */
     void
-    parseQueryResult();
+    parseQueryResult(QString query);
 
   public:
     /**
@@ -309,12 +314,26 @@ class QtDcmManager : QObject
       }
 
     /**
+     * Global method for exporting serie
+     */
+    void
+    exportSerie();
+
+    /**
      * Call dcm2nii in a QProcess object to reconstruct the given list of images
      *
      * @param images
      */
     void
-    exportSerie( QList<QString> images );
+    exportSerieFromCD();
+
+    /**
+     * Call dcm2nii in a QProcess object to reconstruct the given list of images
+     *
+     * @param images
+     */
+    void
+    exportSerieFromPACS();
 
     /**
      * Call dcmqr on the list of server with parameters. Load the results in the patient list
@@ -322,6 +341,36 @@ class QtDcmManager : QObject
      */
     void
     queryPACS();
+
+    /**
+     * add patient in the list
+     */
+    void
+    addPatient()
+      {
+        _patients.append(new QtDcmPatient());
+      }
+
+    /**
+     * Mode getter
+     */
+    QString
+    getMode()
+      {
+        return _mode;
+      }
+
+    void
+    setImagesList(QList<QString> images)
+      {
+        _images = images;
+      }
+
+    void
+    setSerieId(QString id)
+      {
+        _serieId = id;
+      }
   };
 
 #endif /* QTDCMMANAGER_H_ */
