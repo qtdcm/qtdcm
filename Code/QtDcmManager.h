@@ -73,6 +73,9 @@ class QtDcmManager : QObject
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
     QString _patientName; /** Attribute representing the patient name used for query PACS */
     QString _patientId; /** Attribute representing the patient id used for query PACS */
+    QString _modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
+    QString _date1; /** Attribute for the begin date of the query (usefull for date based queries) */
+    QString _date2; /** Attribute for the end date of the query (usefull for date based queries) */
     QString _serieDescription; /** Attibute representing the serie description used for query PACS */
     QString _studyDescription; /** Attibute representing the study description used for query PACS */
     QString _mode; /** Mode that determine the type of media (CD or PACS) */
@@ -109,7 +112,7 @@ class QtDcmManager : QObject
      * This method parse and fill all the list with the result of C-FIND
      */
     void
-    parseQueryResult(QString query);
+    parseQueryResult( QString query );
 
   public:
     /**
@@ -144,6 +147,14 @@ class QtDcmManager : QObject
      */
     void
     displayErrorMessage( QString message );
+
+    /**
+     * Convenience method that display information message in a QMessageBox window.
+     *
+     * @param info the information message to display
+     */
+    void
+    displayMessage( QString info );
 
     /**
      * Return the dicomdir absolute path name
@@ -302,6 +313,72 @@ class QtDcmManager : QObject
       }
 
     /**
+     * Study modality setter
+     *
+     * @param modality as a QString
+     */
+    void
+    setModality( QString modality )
+      {
+        _modality = modality;
+      }
+
+    /**
+     * Study modality getter
+     *
+     * @return _modality as a QString
+     */
+    QString
+    getModality()
+      {
+        return _modality;
+      }
+
+    /**
+     * Study date setter
+     *
+     * @param date as a QString
+     */
+    void
+    setDate1( QString date )
+      {
+        _date1 = date;
+      }
+
+    /**
+     * Study date getter
+     *
+     * @return _date as a QString
+     */
+    QString
+    getDate1()
+      {
+        return _date1;
+      }
+
+    /**
+     * Study date setter
+     *
+     * @param date as a QString
+     */
+    void
+    setDate2( QString date )
+      {
+        _date2 = date;
+      }
+
+    /**
+     * Study date getter
+     *
+     * @return _date as a QString
+     */
+    QString
+    getDate2()
+      {
+        return _date2;
+      }
+
+    /**
      * Return the current patient list
      *
      * @return QList<QtDcmPatient *> the list of patient loaded
@@ -361,13 +438,13 @@ class QtDcmManager : QObject
       }
 
     void
-    setImagesList(QList<QString> images)
+    setImagesList( QList<QString> images )
       {
         _images = images;
       }
 
     void
-    setSerieId(QString id)
+    setSerieId( QString id )
       {
         _serieId = id;
       }

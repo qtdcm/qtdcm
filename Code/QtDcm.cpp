@@ -34,6 +34,7 @@ QtDCM::initConnections()
     QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
     QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
     QObject::connect(widget.dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
+    QObject::connect(widget.modalityComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateModality(int)));
     QObject::connect(widget.dateBeginButton, SIGNAL(clicked()), this, SLOT(chooseBeginDate()));
     QObject::connect(widget.dateEndButton, SIGNAL(clicked()), this, SLOT(chooseEndDate()));
     QObject::connect(widget.searchButton, SIGNAL(clicked()), this, SLOT(queryPACS()));
@@ -201,7 +202,7 @@ QtDCM::openDicomdir()
 void
 QtDCM::exportList()
   {
-    // Open aa QFileDialog in directory mode.
+    // Open a QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::Directory);
     dialog->setOption(QFileDialog::ShowDirsOnly, true);
@@ -233,6 +234,28 @@ QtDCM::queryPACS()
   }
 
 void
+QtDCM::updateModality( int index )
+  {
+    switch (index)
+      {
+      case 0://MR
+        _manager->setModality("MR");
+        this->queryPACS();
+        break;
+      case 1://CT
+        _manager->setModality("CT");
+        this->queryPACS();
+        break;
+      case 2://US
+        _manager->setModality("US");
+        this->queryPACS();
+      case 3://PET
+        _manager->setModality("PET");
+        this->queryPACS();
+      }
+  }
+
+void
 QtDCM::updateDateButtons( int index )
   {
     switch (index)
@@ -242,6 +265,8 @@ QtDCM::updateDateButtons( int index )
         widget.dateEndButton->hide();
         widget.labelTiret->hide();
         widget.dateBeginButton->hide();
+        _manager->setDate1("*");
+        _manager->setDate2("*");
         break;
         //Query on current date Dicom data
       case 1:
@@ -252,6 +277,8 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->setFlat(true);
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate();
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
         break;
         //Query on yesterday date Dicom data
       case 2:
@@ -262,6 +289,8 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->setFlat(true);
         widget.dateBeginButton->show();
         _beginDate = _endDate = QDate::currentDate().addDays(-1);
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
         break;
         //Query on specified date (use date dialog window)
       case 3:
@@ -271,6 +300,8 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->setEnabled(true);
         widget.dateBeginButton->setFlat(false);
         widget.dateBeginButton->show();
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
         break;
       case 4:
         //Query on a range of date (use date dialog window)
@@ -281,6 +312,8 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->setEnabled(true);
         widget.dateBeginButton->setFlat(false);
         widget.dateBeginButton->show();
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
         break;
       }
   }
@@ -290,7 +323,7 @@ QtDCM::chooseBeginDate()
   {
     //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
-    dialog->getCalendarWidget()->setSelectedDate(_beginDate);
+    dialog->setDate(_beginDate);
     QDate date;
     if (dialog->exec())
       {
@@ -301,6 +334,8 @@ QtDCM::chooseBeginDate()
             _endDate = _beginDate;
             widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
           }
+        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
       }
     dialog->close();
     delete dialog;
@@ -311,7 +346,7 @@ QtDCM::chooseEndDate()
   {
     //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
-    dialog->getCalendarWidget()->setSelectedDate(_endDate);
+    dialog->setDate(_endDate);
     QDate date;
     if (dialog->exec())
       {
@@ -322,6 +357,8 @@ QtDCM::chooseEndDate()
             _beginDate = _endDate;
             widget.dateBeginButton->setText(_endDate.toString(Qt::ISODate));
           }
+        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
+        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
       }
     dialog->close();
     delete dialog;

@@ -18,9 +18,18 @@ QtDcmDateDialog::QtDcmDateDialog( QWidget * parent )
 void QtDcmDateDialog::initConnections()
   {
     QObject::connect(widget.calendarWidget, SIGNAL(clicked(QDate)), this, SLOT(setDate(QDate)));
+    QObject::connect(widget.calendarWidget, SIGNAL(currentPageChanged(int,int)), this, SLOT(yearMonthChanged(int,int)));
+  }
+
+void QtDcmDateDialog::yearMonthChanged(int year, int month)
+  {
+    int day = _date.day();
+    _date.setDate(year, month, _date.day());
+    widget.calendarWidget->setSelectedDate(_date);
   }
 
 void QtDcmDateDialog::setDate(const QDate & date)
   {
+    widget.calendarWidget->setSelectedDate(date);
     _date = date;
   }

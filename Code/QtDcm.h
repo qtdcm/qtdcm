@@ -85,6 +85,13 @@ class QtDCM : public QLabel
     updateDateButtons( int index );
 
     /**
+     * Slot that change the modality parameter of the query
+     *
+     */
+    void
+    updateModality(int index);
+
+    /**
      * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
      *
      */

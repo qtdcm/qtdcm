@@ -5,6 +5,7 @@
  *      Author: Alexandre Abadie
  */
 
+#define QT_NO_CAST_TO_ASCII
 #include <QtDcmManager.h>
 
 QtDcmManager::QtDcmManager()
@@ -16,6 +17,9 @@ QtDcmManager::QtDcmManager()
     _process = new QProcess(this);
     _patientName = "*";
     _patientId = "*";
+    _modality = "MR";
+    _date1 = "*";
+    _date2 = "*";
     _serieDescription = "*";
     _studyDescription = "*";
 
@@ -34,6 +38,9 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _process = new QProcess(this);
     _patientName = "*";
     _patientId = "*";
+    _date1 = "*";
+    _date2 = "*";
+    _modality = "MR";
     _serieDescription = "*";
     _studyDescription = "*";
 
@@ -57,6 +64,16 @@ QtDcmManager::displayErrorMessage( QString message )
     QMessageBox * msgBox = new QMessageBox(_parent);
     msgBox->setIcon(QMessageBox::Critical);
     msgBox->setText(message);
+    msgBox->exec();
+  }
+
+void
+QtDcmManager::displayMessage( QString info )
+  {
+    //Instanciate a message from the parent i.e qtdcm
+    QMessageBox * msgBox = new QMessageBox(_parent);
+    msgBox->setIcon(QMessageBox::Information);
+    msgBox->setText(info);
     msgBox->exec();
   }
 
@@ -293,7 +310,6 @@ QtDcmManager::exportSerie()
         this->displayErrorMessage("Impossible de trouver dcm2nii, verifiez votre installation");
         return;
       }
-
     this->generateRandomDir();
 
     if (_mode == "CD")
@@ -332,8 +348,7 @@ QtDcmManager::exportSerieFromPACS()
     QString localPACSParam = _preferences->getAetitle() + ":" + _preferences->getPort();
     QString seriesId = "-qSeriesInstanceUID=" + _serieId;
     arguments << "-L" << localPACSParam << serverPACSParam << "-I" << "-cmove" << _preferences->getAetitle() << seriesId << "-cstoredest" << _tempRandDir.absolutePath();
-    QString command = program + " -L " + localPACSParam + " " + serverPACSParam + " -I" + " -cmove " + _preferences->getAetitle() + " -cstore=MR " + seriesId + " -cstoredest " + _tempRandDir.absolutePath() + ">/dev/null" ;
-
+    QString command = program + " -L " + localPACSParam + " " + serverPACSParam + " -I" + " -cmove " + _preferences->getAetitle() + " -cstore=" + _modality + " " + seriesId + " -cstoredest " + _tempRandDir.absolutePath() + ">/dev/null" ;
     system(command.toAscii().data());
 //    QProcess * process = new QProcess(this);
 //    process->setStandardOutputFile("/home/aabadie/Bureau/retrieve.txt");
@@ -384,8 +399,10 @@ QtDcmManager::queryPACS()
         QString patientName = "-qPatientName=" + _patientName;
         QString patientId = "-qPatientId=" + _patientId;
         QString studyDescription = "-qStudyDescription=" + _studyDescription;
+        QString modality = "-qModality=" + _modality;
+        QString date="-qStudyDate=" + _date1 + "-" + _date2;
 
-        arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription;
+        arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription << modality << date;
 
         QProcess * process = new QProcess(this);
         process->start(program, arguments);
@@ -428,8 +445,8 @@ QtDcmManager::parseQueryResult( QString query )
           {
             numPatient = lines[i].split('#')[2].split('/')[0].toInt() - 1;
             //First get the corresponding study
-            QString studyDesc = lines[i + 6].section('[', 1).split(']')[0];
-            QString studyId = lines[i + 9].section('[', 1).split(']')[0];
+            QString studyDesc = lines[i + 7].section('[', 1).split(']')[0];
+            QString studyId = lines[i + 10].section('[', 1).split(']')[0];
             if (studyId != currentStudyId) // Is it a new study ?
               {
                 //Add the new study in the patients studies list and set study Id and description
@@ -440,12 +457,17 @@ QtDcmManager::parseQueryResult( QString query )
             currentStudyId = studyId;
 
             //Get the found serie Id and description
-            QString serieDesc = lines[i + 7].section('[', 1).split(']')[0];
-            QString serieId = lines[i + 10].section('[', 1).split(']')[0];
+            QString serieDesc = lines[i + 8].section('[', 1).split(']')[0];
+            QString serieId = lines[i + 11].section('[', 1).split(']')[0];
             _patients.at(numPatient)->getStudies().last()->addSerie(new QtDcmSerie());
             //Set the description and Id of the found serie
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setId(serieId);
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDescription(serieDesc);
           }
+      }
+    if (_patients.size() == 0)
+      {
+      //petit message d'information !
+      this->displayMessage("Aucune occurence pour cette recherche");
       }
   }
