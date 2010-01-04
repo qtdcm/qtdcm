@@ -224,6 +224,7 @@ QtDCM::exportList()
           _manager->setSerieId(_currentSerieId);
         _manager->exportSerie();
       }
+    delete dialog;
   }
 
 void

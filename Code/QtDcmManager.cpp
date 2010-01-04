@@ -65,6 +65,7 @@ QtDcmManager::displayErrorMessage( QString message )
     msgBox->setIcon(QMessageBox::Critical);
     msgBox->setText(message);
     msgBox->exec();
+    delete msgBox;
   }
 
 void
@@ -75,6 +76,7 @@ QtDcmManager::displayMessage( QString info )
     msgBox->setIcon(QMessageBox::Information);
     msgBox->setText(info);
     msgBox->exec();
+    delete msgBox;
   }
 
 void
@@ -382,6 +384,7 @@ QtDcmManager::exportSerieFromCD()
     _progress->setValue(100);
     qApp->processEvents();
     _progress->close();
+    delete _progress;
     _images.clear();
   }
 
@@ -411,6 +414,7 @@ QtDcmManager::queryPACS()
         while (process->waitForReadyRead())
           query += process->readAll();
 
+        delete process;
         //Parse the result of the query and store in the different lists and display in the QTreeWidget
         this->parseQueryResult(query);
       }
