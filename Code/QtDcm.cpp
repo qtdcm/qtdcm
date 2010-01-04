@@ -10,8 +10,9 @@ QtDCM::QtDCM( QWidget *parent ) :
     //Initialize QTreeWidget
     widget.treeWidget->setColumnWidth(0, 250);
     widget.treeWidget->setColumnWidth(1, 80);
+    widget.treeWidget->setColumnWidth(2, 100);
     QStringList labels;
-    labels << "Description" << "Type" << "ID";
+    labels << "Description" << "Type" << "Date" << "ID";
     widget.treeWidget->setHeaderLabels(labels);
     widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -60,60 +61,70 @@ QtDCM::display()
     this->clearDisplay();
     for (int i = 0; i < _manager->getPatients().size(); i++)
       {
-        QTreeWidgetItem * child = new QTreeWidgetItem(widget.treeWidget);
-        QTreeWidgetItem * root = NULL;
-        // Fill in the QTreeWidget the patient information
-        child->setText(0, _manager->getPatients().at(i)->getName());
-        child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getName()));
-
-        child->setText(1, "Patient");
-        child->setData(2, 1, QVariant("PATIENT"));
-
-        child->setText(2, _manager->getPatients().at(i)->getId());
-        child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getId()));
-        root = child;
-        //        if (_manager->getMode() == "CD")
-        widget.treeWidget->expandItem(child);
-        for (int j = 0; j < _manager->getPatients().at(i)->getStudies().size(); j++)
+        if (_manager->getPatients().at(i)->getStudies().size() != 0)
           {
-            // Study information
-            child = new QTreeWidgetItem(root);
-            child->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getDescription());
-            child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDescription()));
+            QTreeWidgetItem * child = new QTreeWidgetItem(widget.treeWidget);
+            QTreeWidgetItem * root = NULL;
+            // Fill in the QTreeWidget the patient information
+            child->setText(0, _manager->getPatients().at(i)->getName());
+            child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getName()));
 
-            child->setText(1, "Study");
-            child->setData(2, 1, QVariant("STUDY"));
+            child->setText(1, "Patient");
+            child->setData(2, 1, QVariant("PATIENT"));
 
-            child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getId());
-            child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getId()));
-            if (_manager->getMode() == "CD")
-              widget.treeWidget->expandItem(child);
-            for (int k = 0; k < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().size(); k++)
+            child->setText(2, _manager->getPatients().at(i)->getId());
+            child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getId()));
+
+            root = child;
+            //        if (_manager->getMode() == "CD")
+            widget.treeWidget->expandItem(child);
+            for (int j = 0; j < _manager->getPatients().at(i)->getStudies().size(); j++)
               {
-                //Serie information
-                QTreeWidgetItem * lchild = new QTreeWidgetItem(child);
-                lchild->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription());
-                lchild->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription()));
+                // Study information
+                child = new QTreeWidgetItem(root);
+                child->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getDescription());
+                child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDescription()));
 
-                lchild->setText(1, "Serie");
-                lchild->setData(2, 1, "SERIE");
+                child->setText(1, "Study");
+                child->setData(2, 1, QVariant("STUDY"));
 
-                lchild->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
-                lchild->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId()));
+                child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getDate());
+                child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDate()));
 
-                for (int l = 0; l < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().size(); l++)
+                child->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getId());
+                child->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getId()));
+                if (_manager->getMode() == "CD")
+                  widget.treeWidget->expandItem(child);
+                for (int k = 0; k < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().size(); k++)
                   {
-                    //Images information
-                    QString filename = QDir::toNativeSeparators(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().at(l)->getFilename());
-                    QString basepath = _manager->getDicomdir();
-                    basepath.truncate(basepath.lastIndexOf(QDir::separator()));
-                    filename = QDir::toNativeSeparators(basepath + QDir::separator() + filename.replace(QChar('\\'), QDir::separator()).replace(QChar('/'), QDir::separator()));
-                    QTreeWidgetItem * llchild = new QTreeWidgetItem(lchild);
-                    llchild->setText(0, filename);
-                    llchild->setData(1, 1, QVariant(filename));
+                    //Serie information
+                    QTreeWidgetItem * lchild = new QTreeWidgetItem(child);
+                    lchild->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription());
+                    lchild->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription()));
 
-                    llchild->setText(1, "Image");
-                    llchild->setData(2, 1, QVariant("IMAGES"));
+                    lchild->setText(1, "Serie");
+                    lchild->setData(2, 1, "SERIE");
+
+                    child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDate());
+                    child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDate()));
+
+                    lchild->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
+                    lchild->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId()));
+
+                    for (int l = 0; l < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().size(); l++)
+                      {
+                        //Images information
+                        QString filename = QDir::toNativeSeparators(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().at(l)->getFilename());
+                        QString basepath = _manager->getDicomdir();
+                        basepath.truncate(basepath.lastIndexOf(QDir::separator()));
+                        filename = QDir::toNativeSeparators(basepath + QDir::separator() + filename.replace(QChar('\\'), QDir::separator()).replace(QChar('/'), QDir::separator()));
+                        QTreeWidgetItem * llchild = new QTreeWidgetItem(lchild);
+                        llchild->setText(0, filename);
+                        llchild->setData(1, 1, QVariant(filename));
+
+                        llchild->setText(1, "Image");
+                        llchild->setData(2, 1, QVariant("IMAGES"));
+                      }
                   }
               }
           }
@@ -268,6 +279,7 @@ QtDCM::updateDateButtons( int index )
         widget.dateBeginButton->hide();
         _manager->setDate1("*");
         _manager->setDate2("*");
+        this->queryPACS();
         break;
         //Query on current date Dicom data
       case 1:
@@ -280,6 +292,7 @@ QtDCM::updateDateButtons( int index )
         _beginDate = _endDate = QDate::currentDate();
         _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
         _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        this->queryPACS();
         break;
         //Query on yesterday date Dicom data
       case 2:
@@ -292,6 +305,7 @@ QtDCM::updateDateButtons( int index )
         _beginDate = _endDate = QDate::currentDate().addDays(-1);
         _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
         _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        this->queryPACS();
         break;
         //Query on specified date (use date dialog window)
       case 3:
@@ -337,6 +351,7 @@ QtDCM::chooseBeginDate()
           }
         _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
         _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        this->queryPACS();
       }
     dialog->close();
     delete dialog;
@@ -360,6 +375,7 @@ QtDCM::chooseEndDate()
           }
         _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
         _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        this->queryPACS();
       }
     dialog->close();
     delete dialog;

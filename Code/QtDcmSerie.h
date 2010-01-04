@@ -25,6 +25,7 @@ class QtDcmSerie : public QObject
   private:
     QString _id; /** Serie dicom identificator */
     QString _description; /** Serie description */
+    QString _date; /** Study date */
     QList<QtDcmImage *> _images; /** List of images in the serie */
     QtDcmStudy * _p_study; /** Pointer on the parent study */
 
@@ -60,6 +61,28 @@ class QtDcmSerie : public QObject
     setId( QString id )
       {
         _id = id;
+      }
+
+    /**
+     * Serie date getter
+     *
+     * @return _date a QString
+     */
+    QString
+    getDate()
+      {
+        return _date;
+      }
+
+    /**
+     * Serie date setter
+     *
+     * @param date is a QString
+     */
+    void
+    setDate( QString date )
+      {
+        _date = date;
       }
 
     /**
