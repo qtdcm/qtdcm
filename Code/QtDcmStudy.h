@@ -25,7 +25,7 @@ class QtDcmStudy : public QObject
   private:
     QString _id; /** Dicom study identificator */
     QString _description; /** Dicom study description */
-    QString _date; /** Dicom study date */
+    QDate _date; /** Dicom study date */
     QString _time; /** Dicom study time */
     QList<QtDcmSerie *> _series; /** List of series in the study */
     QtDcmPatient * _p_patient; /** Patient corresponding to the study */
@@ -91,7 +91,7 @@ class QtDcmStudy : public QObject
      *
      * @return _date as a QString
      */
-    QString
+    QDate
     getDate()
       {
         return _date;
@@ -103,7 +103,7 @@ class QtDcmStudy : public QObject
      * @param date as a QString
      */
     void
-    setDate( QString date )
+    setDate( QDate date )
       {
         _date= date;
       }

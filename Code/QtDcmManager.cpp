@@ -184,7 +184,9 @@ QtDcmManager::loadDicomdir()
                   {
                     OFString strDate;
                     lelt->getOFStringArray(strDate);
-                    tmpStudy.last()->setDate(QString(strDate.c_str()));
+                    QString date = QString(strDate.c_str());
+                    QDate qdate = QDate(date.mid(0,4).toInt(),date.mid(4,2).toInt(),date.mid(6,2).toInt());
+                    tmpStudy.last()->setDate(qdate);
                   }
                 if (lobj->findAndGetElement(DCM_StudyTime, lelt).good())
                   {
@@ -205,12 +207,6 @@ QtDcmManager::loadDicomdir()
                     OFString strID;
                     lelt->getOFStringArray(strID);
                     tmpSerie.last()->setId(QString(strID.c_str()));
-                  }
-                if (lobj->findAndGetElement(DCM_StudyDate, lelt).good())
-                  {
-                    OFString strDate;
-                    lelt->getOFStringArray(strDate);
-                    tmpSerie.last()->setDate(QString(strDate.c_str()));
                   }
                 if (lobj->findAndGetElement(DCM_SeriesDescription, lelt).good())
                   {
@@ -458,6 +454,8 @@ QtDcmManager::parseQueryResult( QString query )
             numPatient = lines[i].split('#')[2].split('/')[0].toInt() - 1;
             //First get the corresponding study information
             QString studyDate = lines[i + 2].section('[', 1).split(']')[0];
+            QDate qdate = QDate(studyDate.mid(0,4).toInt(),studyDate.mid(4,2).toInt(),studyDate.mid(6,2).toInt());
+
             QString studyDesc = lines[i + 7].section('[', 1).split(']')[0];
             QString studyId = lines[i + 10].section('[', 1).split(']')[0];
             if (studyId != currentStudyId) // Is it a new study ?
@@ -467,19 +465,18 @@ QtDcmManager::parseQueryResult( QString query )
                 _patients.at(numPatient)->addStudy(new QtDcmStudy());
                 _patients.at(numPatient)->getStudies().last()->setId(studyId);
                 _patients.at(numPatient)->getStudies().last()->setDescription(studyDesc);
-                _patients.at(numPatient)->getStudies().last()->setDate(studyDate);
+                _patients.at(numPatient)->getStudies().last()->setDate(qdate);
               }
             currentStudyId = studyId;
 
             //Get the found serie Id and description
-            QString serieDate = lines[i + 2].section('[', 1).split(']')[0];
             QString serieDesc = lines[i + 8].section('[', 1).split(']')[0];
             QString serieId = lines[i + 11].section('[', 1).split(']')[0];
             _patients.at(numPatient)->getStudies().last()->addSerie(new QtDcmSerie());
             //Set the description and Id of the found serie
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setId(serieId);
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDescription(serieDesc);
-            _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDate(serieDate);
+//            _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDate(serieDate);
           }
       }
     //Aucune occurence = 0 study renvoyee

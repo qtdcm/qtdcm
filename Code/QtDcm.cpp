@@ -10,7 +10,7 @@ QtDCM::QtDCM( QWidget *parent ) :
     //Initialize QTreeWidget
     widget.treeWidget->setColumnWidth(0, 250);
     widget.treeWidget->setColumnWidth(1, 80);
-    widget.treeWidget->setColumnWidth(2, 100);
+    widget.treeWidget->setColumnWidth(2, 120);
     QStringList labels;
     labels << "Description" << "Type" << "Date" << "ID";
     widget.treeWidget->setHeaderLabels(labels);
@@ -72,8 +72,8 @@ QtDCM::display()
             child->setText(1, "Patient");
             child->setData(2, 1, QVariant("PATIENT"));
 
-            child->setText(2, _manager->getPatients().at(i)->getId());
-            child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getId()));
+            child->setText(3, _manager->getPatients().at(i)->getId());
+            child->setData(4, 1, QVariant(_manager->getPatients().at(i)->getId()));
 
             root = child;
             //        if (_manager->getMode() == "CD")
@@ -88,8 +88,8 @@ QtDCM::display()
                 child->setText(1, "Study");
                 child->setData(2, 1, QVariant("STUDY"));
 
-                child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getDate());
-                child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDate()));
+                child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate));
+                child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate)));
 
                 child->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getId());
                 child->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getId()));
@@ -104,9 +104,6 @@ QtDCM::display()
 
                     lchild->setText(1, "Serie");
                     lchild->setData(2, 1, "SERIE");
-
-                    child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDate());
-                    child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDate()));
 
                     lchild->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
                     lchild->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId()));
