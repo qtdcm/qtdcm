@@ -145,7 +145,7 @@ QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
         if (current->data(2, 1).toString() == "SERIE")
           {
             // If a serie is selected, copy all images filenames in a list
-            _currentSerieId = current->data(3, 1).toString();
+            _currentSerieId = current->data(4, 1).toString();
             for (int i = 0; i < current->childCount(); i++)
               {
                 _imagesList.append(current->child(i)->data(1, 1).toStringList());

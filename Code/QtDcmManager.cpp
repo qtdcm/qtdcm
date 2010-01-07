@@ -24,6 +24,7 @@ QtDcmManager::QtDcmManager()
     _studyDescription = "*";
 
     _preferences = new QtDcmPreferences();
+    _thread = new QtDcmExportThread();
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -43,9 +44,10 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _modality = "MR";
     _serieDescription = "*";
     _studyDescription = "*";
-
     _preferences = new QtDcmPreferences();
     _parent = parent;
+
+    _thread = new QtDcmExportThread();
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -185,7 +187,7 @@ QtDcmManager::loadDicomdir()
                     OFString strDate;
                     lelt->getOFStringArray(strDate);
                     QString date = QString(strDate.c_str());
-                    QDate qdate = QDate(date.mid(0,4).toInt(),date.mid(4,2).toInt(),date.mid(6,2).toInt());
+                    QDate qdate = QDate(date.mid(0, 4).toInt(), date.mid(4, 2).toInt(), date.mid(6, 2).toInt());
                     tmpStudy.last()->setDate(qdate);
                   }
                 if (lobj->findAndGetElement(DCM_StudyTime, lelt).good())
@@ -319,7 +321,15 @@ QtDcmManager::exportSerie()
     if (_mode == "CD")
       this->exportSerieFromCD();
     else
-      this->exportSerieFromPACS();
+      {
+        this->exportSerieFromPACS();
+        while (_thread->isRunning())
+          {
+            qApp->processEvents();
+          }
+        _progress->close();
+        delete _progress;
+      }
 
     QStringList listFiles = _tempRandDir.entryList(QDir::Files, QDir::Name);
     if (listFiles.size() != 0)
@@ -345,20 +355,25 @@ void
 QtDcmManager::exportSerieFromPACS()
   {
     QString program = _preferences->getDcm4che();
-
     QStringList arguments;
-
     QString serverPACSParam = _preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort();
     QString localPACSParam = _preferences->getAetitle() + ":" + _preferences->getPort();
     QString seriesId = "-qSeriesInstanceUID=" + _serieId;
     arguments << "-L" << localPACSParam << serverPACSParam << "-I" << "-cmove" << _preferences->getAetitle() << seriesId << "-cstoredest" << _tempRandDir.absolutePath();
     QString command = program + " -L " + localPACSParam + " " + serverPACSParam + " -I" + " -cmove " + _preferences->getAetitle() + " -cstore=" + _modality + " " + seriesId + " -cstoredest "
         + _tempRandDir.absolutePath() + ">/dev/null";
-    system(command.toAscii().data());
-    //    QProcess * process = new QProcess(this);
-    //    process->setStandardOutputFile("/home/aabadie/Bureau/retrieve.txt");
-    //    process->start(program, arguments);
-    //    process->waitForFinished();
+    //    system(command.toAscii().data());
+
+    _progress = new QProgressDialog("Export from PACS in progress...", "", 0, 0, _parent);
+    _progress->setWindowModality(Qt::WindowModal);
+    QPushButton * cancelButton = new QPushButton;
+    _progress->setCancelButton(cancelButton);
+    cancelButton->hide();
+    _progress->show();
+    qApp->processEvents();
+
+    _thread->setCommand(command);
+    _thread->start();
   }
 
 void
@@ -454,7 +469,7 @@ QtDcmManager::parseQueryResult( QString query )
             numPatient = lines[i].split('#')[2].split('/')[0].toInt() - 1;
             //First get the corresponding study information
             QString studyDate = lines[i + 2].section('[', 1).split(']')[0];
-            QDate qdate = QDate(studyDate.mid(0,4).toInt(),studyDate.mid(4,2).toInt(),studyDate.mid(6,2).toInt());
+            QDate qdate = QDate(studyDate.mid(0, 4).toInt(), studyDate.mid(4, 2).toInt(), studyDate.mid(6, 2).toInt());
 
             QString studyDesc = lines[i + 7].section('[', 1).split(']')[0];
             QString studyId = lines[i + 10].section('[', 1).split(']')[0];
@@ -476,7 +491,7 @@ QtDcmManager::parseQueryResult( QString query )
             //Set the description and Id of the found serie
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setId(serieId);
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDescription(serieDesc);
-//            _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDate(serieDate);
+            //            _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDate(serieDate);
           }
       }
     //Aucune occurence = 0 study renvoyee

@@ -46,13 +46,14 @@
 
 #include <QtDcmPatient.h>
 #include <QtDcmPreferences.h>
+#include <QtDcmExportThread.h>
 
 /**
  * This class is in charge of the different process (dcm2nii), pacs query/retrieve (dcm4chee),
  * temporary directory creation and removing, PACS server settings.
  *
  */
-class QtDcmManager : QObject
+class QtDcmManager : public QObject
   {
   Q_OBJECT
   private:
@@ -81,6 +82,7 @@ class QtDcmManager : QObject
     QString _mode; /** Mode that determine the type of media (CD or PACS) */
     QString _dcm2nii; /** Absolute filename of the dcm2nii program */
     QString _dcm4che; /** Absolute filename of the dcm4che program */
+    QtDcmExportThread * _thread;
 
     /**
      * Generate random directory name and create it
@@ -115,6 +117,7 @@ class QtDcmManager : QObject
     parseQueryResult( QString query );
 
   public:
+
     /**
      * Default constructor. Instantiate the internal pointers and create the temporary directory.
      */
@@ -448,6 +451,7 @@ class QtDcmManager : QObject
       {
         _serieId = id;
       }
+
   };
 
 #endif /* QTDCMMANAGER_H_ */
