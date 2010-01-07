@@ -24,7 +24,8 @@ QtDcmManager::QtDcmManager()
     _studyDescription = "*";
 
     _preferences = new QtDcmPreferences();
-    _thread = new QtDcmExportThread();
+    _exportThread = new QtDcmExportThread();
+    _queryThread = new QtDcmQueryThread();
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -47,7 +48,8 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _preferences = new QtDcmPreferences();
     _parent = parent;
 
-    _thread = new QtDcmExportThread();
+    _exportThread = new QtDcmExportThread();
+    _queryThread = new QtDcmQueryThread();
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -323,7 +325,7 @@ QtDcmManager::exportSerie()
     else
       {
         this->exportSerieFromPACS();
-        while (_thread->isRunning())
+        while (_exportThread->isRunning())
           {
             qApp->processEvents();
           }
@@ -342,6 +344,8 @@ QtDcmManager::exportSerie()
         _process->waitForFinished();
 
         this->deleteRandomDir();
+
+        this->displayMessage("Export termine avec succes !!");
       }
     else
       {
@@ -362,9 +366,8 @@ QtDcmManager::exportSerieFromPACS()
     arguments << "-L" << localPACSParam << serverPACSParam << "-I" << "-cmove" << _preferences->getAetitle() << seriesId << "-cstoredest" << _tempRandDir.absolutePath();
     QString command = program + " -L " + localPACSParam + " " + serverPACSParam + " -I" + " -cmove " + _preferences->getAetitle() + " -cstore=" + _modality + " " + seriesId + " -cstoredest "
         + _tempRandDir.absolutePath() + ">/dev/null";
-    //    system(command.toAscii().data());
 
-    _progress = new QProgressDialog("Export from PACS in progress...", "", 0, 0, _parent);
+    _progress = new QProgressDialog("Export from server in progress...", "", 0, 0, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -372,8 +375,8 @@ QtDcmManager::exportSerieFromPACS()
     _progress->show();
     qApp->processEvents();
 
-    _thread->setCommand(command);
-    _thread->start();
+    _exportThread->setCommand(command);
+    _exportThread->start();
   }
 
 void
@@ -425,16 +428,27 @@ QtDcmManager::queryPACS()
 
         arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription << modality << date;
 
-        QProcess * process = new QProcess(this);
-        process->start(program, arguments);
+        _progress = new QProgressDialog("Server query in progress...", "", 0, 0, _parent);
+        _progress->setWindowModality(Qt::WindowModal);
+        QPushButton * cancelButton = new QPushButton;
+        _progress->setCancelButton(cancelButton);
+        cancelButton->hide();
+        _progress->show();
+        qApp->processEvents();
 
-        QByteArray query;
-        while (process->waitForReadyRead())
-          query += process->readAll();
+        _queryThread->setCommand(program);
+        _queryThread->setParameters(arguments);
+        _queryThread->setManager(this);
+        _queryThread->start();
 
-        delete process;
+        while (_queryThread->isRunning())
+          qApp->processEvents();
+
+        _progress->close();
+        delete _progress;
+
         //Parse the result of the query and store in the different lists and display in the QTreeWidget
-        this->parseQueryResult(query);
+        this->parseQueryResult(_query);
       }
     else
       {

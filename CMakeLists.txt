@@ -56,6 +56,7 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.cpp
 )
 
 set(SAMPLE_HDRS
@@ -70,6 +71,7 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.h
 )
 
 set(SAMPLE_UIS

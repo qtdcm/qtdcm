@@ -47,6 +47,10 @@
 #include <QtDcmPatient.h>
 #include <QtDcmPreferences.h>
 #include <QtDcmExportThread.h>
+#include <QtDcmQueryThread.h>
+
+class QtDcmQueryThread;
+
 
 /**
  * This class is in charge of the different process (dcm2nii), pacs query/retrieve (dcm4chee),
@@ -82,7 +86,9 @@ class QtDcmManager : public QObject
     QString _mode; /** Mode that determine the type of media (CD or PACS) */
     QString _dcm2nii; /** Absolute filename of the dcm2nii program */
     QString _dcm4che; /** Absolute filename of the dcm4che program */
-    QtDcmExportThread * _thread;
+    QtDcmExportThread * _exportThread;
+    QtDcmQueryThread * _queryThread;
+    QByteArray _query;
 
     /**
      * Generate random directory name and create it
@@ -450,6 +456,12 @@ class QtDcmManager : public QObject
     setSerieId( QString id )
       {
         _serieId = id;
+      }
+
+    void
+    setQuery(QByteArray query)
+      {
+        _query = query;
       }
 
   };

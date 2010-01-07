@@ -346,6 +346,10 @@ QtDCM::chooseBeginDate()
             _endDate = _beginDate;
             widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
           }
+        if (widget.dateComboBox->currentIndex() == 3)
+          {
+            _endDate = _beginDate;
+          }
         _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
         _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
         this->queryPACS();
