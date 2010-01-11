@@ -7,17 +7,21 @@
 
 #include <QtDcmExportThread.h>
 
-QtDcmExportThread::QtDcmExportThread()
-  {
-    _command = "";
-  }
-
 void
 QtDcmExportThread::run()
   {
-    if (!_command.isEmpty())
+    QDir tempDir(_temporaryDir);
+    for (int i = 0; i < _seriesToExport.size(); i++)
       {
-        system(_command.toAscii().data());
-        exit();
+        if (! tempDir.exists(_seriesToExport.at(i)))
+          {
+            tempDir.mkdir(_seriesToExport.at(i));
+            QString seriesId = "-qSeriesInstanceUID=" + _seriesToExport.at(i);
+            QString command = _program + " -L " + _localPacsParam + " " + _serverPacsParam + " -I" + " -cmove " + _aetitle + " -cstore=" + _modality + " " + seriesId + " -cstoredest " + QDir(
+                _temporaryDir + QDir::separator() + _seriesToExport.at(i)).absolutePath() + ">/dev/null";
+
+            system(command.toAscii().data());
+          }
       }
+    exit();
   }

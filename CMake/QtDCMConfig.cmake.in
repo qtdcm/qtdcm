@@ -48,7 +48,15 @@ if (QTDCM_FOUND)
 	set(DCMTK_INCLUDE_DIR "@DCMTK_INCLUDE_DIR@")
 	set(DCMTK_LIBRARIES 
 	dcmimgle
+	dcmjpeg
+	#dcmpstat
+	dcmimage
 	dcmdata
+	#dcmdsig
+	#dcmnet
+	#dcmsr
+	#dcmtls
+	#dcmwlm
 	ofstd
 	#dcmqrdb
 	)

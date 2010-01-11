@@ -9,7 +9,7 @@ QtDCM::QtDCM( QWidget *parent ) :
 
     //Initialize QTreeWidget
     widget.treeWidget->setColumnWidth(0, 250);
-    widget.treeWidget->setColumnWidth(1, 80);
+    widget.treeWidget->setColumnWidth(1, 100);
     widget.treeWidget->setColumnWidth(2, 120);
     QStringList labels;
     labels << "Description" << "Type" << "Date" << "ID";
@@ -18,6 +18,7 @@ QtDCM::QtDCM( QWidget *parent ) :
 
     //Initialize widgets
     widget.advancedFrame->hide();
+    widget.advancedButton->setCheckable(true);
     widget.dateEndButton->hide();
     widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
     widget.labelTiret->hide();
@@ -28,11 +29,17 @@ QtDCM::QtDCM( QWidget *parent ) :
     initConnections();
   }
 
+QtDCM::~QtDCM()
+  {
+    delete _manager;
+  }
+
 void
 QtDCM::initConnections()
   {
     // Initialize des connections
     QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
+    QObject::connect(widget.treeWidget, SIGNAL(itemClicked (QTreeWidgetItem*, int)), this, SLOT(itemClicked(QTreeWidgetItem*, int)));
     QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
     QObject::connect(widget.dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
     QObject::connect(widget.modalityComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateModality(int)));
@@ -49,6 +56,7 @@ QtDCM::initConnections()
 void
 QtDCM::clearDisplay()
   {
+    _selectedSeries.clear();
     _imagesList.clear();
     widget.treeWidget->clear();
     widget.treeWidget->setAnimated(false);
@@ -103,6 +111,7 @@ QtDCM::display()
                     lchild->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription()));
 
                     lchild->setText(1, "Serie");
+                    lchild->setCheckState(1, Qt::Unchecked);
                     lchild->setData(2, 1, "SERIE");
 
                     lchild->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
@@ -112,9 +121,14 @@ QtDCM::display()
                       {
                         //Images information
                         QString filename = QDir::toNativeSeparators(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().at(l)->getFilename());
+                        filename.replace(QChar('\\'), QDir::separator()).replace(QChar('/'), QDir::separator());
                         QString basepath = _manager->getDicomdir();
                         basepath.truncate(basepath.lastIndexOf(QDir::separator()));
-                        filename = QDir::toNativeSeparators(basepath + QDir::separator() + filename.replace(QChar('\\'), QDir::separator()).replace(QChar('/'), QDir::separator()));
+                        QString goodFilename(filename);
+                        if (QFile(basepath + QDir::separator() + goodFilename.toLower()).exists())
+                          filename = basepath + QDir::separator() + goodFilename.toLower();
+                        else
+                          filename = basepath + QDir::separator() + goodFilename.toUpper();
                         QTreeWidgetItem * llchild = new QTreeWidgetItem(lchild);
                         llchild->setText(0, filename);
                         llchild->setData(1, 1, QVariant(filename));
@@ -133,6 +147,32 @@ QList<QString>
 QtDCM::getImagesList()
   {
     return _imagesList;
+  }
+
+void
+QtDCM::itemClicked( QTreeWidgetItem* current , int column )
+  {
+    if (current != 0)
+      {
+        if (current->data(2, 1).toString() == "SERIE")
+          {
+            if (current->checkState(1) == Qt::Checked)
+              {
+                QList<QString> list;
+                for (int i = 0; i < current->childCount(); i++)
+                  {
+                    list.append(current->child(i)->data(1, 1).toStringList());
+                  }
+                if (!_selectedSeries.contains(_currentSerieId))
+                  _selectedSeries.insert(_currentSerieId, list);
+              }
+            else
+              {
+                if (_selectedSeries.contains(_currentSerieId))
+                  _selectedSeries.remove(_currentSerieId);
+              }
+          }
+      }
   }
 
 void
@@ -162,23 +202,39 @@ QtDCM::contextExportMenu( const QPoint point )
     item = widget.treeWidget->itemAt(point);
     QMenu menu(widget.treeWidget);
     QAction * actionDicomdir = new QAction(this);
-    QAction * actionExp = new QAction(this);
-    // If no item selected (object empty)
+    QAction * actionPreview = new QAction(this);
+    QAction * actionQuery = new QAction(this);
+    QAction * actionExport = new QAction(this);
+
     if (item != 0)
       {
         // If the selected item is a SERIE
         if (item->data(2, 1) == "SERIE")
           {
-            // If the serie is exportable, create export command in the menu
-            actionExp->setText("Export");
-            QObject::connect(actionExp, SIGNAL(triggered()), this, SLOT(exportList()));
-            menu.addAction(actionExp);
+            // Add preview action in the context menu
+            actionPreview->setText("Preview");
+            QObject::connect(actionPreview, SIGNAL(triggered()), this, SLOT(showPreview()));
+            menu.addAction(actionPreview);
+            menu.addSeparator();
           }
       }
+
     // By default the context menu contains an open dicomdir command.
     actionDicomdir->setText("Open dicomdir");
     QObject::connect(actionDicomdir, SIGNAL(triggered()), this, SLOT(openDicomdir()));
     menu.addAction(actionDicomdir);
+    actionQuery->setText("Query server");
+    QObject::connect(actionQuery, SIGNAL(triggered()), this, SLOT(queryPACS()));
+    menu.addAction(actionQuery);
+    // If no item selected (object empty)
+    if (!_selectedSeries.isEmpty())
+      {
+        menu.addSeparator();
+        // If the serie is exportable, create export command in the menu
+        actionExport->setText("Export");
+        QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportList()));
+        menu.addAction(actionExport);
+      }
     menu.exec(widget.treeWidget->mapToGlobal(point));
   }
 
@@ -224,13 +280,10 @@ QtDCM::exportList()
     dialog->close();
     if (!directory.isEmpty()) // A file has been chosen
       {
-        // The the output directory to the manager and launch the conversion process
+        // Set the output directory to the manager and launch the conversion process
         _manager->setOutputDirectory(directory);
-        if (_manager->getMode() == "CD")
-          _manager->setImagesList(_imagesList);
-        else
-          _manager->setSerieId(_currentSerieId);
-        _manager->exportSerie();
+        _manager->setSeriesToExport(_selectedSeries);
+        _manager->exportSeries();
       }
     delete dialog;
   }
@@ -445,13 +498,29 @@ QtDCM::toggleAdvancedView()
   {
     if (widget.advancedFrame->isHidden())
       {
+        widget.advancedButton->setText("Normal");
         widget.advancedFrame->show();
       }
     else
       {
+        widget.advancedButton->setText("Advanced");
         widget.advancedFrame->hide();
         widget.studyDescriptionEdit->setText("");
         widget.serieDescriptionEdit->setText("");
         widget.patientIdEdit->setText("");
       }
+  }
+
+void
+QtDCM::showPreview()
+  {
+    QtDcmPreviewDialog * dialog = new QtDcmPreviewDialog(this);
+    if (_manager->getMode() == "CD")
+      _manager->setImagesList(_imagesList);
+    _manager->setSerieId(_currentSerieId);
+    _manager->makePreview();
+    dialog->setImages(_manager->getListImages());
+    dialog->exec();
+    dialog->close();
+    delete dialog;
   }

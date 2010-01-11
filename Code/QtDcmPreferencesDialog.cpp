@@ -151,7 +151,6 @@ QtDcmPreferencesDialog::removeServer()
   {
     QTreeWidgetItem * root = widget.treeWidget->invisibleRootItem();
     _preferences->removeServer(root->indexOfChild(widget.treeWidget->currentItem()));
-    qDebug() << _preferences->getServers().size();
     root->removeChild(widget.treeWidget->currentItem());
     if (root->childCount() == 0)
       {

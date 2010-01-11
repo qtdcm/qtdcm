@@ -12,6 +12,8 @@ option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
 option(BUILD_DOCUMENTATION "Build QtDcm Documentation" OFF)
 option(BUILD_PACKAGE "Configure QtDcm packaging" OFF)
 
+option(BUILD_SHARED_LIBS "Build Qtdcm with shared libraries." ON)
+
 if (BUILD_PACKAGE)
   include (${QTDCM_SOURCE_DIR}/CMake/CPackConfig.cmake)
 endif(BUILD_PACKAGE)
@@ -57,6 +59,7 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.cpp
 )
 
 set(SAMPLE_HDRS
@@ -72,12 +75,14 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.h
 )
 
 set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmpreviewdialog.ui
 )
 
 set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})

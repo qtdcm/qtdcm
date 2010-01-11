@@ -6,6 +6,7 @@
 #include "ui_qtdcm.h"
 #include <QtDcmDateDialog.h>
 #include <QtDcmPreferencesDialog.h>
+#include <QtDcmPreviewDialog.h>
 #include <QtDcmManager.h>
 
 /**
@@ -21,11 +22,12 @@ class QtDCM : public QLabel
     QList<QString> _imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
     QString _currentSerieId; /** Id of the current selected serie */
     QDate _beginDate, _endDate; /** Begin and end for Q/R retrieve parameters */
+    QMap<QString,QList<QString> > _selectedSeries;
 
   public:
     Ui::QtDCM widget; /** Global widget generating by Designer*/
     QtDCM( QWidget *parent = 0 ); /** Classic constructor */
-
+    ~QtDCM();
     /**
      * Get the pointer of the treewidget
      *
@@ -89,7 +91,7 @@ class QtDCM : public QLabel
      *
      */
     void
-    updateModality(int index);
+    updateModality( int index );
 
     /**
      * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
@@ -112,6 +114,9 @@ class QtDCM : public QLabel
      */
     void
     itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
+
+    void
+    itemClicked( QTreeWidgetItem* current , int );
 
     /**
      * Slot called when right clicking on the QTreeWidget. User can export or open a dicomdir from the context menu
@@ -178,6 +183,9 @@ class QtDCM : public QLabel
      */
     void
     toggleAdvancedView();
+
+    void
+    showPreview();
   };
 
 #endif

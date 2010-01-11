@@ -17,33 +17,38 @@ class QtDcmManager;
  */
 class QtDcmQueryThread : public QThread
   {
+  Q_OBJECT
   private:
     QString _command;
     QStringList _parameters;
     QtDcmManager * _manager;
 
   public:
-    QtDcmQueryThread() {}
+    QtDcmQueryThread()
+      {
+      }
     virtual
-    ~QtDcmQueryThread() {}
+    ~QtDcmQueryThread()
+      {
+      }
 
     void
     run();
 
     void
-    setCommand(QString command)
+    setCommand( QString command )
       {
         _command = command;
       }
 
     void
-    setParameters(QStringList parameters)
+    setParameters( QStringList parameters )
       {
         _parameters = parameters;
       }
 
     void
-    setManager(QtDcmManager * manager)
+    setManager( QtDcmManager * manager )
       {
         _manager = manager;
       }

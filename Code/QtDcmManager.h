@@ -33,6 +33,9 @@
 #include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
+#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
+#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
+#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
 // For color images
 //#include <dcmtk/dcmimage/diregist.h>
 
@@ -51,7 +54,6 @@
 
 class QtDcmQueryThread;
 
-
 /**
  * This class is in charge of the different process (dcm2nii), pacs query/retrieve (dcm4chee),
  * temporary directory creation and removing, PACS server settings.
@@ -65,14 +67,15 @@ class QtDcmManager : public QObject
     QProgressDialog * _progress; /** Dialog window showing file copy in progress */
     QString _dicomdir; /** Dicomdir absolute file path */
     QString _outputDir; /** Output directory for reconstructed serie absolute path */
-    QString _randDirName; /** Randomly generated name where the slices of a serie are temporarily copied */
-    QDir _tempRandDir; /** Directory containing current serie dicom slice */
+    QDir _currentSerieDir; /** Directory containing current serie dicom slice */
     QDir _tempDir; /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
     QDir _logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
     DcmItem * _dcmObject; /** This attribute is usefull for parsing the dicomdir */
     DcmFileFormat _dfile; /** This attribute is usefull for parsing the dicomdir */
     QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
     QList<QString> _images; /** List of image filename to export from a CD */
+    QMap<QString, QList<QString> > _seriesToExport;
+    QList<QPixmap> _listImages;
     QString _serieId; /** Id of the serie to export from the PACS */
     QProcess * _process; /** This attribute launch the reconstruction process */
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
@@ -90,17 +93,11 @@ class QtDcmManager : public QObject
     QtDcmQueryThread * _queryThread;
     QByteArray _query;
 
-    /**
-     * Generate random directory name and create it
-     */
     void
-    generateRandomDir();
+    generateCurrentSerieDir();
 
-    /**
-     * Delete random directory after data has been reconstructed
-     */
     void
-    deleteRandomDir();
+    deleteCurrentSerieDir();
 
     /**
      * Create the temporary directory (/tmp/qtdcm on Unix) and the logging directory.
@@ -402,8 +399,8 @@ class QtDcmManager : public QObject
     /**
      * Global method for exporting serie
      */
-    void
-    exportSerie();
+//    void
+//    exportSerie();
 
     /**
      * Call dcm2nii in a QProcess object to reconstruct the given list of images
@@ -452,18 +449,41 @@ class QtDcmManager : public QObject
         _images = images;
       }
 
+    QList<QPixmap>
+    getListImages()
+      {
+        return _listImages;
+      }
+
     void
     setSerieId( QString id )
       {
         _serieId = id;
       }
 
+    QString
+    getCurrentSerieDirectory()
+      {
+        return _currentSerieDir.absolutePath();
+      }
+
     void
-    setQuery(QByteArray query)
+    setSeriesToExport(QMap<QString, QList<QString> > seriesToExport)
+      {
+        _seriesToExport = seriesToExport;
+      }
+
+    void
+    exportSeries();
+
+    void
+    setQuery( QByteArray query )
       {
         _query = query;
       }
 
+    void
+    makePreview();
   };
 
 #endif /* QTDCMMANAGER_H_ */

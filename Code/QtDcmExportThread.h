@@ -15,11 +15,20 @@
  */
 class QtDcmExportThread : public QThread
   {
+  Q_OBJECT
   private:
-    QString _command;
+    QString _program;
+    QString _serverPacsParam;
+    QString _localPacsParam;
+    QString _temporaryDir;
+    QList<QString> _seriesToExport;
+    QString _modality;
+    QString _aetitle;
 
   public:
-    QtDcmExportThread();
+    QtDcmExportThread()
+      {
+      }
     virtual
     ~QtDcmExportThread()
       {
@@ -28,16 +37,46 @@ class QtDcmExportThread : public QThread
     void
     run();
 
-    QString
-    getCommand()
+    void
+    setProgram( QString program )
       {
-        return _command;
+        _program = program;
       }
 
     void
-    setCommand( QString command )
+    setServerPacsParam( QString param )
       {
-        _command = command;
+        _serverPacsParam = param;
+      }
+
+    void
+    setLocalPacsParam( QString param )
+      {
+        _localPacsParam = param;
+      }
+
+    void
+    setTemporaryDir( QString dir )
+      {
+        _temporaryDir = dir;
+      }
+
+    void
+    setSeriesToExport( QList<QString> list )
+      {
+        _seriesToExport = list;
+      }
+
+    void
+    setModality( QString modality )
+      {
+        _modality = modality;
+      }
+
+    void
+    setAetitle( QString ae )
+      {
+        _aetitle = ae;
       }
   };
 

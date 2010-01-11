@@ -14,7 +14,6 @@ QtDcmManager::QtDcmManager()
     _mode = "PACS";
     _dicomdir = "";
     _outputDir = "";
-    _process = new QProcess(this);
     _patientName = "*";
     _patientId = "*";
     _modality = "MR";
@@ -37,7 +36,6 @@ QtDcmManager::QtDcmManager( QWidget * parent )
     _mode = "PACS";
     _dicomdir = "";
     _outputDir = "";
-    _process = new QProcess(this);
     _patientName = "*";
     _patientId = "*";
     _date1 = "*";
@@ -57,8 +55,10 @@ QtDcmManager::QtDcmManager( QWidget * parent )
 
 QtDcmManager::~QtDcmManager()
   {
-    delete _process;
     this->deleteTemporaryDirs();
+    delete _exportThread;
+    delete _queryThread;
+    delete _preferences;
   }
 
 void
@@ -86,6 +86,7 @@ QtDcmManager::displayMessage( QString info )
 void
 QtDcmManager::loadDicomdir()
   {
+    _seriesToExport.clear();
     _mode = "CD";
     //Convenience declarations for DCMTK
     static const OFString Patient("PATIENT");
@@ -251,19 +252,25 @@ void
 QtDcmManager::createTemporaryDirs()
   {
     //Creation d'un répertoire temporaire pour la série
-    //    QString tmp = QDir::tempPath();
     QDir tempDir = QDir(QDir::tempPath()); //tempDir = /tmp
-    if (!tempDir.exists("qtdcm"))
-      tempDir.mkdir("qtdcm");
 
-    //    tmp = tmp + QDir::separator() + "qtdcm";
-    _tempDir = QDir(QDir::tempPath() + QDir::separator() + "qtdcm"); // tempDir = /tmp/qtdcm
+    //Generer un nom de répertoire aléatoire
+    QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+    QString randName;
+    qsrand(time(NULL));
+    for (int i = 0; i < 6; i++)
+      randName += acceptes[qrand() % 59];
+
+    if (!tempDir.exists("qtdcm" + randName))
+      tempDir.mkdir("qtdcm" + randName);
+
+    _tempDir = QDir(QDir::tempPath() + QDir::separator() + "qtdcm" + randName); // tempDir = /tmp/qtdcm
     if (!_tempDir.exists("logs"))
       {
         if (!_tempDir.mkdir("logs"))
           qDebug() << "Repertoire logs non cree";
       }
-    _logsDir = QDir(QDir::tempPath() + QDir::separator() + "qtdcm" + QDir::separator() + "logs");
+    _logsDir = QDir(_tempDir.absolutePath() + QDir::separator() + "logs");
   }
 
 void
@@ -275,38 +282,51 @@ QtDcmManager::deleteTemporaryDirs()
         _logsDir.remove(listLogs.at(i));
       }
     _tempDir.rmdir("logs");
-    QDir(QDir::tempPath()).rmdir("qtdcm");
+
+    QStringList listSerie = _tempDir.entryList(QDir::Dirs, QDir::Name);
+    for (int i = 0; i < listSerie.size(); i++)
+      {
+        QDir serieDir(_tempDir.absolutePath() + QDir::separator() + listSerie.at(i));
+        QStringList listFiles = serieDir.entryList(QDir::Files, QDir::Name);
+        if (!(listSerie.at(i) == "." || listSerie.at(i) == "."))
+          for (int j = 0; j < listFiles.size(); j++)
+            {
+                {
+                  serieDir.remove(listFiles.at(j));
+                }
+              _tempDir.rmdir(listSerie.at(i));
+            }
+      }
+    QDir(QDir::tempPath()).rmdir(_tempDir.dirName());
   }
 
 void
-QtDcmManager::generateRandomDir()
+QtDcmManager::generateCurrentSerieDir()
   {
-    // Calcul d'un nom aléatoire pour le répertoire temporaire
-    QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
-    _randDirName = "";
-    for (int i = 0; i < 10; i++)
-      _randDirName += acceptes[qrand() % 59];
+    if (!_serieId.isEmpty())
+      {
+        _currentSerieDir = _tempDir.absolutePath() + QDir::separator() + _serieId;
+        _tempDir.mkdir(_serieId);
+      }
 
-    _tempRandDir = _tempDir.absolutePath() + QDir::separator() + _randDirName;
-    _tempDir.mkdir(_randDirName);
   }
 
 void
-QtDcmManager::deleteRandomDir()
+QtDcmManager::deleteCurrentSerieDir()
   {
     // Suppression des fichiers temporaires
-    QStringList listFiles = _tempRandDir.entryList(QDir::Files, QDir::Name);
+    QStringList listFiles = _currentSerieDir.entryList(QDir::Files, QDir::Name);
     for (int i = 0; i < listFiles.size(); i++)
       {
-        _tempRandDir.remove(listFiles.at(i));
+        _currentSerieDir.remove(listFiles.at(i));
       }
     // Suppression du répertoire temporaire
-    if (!_tempDir.rmdir(_randDirName))
+    if (!_tempDir.rmdir(_serieId))
       qDebug() << "Probleme lors de la suppression du répertoire temporaire";
   }
 
 void
-QtDcmManager::exportSerie()
+QtDcmManager::exportSeries()
   {
     _dcm2nii = _preferences->getDcm2nii();
     if (_outputDir == "")
@@ -318,12 +338,12 @@ QtDcmManager::exportSerie()
         this->displayErrorMessage("Impossible de trouver dcm2nii, verifiez votre installation");
         return;
       }
-    this->generateRandomDir();
 
     if (_mode == "CD")
       this->exportSerieFromCD();
     else
       {
+
         this->exportSerieFromPACS();
         while (_exportThread->isRunning())
           {
@@ -333,57 +353,30 @@ QtDcmManager::exportSerie()
         delete _progress;
       }
 
-    QStringList listFiles = _tempRandDir.entryList(QDir::Files, QDir::Name);
-    if (listFiles.size() != 0)
+    QList<QString> series = _seriesToExport.keys();
+    for (int j = 0; j < series.size(); j++)
       {
+        _serieId = series.at(j);
+        _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
         //Conversion de la serie avec dcm2nii
         QStringList arguments;
-        arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << _tempRandDir.absolutePath();
-        _process->setStandardOutputFile(_logsDir.absolutePath() + QDir::separator() + "log" + _randDirName + ".txt");
+        arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << _currentSerieDir.absolutePath();
+        _process = new QProcess(this);
+        _process->setStandardOutputFile(_logsDir.absolutePath() + QDir::separator() + "log" + _serieId + ".txt");
         _process->start(_dcm2nii, arguments);
         _process->waitForFinished();
 
-        this->deleteRandomDir();
-
-        this->displayMessage("Export termine avec succes !!");
+        this->deleteCurrentSerieDir();
+        delete _process;
       }
-    else
-      {
-        //message d'erreur !
-        this->displayErrorMessage("Pas d'images copiees, reessayez.");
-      }
-
-  }
-
-void
-QtDcmManager::exportSerieFromPACS()
-  {
-    QString program = _preferences->getDcm4che();
-    QStringList arguments;
-    QString serverPACSParam = _preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort();
-    QString localPACSParam = _preferences->getAetitle() + ":" + _preferences->getPort();
-    QString seriesId = "-qSeriesInstanceUID=" + _serieId;
-    arguments << "-L" << localPACSParam << serverPACSParam << "-I" << "-cmove" << _preferences->getAetitle() << seriesId << "-cstoredest" << _tempRandDir.absolutePath();
-    QString command = program + " -L " + localPACSParam + " " + serverPACSParam + " -I" + " -cmove " + _preferences->getAetitle() + " -cstore=" + _modality + " " + seriesId + " -cstoredest "
-        + _tempRandDir.absolutePath() + ">/dev/null";
-
-    _progress = new QProgressDialog("Export from server in progress...", "", 0, 0, _parent);
-    _progress->setWindowModality(Qt::WindowModal);
-    QPushButton * cancelButton = new QPushButton;
-    _progress->setCancelButton(cancelButton);
-    cancelButton->hide();
-    _progress->show();
-    qApp->processEvents();
-
-    _exportThread->setCommand(command);
-    _exportThread->start();
+    this->displayMessage("Export termine avec succes !!");
   }
 
 void
 QtDcmManager::exportSerieFromCD()
   {
     // Launch progress dialog window, to follow images copy
-    _progress = new QProgressDialog("Dicom extraction in progress...", "", 0, 100, _parent);
+    _progress = new QProgressDialog("Getting images from CD...", "", 0, 100, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -392,26 +385,61 @@ QtDcmManager::exportSerieFromCD()
     qApp->processEvents();
 
     //Copie des fichiers images dans le répertoire temporaire
-    for (int i = 0; i < _images.size(); i++)
+    QList<QString> series = _seriesToExport.keys();
+    for (int j = 0; j < series.size(); j++)
       {
-        QFile image(_images.at(i));
-        if (image.exists())
+        _progress->setValue(0);
+        _serieId = series.at(j);
+        _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
+        if (!_tempDir.exists(series.at(j)))
           {
-            image.copy(_tempRandDir.absolutePath() + QDir::separator() + "ima" + QString::number(i));
-            _progress->setValue(100 * i / _images.size());
-            qApp->processEvents();
+            this->generateCurrentSerieDir();
           }
+        for (int i = 0; i < _seriesToExport.value(series.at(j)).size(); i++)
+          {
+            QFile image(_seriesToExport.value(series.at(j)).at(i));
+            if (image.exists())
+              {
+                image.copy(_currentSerieDir.absolutePath() + QDir::separator() + "ima" + QString::number(i));
+                _progress->setValue(100 * i / _seriesToExport.value(series.at(j)).size());
+                qApp->processEvents();
+              }
+          }
+        _progress->setValue(100);
+        qApp->processEvents();
       }
-    _progress->setValue(100);
-    qApp->processEvents();
     _progress->close();
     delete _progress;
-    _images.clear();
+  }
+
+void
+QtDcmManager::exportSerieFromPACS()
+  {
+    QString program = _preferences->getDcm4che();
+
+    _exportThread->setProgram(_preferences->getDcm4che());
+    _exportThread->setServerPacsParam(_preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort());
+    _exportThread->setLocalPacsParam(_preferences->getAetitle() + ":" + _preferences->getPort());
+    _exportThread->setSeriesToExport(_seriesToExport.keys());
+    _exportThread->setTemporaryDir(_tempDir.absolutePath());
+    _exportThread->setModality(_modality);
+    _exportThread->setAetitle(_preferences->getAetitle());
+
+    _progress = new QProgressDialog("Retrieving images from server...", "", 0, 0, _parent);
+    _progress->setWindowModality(Qt::WindowModal);
+    QPushButton * cancelButton = new QPushButton;
+    _progress->setCancelButton(cancelButton);
+    cancelButton->hide();
+    _progress->show();
+    qApp->processEvents();
+
+    _exportThread->start();
   }
 
 void
 QtDcmManager::queryPACS()
   {
+    _seriesToExport.clear();
     _mode = "PACS";
     QString program = _preferences->getDcm4che();
     if (QFile(program).exists())
@@ -505,7 +533,6 @@ QtDcmManager::parseQueryResult( QString query )
             //Set the description and Id of the found serie
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setId(serieId);
             _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDescription(serieDesc);
-            //            _patients.at(numPatient)->getStudies().last()->getSeries().last()->setDate(serieDate);
           }
       }
     //Aucune occurence = 0 study renvoyee
@@ -514,4 +541,107 @@ QtDcmManager::parseQueryResult( QString query )
         //petit message d'information !
         this->displayMessage("Aucune occurence pour cette recherche");
       }
+  }
+
+void
+QtDcmManager::makePreview()
+  {
+    _seriesToExport.insert(_serieId,_images);
+    _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
+    if (!_tempDir.exists(_serieId))
+      {
+        //Utiliser l'UID de la serie pour copier les images
+        if (_mode == "CD")
+          {
+            this->exportSerieFromCD();
+          }
+        else
+          {
+            this->exportSerieFromPACS();
+            while (_exportThread->isRunning())
+              {
+                qApp->processEvents();
+              }
+            _progress->close();
+            delete _progress;
+          }
+      }
+    _progress = new QProgressDialog("Generating preview...", "", 0, 0, _parent);
+    _progress->setWindowModality(Qt::WindowModal);
+    QPushButton * cancelButton = new QPushButton;
+    _progress->setCancelButton(cancelButton);
+    cancelButton->hide();
+    _progress->show();
+    qApp->processEvents();
+    QStringList list = _currentSerieDir.entryList(QDir::Files, QDir::Name);
+    _listImages.clear();
+
+    DcmRLEDecoderRegistration::registerCodecs(OFFalse , OFFalse);
+    DJDecoderRegistration::registerCodecs(EDC_photometricInterpretation, EUC_default, EPC_default, OFFalse);
+
+    for (int i = 0; i < list.size(); i++)
+      {
+        qApp->processEvents();
+        QImage * current_image_ = NULL;
+        // get pixeldata
+        DcmFileFormat file;
+        file.loadFile((_currentSerieDir.absolutePath() + QDir::separator() + list.at(i)).toLatin1().data());
+        DcmDataset * dset = file.getDataset();
+        DicomImage* dcimage = new DicomImage(dset, file.getDataset()->getOriginalXfer(), CIF_MayDetachPixelData);
+
+        dcimage->setNoDisplayFunction();
+        dcimage->hideAllOverlays();
+        dcimage->setNoVoiTransformation();
+
+        //        DicomImage * dcimage = new DicomImage((_currentSerieDir.absolutePath() + QDir::separator() + list.at(i)).toLatin1().data());
+        if (dcimage != NULL)
+          {
+            if (dcimage->getStatus() == EIS_Normal)
+              {
+                Uint32 *pixelData = (Uint32 *) (dcimage->getOutputData(32 /* bits per sample */));
+                if (pixelData != NULL)
+                  {
+                    Uint8 *colored = new Uint8[dcimage->getWidth() * dcimage->getHeight() * 4]; //4 * dcimage->getWidth() * dcimage->getHeight() matrix
+                    Uint8 *col = colored;
+                    Uint32 *p = pixelData;
+                    //get the highest values for RGBA, then use them to scale the pixel luminosity
+                    Uint32 p_max = 0;
+                    Uint32 p_min = 4294967295;
+                    for (unsigned i = 0; i < dcimage->getWidth(); ++i)
+                      for (unsigned j = 0; j < dcimage->getHeight(); ++j, ++p)
+                        {
+                          if (*p > p_max)
+                            p_max = *p;
+                          if (*p < p_min)
+                            p_min = *p;
+                        }
+                    double a = 4294967295.f / ((double) p_max - (double) p_min);
+                    //re-initialize 'col'
+                    p = pixelData;
+                    //copy the pixels in our QImage
+                    for (unsigned i = 0; i < dcimage->getWidth(); ++i)
+                      for (unsigned j = 0; j < dcimage->getHeight(); ++j, ++p)
+                        {
+                          *col = (Uint8) ((255.f / 4294967295.f) * (a * ((double) (*p) - (double) p_min)));
+                          ++col;
+                          *col = (Uint8) ((255.f / 4294967295.f) * (a * ((double) (*p) - (double) p_min)));
+                          ++col;
+                          *col = (Uint8) ((255.f / 4294967295.f) * (a * ((double) (*p) - (double) p_min)));
+                          ++col;
+                          *col = 255;
+                          ++col;
+                        }
+                    current_image_ = new QImage(colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32);
+                    *current_image_ = current_image_->scaledToWidth(150);
+                    *current_image_ = current_image_->scaledToHeight(150);
+
+                    _listImages.append(QPixmap::fromImage(*current_image_));
+                  }
+
+              }
+          }
+      }
+    _progress->close();
+    delete _progress;
+    _seriesToExport.clear();
   }
