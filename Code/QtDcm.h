@@ -22,7 +22,7 @@ class QtDCM : public QLabel
     QList<QString> _imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
     QString _currentSerieId; /** Id of the current selected serie */
     QDate _beginDate, _endDate; /** Begin and end for Q/R retrieve parameters */
-    QMap<QString,QList<QString> > _selectedSeries;
+    QMap<QString, QList<QString> > _selectedSeries;
 
   public:
     Ui::QtDCM widget; /** Global widget generating by Designer*/
@@ -76,6 +76,9 @@ class QtDCM : public QLabel
      */
     QList<QString>
     getImagesList();
+
+    void
+    exportToDirectory( QString directory );
 
   public slots:
 

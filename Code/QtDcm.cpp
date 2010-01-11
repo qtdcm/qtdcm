@@ -266,26 +266,56 @@ QtDCM::openDicomdir()
 void
 QtDCM::exportList()
   {
-    // Open a QFileDialog in directory mode.
-    QFileDialog * dialog = new QFileDialog(this);
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOption(QFileDialog::ShowDirsOnly, true);
-    dialog->setDirectory(QDir::home().dirName());
-    dialog->setWindowTitle(tr("Export directory"));
-    QString directory;
-    if (dialog->exec())
+    if (_selectedSeries.size() != 0)
       {
-        directory = dialog->selectedFiles()[0];
+        // Open a QFileDialog in directory mode.
+        QFileDialog * dialog = new QFileDialog(this);
+        dialog->setFileMode(QFileDialog::Directory);
+        dialog->setOption(QFileDialog::ShowDirsOnly, true);
+        dialog->setDirectory(QDir::home().dirName());
+        dialog->setWindowTitle(tr("Export directory"));
+        QString directory;
+        if (dialog->exec())
+          {
+            directory = dialog->selectedFiles()[0];
+          }
+        dialog->close();
+        if (!directory.isEmpty()) // A file has been chosen
+          {
+            // Set the output directory to the manager and launch the conversion process
+            _manager->setOutputDirectory(directory);
+            _manager->setSeriesToExport(_selectedSeries);
+            _manager->exportSeries();
+          }
+        delete dialog;
       }
-    dialog->close();
-    if (!directory.isEmpty()) // A file has been chosen
+    else
       {
-        // Set the output directory to the manager and launch the conversion process
+        QMessageBox * msgBox = new QMessageBox(this);
+        msgBox->setIcon(QMessageBox::Information);
+        msgBox->setText(tr("Please select at least one serie to Export"));
+        msgBox->exec();
+        delete msgBox;
+      }
+  }
+
+void
+QtDCM::exportToDirectory( QString directory )
+  {
+    if (_selectedSeries.size() != 0)
+      {
         _manager->setOutputDirectory(directory);
         _manager->setSeriesToExport(_selectedSeries);
         _manager->exportSeries();
       }
-    delete dialog;
+    else
+      {
+        QMessageBox * msgBox = new QMessageBox(this);
+        msgBox->setIcon(QMessageBox::Information);
+        msgBox->setText(tr("Please select at least one serie to Export"));
+        msgBox->exec();
+        delete msgBox;
+      }
   }
 
 void

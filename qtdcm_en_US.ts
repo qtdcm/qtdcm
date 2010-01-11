@@ -266,9 +266,15 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="Code/QtDcm.cpp" line="274"/>
+        <location filename="Code/QtDcm.cpp" line="276"/>
         <source>Export directory</source>
         <translation>Export directory</translation>
+    </message>
+    <message>
+        <location filename="Code/QtDcm.cpp" line="296"/>
+        <location filename="Code/QtDcm.cpp" line="315"/>
+        <source>Please select at least one serie to Export</source>
+        <translation>Please select at least one serie to export</translation>
     </message>
 </context>
 <context>
