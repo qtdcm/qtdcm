@@ -268,7 +268,7 @@ QtDcmManager::createTemporaryDirs()
     if (!_tempDir.exists("logs"))
       {
         if (!_tempDir.mkdir("logs"))
-          qDebug() << "Repertoire logs non cree";
+          qDebug() << tr("Repertoire logs non cree");
       }
     _logsDir = QDir(_tempDir.absolutePath() + QDir::separator() + "logs");
   }
@@ -322,7 +322,7 @@ QtDcmManager::deleteCurrentSerieDir()
       }
     // Suppression du répertoire temporaire
     if (!_tempDir.rmdir(_serieId))
-      qDebug() << "Probleme lors de la suppression du répertoire temporaire";
+      qDebug() << tr("Probleme lors de la suppression du répertoire temporaire");
   }
 
 void
@@ -335,7 +335,7 @@ QtDcmManager::exportSeries()
     if (!QFile(_dcm2nii).exists())
       {
         //message d'erreur !
-        this->displayErrorMessage("Impossible de trouver dcm2nii, verifiez votre installation");
+        this->displayErrorMessage(tr("Impossible de trouver dcm2nii, verifiez votre installation"));
         return;
       }
 
@@ -369,14 +369,14 @@ QtDcmManager::exportSeries()
         this->deleteCurrentSerieDir();
         delete _process;
       }
-    this->displayMessage("Export termine avec succes !!");
+    this->displayMessage(tr("Export termine avec succes !!"));
   }
 
 void
 QtDcmManager::exportSerieFromCD()
   {
     // Launch progress dialog window, to follow images copy
-    _progress = new QProgressDialog("Getting images from CD...", "", 0, 100, _parent);
+    _progress = new QProgressDialog(tr("Getting images from CD..."), "", 0, 100, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -425,7 +425,7 @@ QtDcmManager::exportSerieFromPACS()
     _exportThread->setModality(_modality);
     _exportThread->setAetitle(_preferences->getAetitle());
 
-    _progress = new QProgressDialog("Retrieving images from server...", "", 0, 0, _parent);
+    _progress = new QProgressDialog(tr("Retrieving images from server..."), "", 0, 0, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -456,7 +456,7 @@ QtDcmManager::queryPACS()
 
         arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription << modality << date;
 
-        _progress = new QProgressDialog("Server query in progress...", "", 0, 0, _parent);
+        _progress = new QProgressDialog(tr("Server query in progress..."), "", 0, 0, _parent);
         _progress->setWindowModality(Qt::WindowModal);
         QPushButton * cancelButton = new QPushButton;
         _progress->setCancelButton(cancelButton);
@@ -481,7 +481,7 @@ QtDcmManager::queryPACS()
     else
       {
         //message d'erreur !
-        this->displayErrorMessage("Impossible de trouver dcmqr, verifiez votre installation");
+        this->displayErrorMessage(tr("Impossible de trouver dcmqr, verifiez votre installation"));
       }
   }
 
@@ -539,7 +539,7 @@ QtDcmManager::parseQueryResult( QString query )
     if (cptStudy == 0)
       {
         //petit message d'information !
-        this->displayMessage("Aucune occurence pour cette recherche");
+        this->displayMessage(tr("Aucune occurence pour cette recherche"));
       }
   }
 
@@ -566,7 +566,7 @@ QtDcmManager::makePreview()
             delete _progress;
           }
       }
-    _progress = new QProgressDialog("Generating preview...", "", 0, 0, _parent);
+    _progress = new QProgressDialog(tr("Generating preview..."), "", 0, 0, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);

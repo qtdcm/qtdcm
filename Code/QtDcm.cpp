@@ -212,7 +212,7 @@ QtDCM::contextExportMenu( const QPoint point )
         if (item->data(2, 1) == "SERIE")
           {
             // Add preview action in the context menu
-            actionPreview->setText("Preview");
+            actionPreview->setText(tr("Preview"));
             QObject::connect(actionPreview, SIGNAL(triggered()), this, SLOT(showPreview()));
             menu.addAction(actionPreview);
             menu.addSeparator();
@@ -220,10 +220,10 @@ QtDCM::contextExportMenu( const QPoint point )
       }
 
     // By default the context menu contains an open dicomdir command.
-    actionDicomdir->setText("Open dicomdir");
+    actionDicomdir->setText(tr("Open dicomdir"));
     QObject::connect(actionDicomdir, SIGNAL(triggered()), this, SLOT(openDicomdir()));
     menu.addAction(actionDicomdir);
-    actionQuery->setText("Query server");
+    actionQuery->setText(tr("Query server"));
     QObject::connect(actionQuery, SIGNAL(triggered()), this, SLOT(queryPACS()));
     menu.addAction(actionQuery);
     // If no item selected (object empty)
@@ -231,7 +231,7 @@ QtDCM::contextExportMenu( const QPoint point )
       {
         menu.addSeparator();
         // If the serie is exportable, create export command in the menu
-        actionExport->setText("Export");
+        actionExport->setText(tr("Export"));
         QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportList()));
         menu.addAction(actionExport);
       }
@@ -245,7 +245,7 @@ QtDCM::openDicomdir()
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setDirectory(QDir::home().dirName());
-    dialog.setWindowTitle("Open dicomdir");
+    dialog.setWindowTitle(tr("Open dicomdir"));
     dialog.setNameFilter(tr("Dicomdir (dicomdir DICOMDIR)"));
     QString fileName;
     if (dialog.exec())
@@ -271,7 +271,7 @@ QtDCM::exportList()
     dialog->setFileMode(QFileDialog::Directory);
     dialog->setOption(QFileDialog::ShowDirsOnly, true);
     dialog->setDirectory(QDir::home().dirName());
-    dialog->setWindowTitle("Export directory");
+    dialog->setWindowTitle(tr("Export directory"));
     QString directory;
     if (dialog->exec())
       {

@@ -170,7 +170,7 @@ void QtDcmPreferencesDialog::setDcm2nii()
     dialog->setNameFilter(tr("Dcm2nii (dcm2nii.exe)"));
 #endif
     dialog->setDirectory(QDir::home().dirName());
-    dialog->setWindowTitle("Choose dcm2nii binary");
+    dialog->setWindowTitle(tr("Choose dcm2nii binary"));
     QString filename;
     if (dialog->exec())
       {
@@ -197,7 +197,7 @@ void QtDcmPreferencesDialog::setDcm4che()
     dialog->setNameFilter(tr("Dcm4che (dcmqr.bat)"));
 #endif
     dialog->setDirectory(QDir::home().dirName());
-    dialog->setWindowTitle("Choose dcmqr binary");
+    dialog->setWindowTitle(tr("Choose dcmqr binary"));
     QString filename;
     if (dialog->exec())
       {
