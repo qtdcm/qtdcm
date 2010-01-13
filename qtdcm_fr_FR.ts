@@ -14,7 +14,7 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="379"/>
         <source>QtDcm settings</source>
-        <translation>Paramètres</translation>
+        <translation>Paramètres de QtDcm</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="380"/>
@@ -116,7 +116,7 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="402"/>
         <source>Servers settings</source>
-        <translation>Paramètres serveurs</translation>
+        <translation>Paramètres des serveurs</translation>
     </message>
 </context>
 <context>
@@ -212,17 +212,17 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="287"/>
         <source>beginDate</source>
-        <translation></translation>
+        <translation>beginDate</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="288"/>
         <source>-</source>
-        <translation></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="289"/>
         <source>endDate</source>
-        <translation></translation>
+        <translation>endDate</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="290"/>
@@ -232,7 +232,7 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="291"/>
         <source>Study description :</source>
-        <translation>Description de l&apos;étude :</translation>
+        <translation>Description de la série :</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="292"/>
@@ -302,12 +302,12 @@
     <message>
         <location filename="Code/QtDcmManager.cpp" line="379"/>
         <source>Getting images from CD...</source>
-        <translation>Copie des images en cours...</translation>
+        <translation>Copie des images depuis le CD...</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="428"/>
         <source>Retrieving images from server...</source>
-        <translation>Téléchargement des images en cours...</translation>
+        <translation>Téléchargement des images depuis le serveur...</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="459"/>
@@ -322,12 +322,12 @@
     <message>
         <location filename="Code/QtDcmManager.cpp" line="542"/>
         <source>Aucune occurence pour cette recherche</source>
-        <translation>Aucune occurence pour cette recherche</translation>
+        <translation>Aucune.série trouvée pour cette recherche</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="569"/>
         <source>Generating preview...</source>
-        <translation>Génération de l&apos;aperçu...</translation>
+        <translation>Création de l&apos;aperçu en cours...</translation>
     </message>
 </context>
 <context>
@@ -360,7 +360,7 @@
     <message>
         <location filename="Code/QtDcmPreferencesDialog.cpp" line="200"/>
         <source>Choose dcmqr binary</source>
-        <translation>Sélection du binaire dcmqr</translation>
+        <translation>Sélection du binaire dcm4che</translation>
     </message>
 </context>
 </TS>

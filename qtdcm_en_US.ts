@@ -14,12 +14,12 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="379"/>
         <source>QtDcm settings</source>
-        <translation>Parameters</translation>
+        <translation>QtDcm settings</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="380"/>
         <source>Binary paths</source>
-        <translation>Binary path</translation>
+        <translation>Binary paths</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcmpreferencesdialog.h" line="381"/>
@@ -212,17 +212,17 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="287"/>
         <source>beginDate</source>
-        <translation></translation>
+        <translation>beginDate</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="288"/>
         <source>-</source>
-        <translation></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="289"/>
         <source>endDate</source>
-        <translation></translation>
+        <translation>endDate</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="290"/>
@@ -274,7 +274,7 @@
         <location filename="Code/QtDcm.cpp" line="296"/>
         <location filename="Code/QtDcm.cpp" line="315"/>
         <source>Please select at least one serie to Export</source>
-        <translation>Please select at least one serie to export</translation>
+        <translation>Please select at least one serie to Export</translation>
     </message>
 </context>
 <context>
@@ -282,22 +282,22 @@
     <message>
         <location filename="Code/QtDcmManager.cpp" line="271"/>
         <source>Repertoire logs non cree</source>
-        <translation>Logs directory cannot be created</translation>
+        <translation>Cannot create logs directory</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="325"/>
         <source>Probleme lors de la suppression du rÃ©pertoire temporaire</source>
-        <translation>Temporary directory deletion error</translation>
+        <translation>There was an error during temporary directory deletion</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="338"/>
         <source>Impossible de trouver dcm2nii, verifiez votre installation</source>
-        <translation>Dcm2nii not found, please verify your installation</translation>
+        <translation>dcm2nii cannot be found, check your installation</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="372"/>
         <source>Export termine avec succes !!</source>
-        <translation>Export successfully finished !!</translation>
+        <translation>Export process finished successfully !!</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="379"/>
@@ -317,12 +317,12 @@
     <message>
         <location filename="Code/QtDcmManager.cpp" line="484"/>
         <source>Impossible de trouver dcmqr, verifiez votre installation</source>
-        <translation>Dcmqr not found, please verify your installation</translation>
+        <translation>dcmqr cannot be found, please verify your installation</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="542"/>
         <source>Aucune occurence pour cette recherche</source>
-        <translation>No series found for this query</translation>
+        <translation>No result for this query</translation>
     </message>
     <message>
         <location filename="Code/QtDcmManager.cpp" line="569"/>
