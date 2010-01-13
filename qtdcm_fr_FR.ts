@@ -232,7 +232,7 @@
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="291"/>
         <source>Study description :</source>
-        <translation>Description de la série :</translation>
+        <translation>Description de l&apos;étude :</translation>
     </message>
     <message>
         <location filename="../../../../builds/qtdcm2/ui_qtdcm.h" line="292"/>
