@@ -381,6 +381,8 @@ QtDcmManager::exportSerieFromCD()
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
     cancelButton->hide();
+    _progress->setValue(0);
+    qApp->processEvents();
     _progress->show();
     qApp->processEvents();
 
@@ -430,6 +432,8 @@ QtDcmManager::exportSerieFromPACS()
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
     cancelButton->hide();
+    cancelButton->hide();
+    _progress->setValue(0);
     _progress->show();
     qApp->processEvents();
 
