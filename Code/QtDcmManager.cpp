@@ -343,7 +343,6 @@ QtDcmManager::exportSeries()
       this->exportSerieFromCD();
     else
       {
-
         this->exportSerieFromPACS();
         while (_exportThread->isRunning())
           {
@@ -360,7 +359,11 @@ QtDcmManager::exportSeries()
         _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
         //Conversion de la serie avec dcm2nii
         QStringList arguments;
-        arguments << "-x" << "N" << "-r" << "N" << "-g" << "N" << "-o" << _outputDir << _currentSerieDir.absolutePath();
+        arguments << "-x" << "N";
+        arguments << "-r" << "N";
+        arguments << "-g" << "N";
+        arguments << "-o" << _outputDir << _currentSerieDir.absolutePath();
+
         _process = new QProcess(this);
         _process->setStandardOutputFile(_logsDir.absolutePath() + QDir::separator() + "log" + _serieId + ".txt");
         _process->start(_dcm2nii, arguments);
@@ -421,7 +424,7 @@ QtDcmManager::exportSerieFromPACS()
 
     _exportThread->setProgram(_preferences->getDcm4che());
     _exportThread->setServerPacsParam(_preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort());
-    _exportThread->setLocalPacsParam(_preferences->getAetitle() + ":" + _preferences->getPort());
+    _exportThread->setLocalPacsParam(_preferences->getAetitle() + "@" + _preferences->getHostname() + ":" + _preferences->getPort());
     _exportThread->setSeriesToExport(_seriesToExport.keys());
     _exportThread->setTemporaryDir(_tempDir.absolutePath());
     _exportThread->setModality(_modality);
@@ -449,7 +452,7 @@ QtDcmManager::queryPACS()
     if (QFile(program).exists())
       {
         QStringList arguments;
-
+        QString localDicomParam = _preferences->getAetitle() + "@" + _preferences->getHostname() + ":" + _preferences->getPort();
         QString serverPACSParam = _preferences->getServers().at(0)->getAetitle() + "@" + _preferences->getServers().at(0)->getServer() + ":" + _preferences->getServers().at(0)->getPort();
         QString serieDescription = "-qSeriesDescription=" + _serieDescription;
         QString patientName = "-qPatientName=" + _patientName;
@@ -458,13 +461,15 @@ QtDcmManager::queryPACS()
         QString modality = "-qModality=" + _modality;
         QString date = "-qStudyDate=" + _date1 + "-" + _date2;
 
-        arguments << serverPACSParam << "-S" << serieDescription << patientName << studyDescription << modality << date;
+        arguments << "-L" << localDicomParam << serverPACSParam;
+        arguments << "-S" << serieDescription;
+        arguments << patientName;
+        arguments << studyDescription << modality << date;
 
         _progress = new QProgressDialog(tr("Server query in progress..."), "", 0, 0, _parent);
         _progress->setWindowModality(Qt::WindowModal);
-        QPushButton * cancelButton = new QPushButton;
-        _progress->setCancelButton(cancelButton);
-        cancelButton->hide();
+        QPushButton * cancel = new QPushButton("Cancel");
+        _progress->setCancelButton(cancel);
         _progress->show();
         qApp->processEvents();
 
@@ -474,7 +479,11 @@ QtDcmManager::queryPACS()
         _queryThread->start();
 
         while (_queryThread->isRunning())
-          qApp->processEvents();
+          {
+            if (_progress->isHidden())
+              _queryThread->terminate();
+            qApp->processEvents();
+          }
 
         _progress->close();
         delete _progress;
@@ -550,7 +559,7 @@ QtDcmManager::parseQueryResult( QString query )
 void
 QtDcmManager::makePreview()
   {
-    _seriesToExport.insert(_serieId,_images);
+    _seriesToExport.insert(_serieId, _images);
     _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
     if (!_tempDir.exists(_serieId))
       {
@@ -580,7 +589,7 @@ QtDcmManager::makePreview()
     QStringList list = _currentSerieDir.entryList(QDir::Files, QDir::Name);
     _listImages.clear();
 
-    DcmRLEDecoderRegistration::registerCodecs(OFFalse , OFFalse);
+    DcmRLEDecoderRegistration::registerCodecs(OFFalse, OFFalse);
     DJDecoderRegistration::registerCodecs(EDC_photometricInterpretation, EUC_default, EPC_default, OFFalse);
 
     for (int i = 0; i < list.size(); i++)

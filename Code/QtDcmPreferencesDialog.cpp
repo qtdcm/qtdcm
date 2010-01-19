@@ -48,6 +48,7 @@ QtDcmPreferencesDialog::setPreferences( QtDcmPreferences * prefs )
     widget.dcm4chePathEdit->setText(_preferences->getDcm4che());
     widget.localAetitleEdit->setText(_preferences->getAetitle());
     widget.localPortEdit->setText(_preferences->getPort());
+    widget.localHostnameEdit->setText(_preferences->getHostname());
     for (int i = 0; i < _preferences->getServers().size(); i++)
       {
         QTreeWidgetItem * item = new QTreeWidgetItem(widget.treeWidget);
@@ -69,6 +70,7 @@ QtDcmPreferencesDialog::updatePreferences()
     _preferences->setDcm4che(widget.dcm4chePathEdit->text());
     _preferences->setAetitle(widget.localAetitleEdit->text());
     _preferences->setPort(widget.localPortEdit->text());
+    _preferences->setHostname(widget.localHostnameEdit->text());
     QTreeWidgetItem * root = widget.treeWidget->invisibleRootItem();
     for (int i = 0; i < _preferences->getServers().size(); i++)
       {

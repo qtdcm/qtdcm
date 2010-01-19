@@ -37,6 +37,7 @@ class QtDcmPreferences : public QObject
     QFile _iniFile; /** File stored on the file system that contains the preferences */
     QString _aetitle; /** Local aetitle of QtDcm */
     QString _port; /** Local port of qtdcm */
+    QString _hostname;
     QString _encoding; /** Local character encoding */
 
     QString _dcm2nii; /** Absolute filename of the dcm2nii binary on the system */
@@ -60,7 +61,10 @@ class QtDcmPreferences : public QObject
      * Default destructor
      */
     virtual
-    ~QtDcmPreferences() {};
+    ~QtDcmPreferences()
+      {
+      }
+    ;
 
     /**
      * Read the settings from the ini file.
@@ -149,7 +153,7 @@ class QtDcmPreferences : public QObject
      * @param as a QString
      */
     void
-    setDcm2nii(QString path)
+    setDcm2nii( QString path )
       {
         _dcm2nii = path;
       }
@@ -160,9 +164,26 @@ class QtDcmPreferences : public QObject
      * @param as a QString
      */
     void
-    setDcm4che(QString path)
+    setDcm4che( QString path )
       {
         _dcm4che = path;
+      }
+
+    /**
+     * QtDcm local AETitle setter
+     *
+     * @param _aetitle as a QString
+     */
+    void
+    setHostname( QString _hostname )
+      {
+        this->_hostname = _hostname;
+      }
+
+    QString
+    getHostname()
+      {
+        return _hostname;
       }
 
     /**
@@ -210,7 +231,7 @@ class QtDcmPreferences : public QObject
      * @param i index of the server to be removed in the list
      */
     void
-    removeServer(int index);
+    removeServer( int index );
 
     /**
      * QtDcm server list setter

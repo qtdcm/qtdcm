@@ -36,9 +36,10 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QTDCM_CMAKE_MODULE_PATH}")
 
 include (${QTDCM_SOURCE_DIR}/CMake/QtDCMSettings.cmake)
 
-find_package( Qt4 REQUIRED )
+find_package( Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork)
 if(QT4_FOUND)
   include(${QT_USE_FILE})
+  set(QT_USE_QTNETWORK true)
 endif(QT4_FOUND)
 
 find_package(DCMTK REQUIRED)
@@ -106,7 +107,7 @@ ENDIF(LANGUAGE_TS_FILES)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${qm_files})
-target_link_libraries( qtdcm ${DCMTK_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries( qtdcm ${DCMTK_LIBRARIES} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY})
 
 
 # External inclusion stuff :

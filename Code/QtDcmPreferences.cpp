@@ -45,6 +45,7 @@ QtDcmPreferences::readSettings()
     _dcm4che = prefs.value("Dcm4che").toString();
     _aetitle = prefs.value("AETitle").toString();
     _port = prefs.value("Port").toString();
+    _hostname = prefs.value("Hostname").toString();
     _encoding = prefs.value("Encoding").toString();
     prefs.endGroup();
     //For each server load corresponding settings
@@ -74,6 +75,7 @@ QtDcmPreferences::writeSettings()
     prefs.setValue("Dcm4che", _dcm4che);
     prefs.setValue("AETitle", _aetitle);
     prefs.setValue("Port", _port);
+    prefs.setValue("Hostname", _hostname);
     prefs.setValue("Encoding", _encoding);
     prefs.endGroup();
     //Do the job for each server
@@ -98,6 +100,7 @@ QtDcmPreferences::setDefaultIniFile()
     _dcm4che = "";
     _aetitle = "QTDCM";
     _port = "2010";
+    _hostname = "localhost";
     _encoding = "ISO_IR 100";
 
     QtDcmServer * server = new QtDcmServer();

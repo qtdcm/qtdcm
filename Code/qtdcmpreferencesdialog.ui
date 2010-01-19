@@ -129,6 +129,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Hostname :</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="label_3">
                 <property name="text">
                  <string>Encoding :</string>
@@ -144,6 +151,9 @@
               </item>
               <item>
                <widget class="QLineEdit" name="localPortEdit"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="localHostnameEdit"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">

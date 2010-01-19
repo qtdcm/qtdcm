@@ -9,6 +9,7 @@
 #define QTDCMMANAGER_H_
 
 #include <QtGui>
+#include <QtNetwork>
 
 #include <algorithm>
 #include <iostream>

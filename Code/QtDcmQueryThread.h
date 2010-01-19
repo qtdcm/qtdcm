@@ -22,11 +22,13 @@ class QtDcmQueryThread : public QThread
     QString _command;
     QStringList _parameters;
     QtDcmManager * _manager;
+    QProcess * _process;
 
   public:
     QtDcmQueryThread()
       {
       }
+
     virtual
     ~QtDcmQueryThread()
       {
@@ -34,6 +36,12 @@ class QtDcmQueryThread : public QThread
 
     void
     run();
+
+    QProcess *
+    getProcess()
+      {
+        return _process;
+      }
 
     void
     setCommand( QString command )

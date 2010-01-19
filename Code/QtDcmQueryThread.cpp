@@ -10,16 +10,16 @@
 void
 QtDcmQueryThread::run()
   {
-    QProcess * process = new QProcess(this);
-    process->start(_command, _parameters);
+    _process = new QProcess();
+    _process->start(_command, _parameters);
 
     QByteArray query;
-    while (process->waitForReadyRead())
-      query += process->readAll();
+    while (_process->waitForReadyRead())
+      query += _process->readAll();
 
     _manager->setQuery(query);
 
-    delete process;
+    delete _process;
 
     exit();
   }
