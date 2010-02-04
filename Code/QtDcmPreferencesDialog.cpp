@@ -106,7 +106,7 @@ QtDcmPreferencesDialog::serverNameChanged( QString text )
 void
 QtDcmPreferencesDialog::serverAetitleChanged( QString text )
   {
-    QRegExp rexp ("[A-Z0-9]{1,50}");
+    QRegExp rexp ("[A-Z0-9._-]{1,50}");
     QRegExpValidator * valid = new QRegExpValidator(rexp,this);
     widget.serverAetitleEdit->setValidator(valid);
     widget.treeWidget->currentItem()->setText(1, text);
