@@ -189,6 +189,10 @@ class QtDCM : public QLabel
 
     void
     showPreview();
+
+    signals:
+    void serieChecked(bool checked);
+    void serieSelected(bool selected);
   };
 
 #endif

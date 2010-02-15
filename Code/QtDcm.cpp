@@ -37,7 +37,7 @@ QtDCM::~QtDCM()
 void
 QtDCM::initConnections()
   {
-    // Initialize des connections
+    // Initialize connections
     QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
     QObject::connect(widget.treeWidget, SIGNAL(itemClicked (QTreeWidgetItem*, int)), this, SLOT(itemClicked(QTreeWidgetItem*, int)));
     QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
@@ -60,6 +60,7 @@ QtDCM::clearDisplay()
     _imagesList.clear();
     widget.treeWidget->clear();
     widget.treeWidget->setAnimated(false);
+    emit serieSelected(false);
   }
 
 void
@@ -171,6 +172,7 @@ QtDCM::itemClicked( QTreeWidgetItem* current , int column )
                 if (_selectedSeries.contains(_currentSerieId))
                   _selectedSeries.remove(_currentSerieId);
               }
+            emit(serieChecked(_selectedSeries.size()));
           }
       }
   }
@@ -190,7 +192,10 @@ QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
               {
                 _imagesList.append(current->child(i)->data(1, 1).toStringList());
               }
+            emit serieSelected(true);
           }
+        else
+          emit serieSelected(false);
       }
   }
 
