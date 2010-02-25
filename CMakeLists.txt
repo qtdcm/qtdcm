@@ -38,8 +38,8 @@ include (${QTDCM_SOURCE_DIR}/CMake/QtDCMSettings.cmake)
 
 find_package( Qt4 REQUIRED COMPONENTS QtCore QtGui QtNetwork)
 if(QT4_FOUND)
-  include(${QT_USE_FILE})
   set(QT_USE_QTNETWORK true)
+  include(${QT_USE_FILE})
 endif(QT4_FOUND)
 
 find_package(DCMTK REQUIRED)
