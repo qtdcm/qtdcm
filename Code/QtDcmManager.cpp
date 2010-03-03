@@ -372,14 +372,14 @@ QtDcmManager::exportSeries()
         this->deleteCurrentSerieDir();
         delete _process;
       }
-    this->displayMessage(tr("Export termine avec succes !!"));
+    this->displayMessage(tr("Import termine"));
   }
 
 void
 QtDcmManager::exportSerieFromCD()
   {
     // Launch progress dialog window, to follow images copy
-    _progress = new QProgressDialog(tr("Getting images from CD..."), "", 0, 100, _parent);
+    _progress = new QProgressDialog(tr("Copie des images depuis le CD..."), "", 0, 100, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -430,7 +430,7 @@ QtDcmManager::exportSerieFromPACS()
     _exportThread->setModality(_modality);
     _exportThread->setAetitle(_preferences->getAetitle());
 
-    _progress = new QProgressDialog(tr("Retrieving images from server..."), "", 0, 0, _parent);
+    _progress = new QProgressDialog(tr("Chargement des images..."), "", 0, 0, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
@@ -466,7 +466,7 @@ QtDcmManager::queryPACS()
         arguments << patientName;
         arguments << studyDescription << modality << date;
 
-        _progress = new QProgressDialog(tr("Server query in progress..."), "", 0, 0, _parent);
+        _progress = new QProgressDialog(tr("Requete en cours..."), "", 0, 0, _parent);
         _progress->setWindowModality(Qt::WindowModal);
         QPushButton * cancel = new QPushButton("Cancel");
         _progress->setCancelButton(cancel);
@@ -579,7 +579,7 @@ QtDcmManager::makePreview()
             delete _progress;
           }
       }
-    _progress = new QProgressDialog(tr("Generating preview..."), "", 0, 0, _parent);
+    _progress = new QProgressDialog(tr("Creation de l'apercu..."), "", 0, 0, _parent);
     _progress->setWindowModality(Qt::WindowModal);
     QPushButton * cancelButton = new QPushButton;
     _progress->setCancelButton(cancelButton);
