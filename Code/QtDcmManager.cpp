@@ -405,7 +405,9 @@ QtDcmManager::exportSerieFromCD()
             QFile image(_seriesToExport.value(series.at(j)).at(i));
             if (image.exists())
               {
-                image.copy(_currentSerieDir.absolutePath() + QDir::separator() + "ima" + QString::number(i));
+                QString zeroStr;
+                zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
+                image.copy(_currentSerieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number(i));
                 _progress->setValue(100 * i / _seriesToExport.value(series.at(j)).size());
                 qApp->processEvents();
               }
@@ -644,11 +646,7 @@ QtDcmManager::makePreview()
                           *col = 255;
                           ++col;
                         }
-                    current_image_ = new QImage(colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32);
-                    *current_image_ = current_image_->scaledToWidth(150);
-                    *current_image_ = current_image_->scaledToHeight(150);
-
-                    _listImages.append(QPixmap::fromImage(*current_image_));
+                    _listImages.append(QImage(colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32));
                   }
 
               }

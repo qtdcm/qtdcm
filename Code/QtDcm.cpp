@@ -555,6 +555,7 @@ QtDCM::showPreview()
     _manager->setSerieId(_currentSerieId);
     _manager->makePreview();
     dialog->setImages(_manager->getListImages());
+    dialog->updatePreview();
     dialog->exec();
     dialog->close();
     delete dialog;

@@ -76,7 +76,8 @@ class QtDcmManager : public QObject
     QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
     QList<QString> _images; /** List of image filename to export from a CD */
     QMap<QString, QList<QString> > _seriesToExport;
-    QList<QPixmap> _listImages;
+//    QList<QPixmap> _listImages;
+    QList<QImage> _listImages;
     QString _serieId; /** Id of the serie to export from the PACS */
     QProcess * _process; /** This attribute launch the reconstruction process */
     QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
@@ -450,7 +451,7 @@ class QtDcmManager : public QObject
         _images = images;
       }
 
-    QList<QPixmap>
+    QList<QImage>
     getListImages()
       {
         return _listImages;
