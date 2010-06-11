@@ -165,7 +165,6 @@ void QtDcmPreferencesDialog::setDcm2nii()
     // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setOption(QFileDialog::ShowDirsOnly, true);
 #ifdef Q_OS_UNIX
     dialog->setNameFilter(tr("Dcm2nii (dcm2nii)"));
 #else
@@ -192,7 +191,6 @@ void QtDcmPreferencesDialog::setDcm4che()
     // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
     dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setOption(QFileDialog::ShowDirsOnly, true);
 #ifdef Q_OS_UNIX
     dialog->setNameFilter(tr("Dcm4che (dcmqr)"));
 #else
