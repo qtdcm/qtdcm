@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 #define HAVE_CLASS_TEMPLATE
 #define HAVE_STL
