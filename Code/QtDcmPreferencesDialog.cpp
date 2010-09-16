@@ -7,7 +7,7 @@
 
 #include <QtDcmPreferencesDialog.h>
 
-QtDcmPreferencesDialog::QtDcmPreferencesDialog( QWidget * parent )
+QtDcmPreferencesDialog::QtDcmPreferencesDialog(QWidget * parent)
   {
     widget.setupUi(this);
     this->setModal(true);
@@ -29,11 +29,17 @@ QtDcmPreferencesDialog::QtDcmPreferencesDialog( QWidget * parent )
 void
 QtDcmPreferencesDialog::initConnections()
   {
-    QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
-    QObject::connect(widget.serverNameEdit, SIGNAL(textChanged(QString)), this, SLOT(serverNameChanged(QString)));
-    QObject::connect(widget.serverHostnameEdit, SIGNAL(textChanged(QString)), this, SLOT(serverHostnameChanged(QString)));
-    QObject::connect(widget.serverAetitleEdit, SIGNAL(textChanged(QString)), this, SLOT(serverAetitleChanged(QString)));
-    QObject::connect(widget.serverPortEdit, SIGNAL(textChanged(QString)), this, SLOT(serverPortChanged(QString)));
+    QObject::connect(widget.treeWidget,
+        SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this,
+        SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
+    QObject::connect(widget.serverNameEdit, SIGNAL(textChanged(QString)), this,
+        SLOT(serverNameChanged(QString)));
+    QObject::connect(widget.serverHostnameEdit, SIGNAL(textChanged(QString)), this,
+        SLOT(serverHostnameChanged(QString)));
+    QObject::connect(widget.serverAetitleEdit, SIGNAL(textChanged(QString)), this,
+        SLOT(serverAetitleChanged(QString)));
+    QObject::connect(widget.serverPortEdit, SIGNAL(textChanged(QString)), this,
+        SLOT(serverPortChanged(QString)));
     QObject::connect(widget.addButton, SIGNAL(clicked()), this, SLOT(addServer()));
     QObject::connect(widget.removeButton, SIGNAL(clicked()), this, SLOT(removeServer()));
     QObject::connect(widget.dcm2niiButton, SIGNAL(clicked()), this, SLOT(setDcm2nii()));
@@ -41,7 +47,7 @@ QtDcmPreferencesDialog::initConnections()
   }
 
 void
-QtDcmPreferencesDialog::setPreferences( QtDcmPreferences * prefs )
+QtDcmPreferencesDialog::setPreferences(QtDcmPreferences * prefs)
   {
     _preferences = prefs;
     widget.dcm2niiPathEdit->setText(_preferences->getDcm2nii());
@@ -83,7 +89,7 @@ QtDcmPreferencesDialog::updatePreferences()
   }
 
 void
-QtDcmPreferencesDialog::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
+QtDcmPreferencesDialog::itemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous)
   {
     widget.removeButton->setEnabled(true);
     widget.serverNameEdit->setEnabled(true);
@@ -97,33 +103,33 @@ QtDcmPreferencesDialog::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem
   }
 
 void
-QtDcmPreferencesDialog::serverNameChanged( QString text )
+QtDcmPreferencesDialog::serverNameChanged(QString text)
   {
     widget.treeWidget->currentItem()->setText(0, text);
     widget.treeWidget->currentItem()->setData(0, 1, QVariant(text));
   }
 
 void
-QtDcmPreferencesDialog::serverAetitleChanged( QString text )
+QtDcmPreferencesDialog::serverAetitleChanged(QString text)
   {
-    QRegExp rexp ("[A-Z0-9._-]{1,50}");
-    QRegExpValidator * valid = new QRegExpValidator(rexp,this);
+    QRegExp rexp("[A-Z0-9._-]{1,50}");
+    QRegExpValidator * valid = new QRegExpValidator(rexp, this);
     widget.serverAetitleEdit->setValidator(valid);
     widget.treeWidget->currentItem()->setText(1, text);
     widget.treeWidget->currentItem()->setData(1, 1, QVariant(text));
   }
 
 void
-QtDcmPreferencesDialog::serverPortChanged( QString text )
+QtDcmPreferencesDialog::serverPortChanged(QString text)
   {
-    QIntValidator * valid = new QIntValidator(1000, 100000,this);
+    QIntValidator * valid = new QIntValidator(1000, 100000, this);
     widget.serverPortEdit->setValidator(valid);
     widget.treeWidget->currentItem()->setText(2, text);
     widget.treeWidget->currentItem()->setData(2, 1, QVariant(text));
   }
 
 void
-QtDcmPreferencesDialog::serverHostnameChanged( QString text )
+QtDcmPreferencesDialog::serverHostnameChanged(QString text)
   {
     widget.treeWidget->currentItem()->setText(3, text);
     widget.treeWidget->currentItem()->setData(3, 1, QVariant(text));
@@ -153,14 +159,20 @@ QtDcmPreferencesDialog::removeServer()
   {
     QTreeWidgetItem * root = widget.treeWidget->invisibleRootItem();
     _preferences->removeServer(root->indexOfChild(widget.treeWidget->currentItem()));
-    root->removeChild(widget.treeWidget->currentItem());
     if (root->childCount() == 0)
+      widget.removeButton->setEnabled(false);
+    else if (root->childCount() == 1)
       {
+        widget.treeWidget->reset();
+        widget.treeWidget->clear();
         widget.removeButton->setEnabled(false);
       }
+    else
+      root->removeChild(widget.treeWidget->currentItem());
   }
 
-void QtDcmPreferencesDialog::setDcm2nii()
+void
+QtDcmPreferencesDialog::setDcm2nii()
   {
     // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
@@ -175,7 +187,7 @@ void QtDcmPreferencesDialog::setDcm2nii()
     QString filename;
     if (dialog->exec())
       {
-      filename = dialog->selectedFiles()[0];
+        filename = dialog->selectedFiles()[0];
       }
     dialog->close();
     if (!filename.isEmpty()) // A file has been chosen
@@ -186,7 +198,8 @@ void QtDcmPreferencesDialog::setDcm2nii()
       }
   }
 
-void QtDcmPreferencesDialog::setDcm4che()
+void
+QtDcmPreferencesDialog::setDcm4che()
   {
     // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
