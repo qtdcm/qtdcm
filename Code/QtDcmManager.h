@@ -15,20 +15,23 @@
 #include <iostream>
 #include <limits>
 
-#define HAVE_CLASS_TEMPLATE
-#define HAVE_STL
-#define HAVE_STD_NAMESPACE
-#define HAVE_SSTREAM
-#define USE_STD_CXX_INCLUDES
-#define HAVE_CXX_BOOL
-
-#define DCM_DICT_DEFAULT_PATH
+//#define HAVE_CLASS_TEMPLATE
+//#define HAVE_STL
+//#define HAVE_STD_NAMESPACE
+//#define HAVE_SSTREAM
+//#define USE_STD_CXX_INCLUDES
+//#define HAVE_CXX_BOOL
+//
+//#define DCM_DICT_DEFAULT_PATH
 
 // From Dcmtk:
+#include "dcmtk/ofstd/ofstdinc.h"
+#include "dcmtk/ofstd/ofstd.h"
+#include "dcmtk/ofstd/ofconapp.h"
 #include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
 #include <dcmtk/ofstd/ofstream.h>
 #include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcdebug.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
 #include <dcmtk/dcmdata/cmdlnarg.h>
 #include <dcmtk/ofstd/ofconapp.h>
 #include <dcmtk/dcmdata/dcuid.h>       /* for dcmtk version name */
@@ -39,15 +42,15 @@
 #include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
 #include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
 // For color images
-//#include <dcmtk/dcmimage/diregist.h>
+#include <dcmtk/dcmimage/diregist.h>
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTRING
+//#define INCLUDE_CSTDLIB
+//#define INCLUDE_CSTRING
 #include "dcmtk/ofstd/ofstdinc.h"
 
-#ifdef WITH_ZLIB
-#include <zlib.h>        /* for zlibVersion() */
-#endif
+//#ifdef WITH_ZLIB
+//#include <zlib.h>        /* for zlibVersion() */
+//#endif
 
 #include <QtDcmPatient.h>
 #include <QtDcmPreferences.h>

@@ -2,11 +2,21 @@ cmake_minimum_required(VERSION 2.6)
 
 project(QTDCM)
 
-set(QTDCM_VERSION_MAJOR "0")
-set(QTDCM_VERSION_MINOR "1")
-set(QTDCM_VERSION_PATCH "0")
+#set(QTDCM_VERSION_MAJOR "0")
+#set(QTDCM_VERSION_MINOR "1")
+#set(QTDCM_VERSION_PATCH "0")
 
-add_definitions(-g -Wno-deprecated)
+set(${PROJECT_NAME}_VERSION_MAJOR 0 CACHE STRING "${PROJECT_NAME} major version number.")
+set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "${PROJECT_NAME} minor version number.")
+set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number.")
+set(${PROJECT_NAME}_VERSION
+  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+
+mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
+mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
+mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
+
+add_definitions(-g -Wno-deprecated -DPACKAGE_DATE="" -DPACKAGE_VERSION="" -DPACKAGE_VERSION_NUMBER="")
 
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
 option(BUILD_DOCUMENTATION "Build QtDcm Documentation" OFF)
@@ -42,7 +52,10 @@ if(QT4_FOUND)
   include(${QT_USE_FILE})
 endif(QT4_FOUND)
 
-find_package(DCMTK REQUIRED)
+find_package(DCMTK2 REQUIRED)
+include_directories(${DCMTK_INCLUDE_DIR})
+
+add_definitions(-DHAVE_CONFIG_H)
 
 
 set(SAMPLE_SRCS
@@ -105,7 +118,7 @@ qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})# ${qm_files})
-target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} tiff jpeg ijg12 ijg16 ijg8 /lib/libwrap.so.0)
+target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} dcmimage tiff jpeg ijg12 ijg16 ijg8 /lib/libwrap.so.0)
 
 
 # External inclusion stuff :

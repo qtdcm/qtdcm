@@ -147,19 +147,19 @@ QtDcmManager::loadDicomdir()
                     lelt->getOFStringArray(strID);
                     _patients.last()->setId(QString(strID.c_str()));
                   }
-                if (lobj->findAndGetElement(DCM_PatientsName, lelt).good())
+                if (lobj->findAndGetElement(DCM_PatientName, lelt).good())
                   {
                     OFString strName;
                     lelt->getOFStringArray(strName);
                     _patients.last()->setName(QString(strName.c_str()));
                   }
-                if (lobj->findAndGetElement(DCM_PatientsBirthDate, lelt).good())
+                if (lobj->findAndGetElement(DCM_PatientBirthDate, lelt).good())
                   {
                     OFString strBirth;
                     lelt->getOFStringArray(strBirth);
                     _patients.last()->setBirthdate(QString(strBirth.c_str()));
                   }
-                if (lobj->findAndGetElement(DCM_PatientsSex, lelt).good())
+                if (lobj->findAndGetElement(DCM_PatientSex, lelt).good())
                   {
                     OFString strSex;
                     lelt->getOFStringArray(strSex);
@@ -621,7 +621,7 @@ QtDcmManager::makePreview()
                     Uint32 *p = pixelData;
                     //get the highest values for RGBA, then use them to scale the pixel luminosity
                     Uint32 p_max = 0;
-					Uint32 p_min = numeric_limits<Uint32>::max();
+					Uint32 p_min = std::numeric_limits<Uint32>::max();
                     for (unsigned i = 0; i < dcimage->getWidth(); ++i)
                       for (unsigned j = 0; j < dcimage->getHeight(); ++j, ++p)
                         {
