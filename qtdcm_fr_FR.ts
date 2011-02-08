@@ -1,4 +1,131 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en" sourcelanguage="fr_FR">
+<context>
+    <name>DateDialog</name>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished">Date</translation>
+    </message>
+</context>
+<context>
+    <name>PreferencesDialog</name>
+    <message>
+        <source>QtDcm settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Binary paths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dcm2nii path :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dcm4che path :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dicom settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AE Title :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TCP port :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hostname :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoding :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hostname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AETitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AE Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TCP port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PreviewDialog</name>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>QtDCM</name>
     <message>
@@ -29,6 +156,90 @@
         <source>Please select at least one serie to Export</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modality :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>US</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aujourd&apos;hui</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished">Date</translation>
+    </message>
+    <message>
+        <source>Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>beginDate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>endDate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Serie description :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Study description :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patient ID :</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QtDcmManager</name>
@@ -37,27 +248,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Probleme lors de la suppression du r&#xc3;&#xa9;pertoire temporaire</source>
+        <source>Probleme lors de la suppression du rÃ©pertoire temporaire</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Impossible de trouver dcm2nii, verifiez votre installation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export termine avec succes !!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Getting images from CD...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Retrieving images from server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server query in progress...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -69,7 +264,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Generating preview...</source>
+        <source>Import termine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copie des images depuis le CD...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chargement des images...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requete en cours...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creation de l&apos;apercu...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

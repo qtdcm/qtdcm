@@ -55,7 +55,7 @@ endif(QT4_FOUND)
 find_package(DCMTK2 REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIR})
 
-add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-DHAVE_CONFIG_H -fPIC)
 
 
 set(SAMPLE_SRCS
