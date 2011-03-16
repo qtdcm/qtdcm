@@ -22,6 +22,8 @@ QtDcmExportThread::run()
             parameters << "-L" << _localPacsParam << _serverPacsParam;
             parameters << "-I" << "-cmove" << _aetitle;
             parameters << "-cstore=" + _modality << seriesId;
+            // Test requete alexandre
+            parameters << "-cstore PR:LE";
             parameters << "-cstoredest";
             parameters << QDir(_temporaryDir + QDir::separator() + _seriesToExport.at(i)).absolutePath();
             process->start(_program, parameters);

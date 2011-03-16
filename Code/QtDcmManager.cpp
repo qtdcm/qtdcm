@@ -359,6 +359,7 @@ QtDcmManager::exportSeries()
         _currentSerieDir = QDir(_tempDir.absolutePath() + QDir::separator() + _serieId);
         //Conversion de la serie avec dcm2nii
         QStringList arguments;
+        arguments << "-s" << "N";
         arguments << "-x" << "N";
         arguments << "-r" << "N";
         arguments << "-g" << "N";
@@ -368,6 +369,7 @@ QtDcmManager::exportSeries()
         _process->setStandardOutputFile(_logsDir.absolutePath() + QDir::separator() + "log" + _serieId + ".txt");
         _process->start(_dcm2nii, arguments);
         _process->waitForFinished();
+        //zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
 
         this->deleteCurrentSerieDir();
         delete _process;
