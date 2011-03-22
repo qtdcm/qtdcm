@@ -11,53 +11,10 @@
 #include <QtGui>
 #include <QtNetwork>
 
-#include <algorithm>
-#include <iostream>
-#include <limits>
-
-//#define HAVE_CLASS_TEMPLATE
-//#define HAVE_STL
-//#define HAVE_STD_NAMESPACE
-//#define HAVE_SSTREAM
-//#define USE_STD_CXX_INCLUDES
-//#define HAVE_CXX_BOOL
-//
-//#define DCM_DICT_DEFAULT_PATH
-
-// From Dcmtk:
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include <dcmtk/dcmdata/cmdlnarg.h>
-#include <dcmtk/ofstd/ofconapp.h>
-#include <dcmtk/dcmdata/dcuid.h>       /* for dcmtk version name */
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-//#define INCLUDE_CSTDLIB
-//#define INCLUDE_CSTRING
-#include "dcmtk/ofstd/ofstdinc.h"
-
-//#ifdef WITH_ZLIB
-//#include <zlib.h>        /* for zlibVersion() */
-//#endif
-
-#include <QtDcmPatient.h>
-#include <QtDcmPreferences.h>
-#include <QtDcmExportThread.h>
-#include <QtDcmQueryThread.h>
-
+class QtDcmPatient;
 class QtDcmQueryThread;
+class QtDcmPreferences;
+class QtDcmManagerPrivate;
 
 /**
  * This class is in charge of the different process (dcm2nii), pacs query/retrieve (dcm4chee),
@@ -68,37 +25,6 @@ class QtDcmManager : public QObject
   {
   Q_OBJECT
   private:
-    QWidget * _parent; /** Here the parent is corresponding to the QtDCM object */
-    QProgressDialog * _progress; /** Dialog window showing file copy in progress */
-    QString _dicomdir; /** Dicomdir absolute file path */
-    QString _outputDir; /** Output directory for reconstructed serie absolute path */
-    QDir _currentSerieDir; /** Directory containing current serie dicom slice */
-    QDir _tempDir; /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
-    QDir _logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
-    DcmItem * _dcmObject; /** This attribute is usefull for parsing the dicomdir */
-    DcmFileFormat _dfile; /** This attribute is usefull for parsing the dicomdir */
-    QList<QtDcmPatient *> _patients; /** List that contains patients resulting of a query or read from a CD */
-    QList<QString> _images; /** List of image filename to export from a CD */
-    QMap<QString, QList<QString> > _seriesToExport;
-//    QList<QPixmap> _listImages;
-    QList<QImage> _listImages;
-    QString _serieId; /** Id of the serie to export from the PACS */
-    QProcess * _process; /** This attribute launch the reconstruction process */
-    QtDcmPreferences * _preferences; /** Attribute that give access to the Pacs settings */
-    QString _patientName; /** Attribute representing the patient name used for query PACS */
-    QString _patientId; /** Attribute representing the patient id used for query PACS */
-    QString _modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
-    QString _date1; /** Attribute for the begin date of the query (usefull for date based queries) */
-    QString _date2; /** Attribute for the end date of the query (usefull for date based queries) */
-    QString _serieDescription; /** Attibute representing the serie description used for query PACS */
-    QString _studyDescription; /** Attibute representing the study description used for query PACS */
-    QString _mode; /** Mode that determine the type of media (CD or PACS) */
-    QString _dcm2nii; /** Absolute filename of the dcm2nii program */
-    QString _dcm4che; /** Absolute filename of the dcm4che program */
-    QtDcmExportThread * _exportThread;
-    QtDcmQueryThread * _queryThread;
-    QByteArray _query;
-
     void
     generateCurrentSerieDir();
 
@@ -145,6 +71,12 @@ class QtDcmManager : public QObject
     ~QtDcmManager();
 
     /**
+     * Send echo to the default stored SCP
+     */
+    void
+    sendEchoRequest();
+
+    /**
      * This method read the dicomdir file and populate the different lists (Patients, Studies, Series and Images)
      *
      * @see QtDcmPatient, QtDcmStudy, QtDcmSerie, QtDcmImage
@@ -174,10 +106,7 @@ class QtDcmManager : public QObject
      * @return _dicomdir the dicomdir file name.
      */
     QString
-    getDicomdir() const
-      {
-        return _dicomdir;
-      }
+    getDicomdir() const;
 
     /**
      * Set the dicomdir file name
@@ -185,10 +114,7 @@ class QtDcmManager : public QObject
      * @param dicomdir the dicomdir file name
      */
     void
-    setDicomdir( QString dicomdir )
-      {
-        this->_dicomdir = dicomdir;
-      }
+    setDicomdir( QString dicomdir );
 
     /**
      * Return the output directory where the current serie will be reconstructed
@@ -196,10 +122,7 @@ class QtDcmManager : public QObject
      * @return _outputdir the output directory path
      */
     QString
-    getOutputDirectory() const
-      {
-        return _outputDir;
-      }
+    getOutputDirectory() const;
 
     /**
      * Set the output directory
@@ -207,10 +130,7 @@ class QtDcmManager : public QObject
      * @param directory the output directory
      */
     void
-    setOutputDirectory( QString directory )
-      {
-        this->_outputDir = directory;
-      }
+    setOutputDirectory( QString directory );
 
     /**
      * Return the pointer to the QtDcmPreferences instance
@@ -219,10 +139,7 @@ class QtDcmManager : public QObject
      * @see QtDcmPreferences
      */
     QtDcmPreferences *
-    getPreferences()
-      {
-        return _preferences;
-      }
+    getPreferences();
 
     /**
      * Set the pointer to the QtDcmPreferences instance
@@ -231,10 +148,7 @@ class QtDcmManager : public QObject
      * @see QtDcmPreferences
      */
     void
-    setPreferences( QtDcmPreferences * prefs )
-      {
-        _preferences = prefs;
-      }
+    setPreferences( QtDcmPreferences * prefs );
 
     /**
      * Patient name getter
@@ -242,10 +156,7 @@ class QtDcmManager : public QObject
      * @return _patientName as a QString
      */
     QString
-    getPatientName()
-      {
-        return _patientName;
-      }
+    getPatientName();
 
     /**
      * Patient name setter
@@ -253,10 +164,7 @@ class QtDcmManager : public QObject
      * @param patientName as a QString
      */
     void
-    setPatientName( QString patientName )
-      {
-        _patientName = patientName;
-      }
+    setPatientName( QString patientName );
 
     /**
      * Patient id getter
@@ -264,10 +172,7 @@ class QtDcmManager : public QObject
      * @return _patientId as a QString
      */
     QString
-    getPatientId()
-      {
-        return _patientId;
-      }
+    getPatientId();
 
     /**
      * Patient id setter
@@ -275,10 +180,7 @@ class QtDcmManager : public QObject
      * @param patientId as a QString
      */
     void
-    setPatientId( QString patientId )
-      {
-        _patientId = patientId;
-      }
+    setPatientId( QString patientId );
 
     /**
      * Serie description getter
@@ -286,10 +188,7 @@ class QtDcmManager : public QObject
      * @return _serieDescription as a QString
      */
     QString
-    getSerieDescription()
-      {
-        return _serieDescription;
-      }
+    getSerieDescription();
 
     /**
      * Serie description setter
@@ -297,10 +196,7 @@ class QtDcmManager : public QObject
      * @param serieDescription as a QString
      */
     void
-    setSerieDescription( QString serieDescription )
-      {
-        _serieDescription = serieDescription;
-      }
+    setSerieDescription( QString serieDescription );
 
     /**
      * Study description getter
@@ -308,10 +204,7 @@ class QtDcmManager : public QObject
      * @return _studyDescription as a QString
      */
     QString
-    getStudyDescription()
-      {
-        return _studyDescription;
-      }
+    getStudyDescription();
 
     /**
      * Study description setter
@@ -319,10 +212,7 @@ class QtDcmManager : public QObject
      * @param studyDescription as a QString
      */
     void
-    setStudyDescription( QString studyDescription )
-      {
-        _studyDescription = studyDescription;
-      }
+    setStudyDescription( QString studyDescription );
 
     /**
      * Study modality setter
@@ -330,10 +220,7 @@ class QtDcmManager : public QObject
      * @param modality as a QString
      */
     void
-    setModality( QString modality )
-      {
-        _modality = modality;
-      }
+    setModality( QString modality );
 
     /**
      * Study modality getter
@@ -341,10 +228,7 @@ class QtDcmManager : public QObject
      * @return _modality as a QString
      */
     QString
-    getModality()
-      {
-        return _modality;
-      }
+    getModality();
 
     /**
      * Study date setter
@@ -352,10 +236,7 @@ class QtDcmManager : public QObject
      * @param date as a QString
      */
     void
-    setDate1( QString date )
-      {
-        _date1 = date;
-      }
+    setDate1( QString date );
 
     /**
      * Study date getter
@@ -363,10 +244,7 @@ class QtDcmManager : public QObject
      * @return _date as a QString
      */
     QString
-    getDate1()
-      {
-        return _date1;
-      }
+    getDate1();
 
     /**
      * Study date setter
@@ -374,10 +252,7 @@ class QtDcmManager : public QObject
      * @param date as a QString
      */
     void
-    setDate2( QString date )
-      {
-        _date2 = date;
-      }
+    setDate2( QString date );
 
     /**
      * Study date getter
@@ -385,10 +260,7 @@ class QtDcmManager : public QObject
      * @return _date as a QString
      */
     QString
-    getDate2()
-      {
-        return _date2;
-      }
+    getDate2();
 
     /**
      * Return the current patient list
@@ -397,10 +269,7 @@ class QtDcmManager : public QObject
      * @see QtDcmPatient
      */
     QList<QtDcmPatient *>
-    getPatients()
-      {
-        return _patients;
-      }
+    getPatients();
 
     /**
      * Global method for exporting serie
@@ -435,61 +304,40 @@ class QtDcmManager : public QObject
      * add patient in the list
      */
     void
-    addPatient()
-      {
-        _patients.append(new QtDcmPatient());
-      }
+    addPatient();
 
     /**
      * Mode getter
      */
     QString
-    getMode()
-      {
-        return _mode;
-      }
+    getMode();
 
     void
-    setImagesList( QList<QString> images )
-      {
-        _images = images;
-      }
+    setImagesList( QList<QString> images );
 
     QList<QImage>
-    getListImages()
-      {
-        return _listImages;
-      }
+    getListImages();
 
     void
-    setSerieId( QString id )
-      {
-        _serieId = id;
-      }
+    setSerieId( QString id );
 
     QString
-    getCurrentSerieDirectory()
-      {
-        return _currentSerieDir.absolutePath();
-      }
+    getCurrentSerieDirectory();
 
     void
-    setSeriesToExport(QMap<QString, QList<QString> > seriesToExport)
-      {
-        _seriesToExport = seriesToExport;
-      }
+    setSeriesToExport(QMap<QString, QList<QString> > seriesToExport);
 
     void
     exportSeries();
 
     void
-    setQuery( QByteArray query )
-      {
-        _query = query;
-      }
+    setQuery( QByteArray query );
 
     void
     makePreview();
+
+  private:
+    QtDcmManagerPrivate *d;
   };
 
 #endif /* QTDCMMANAGER_H_ */

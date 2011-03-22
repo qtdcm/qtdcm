@@ -1,65 +1,93 @@
 #include "QtDcm.h"
+#include <QtDcmPatient.h>
+#include <QtDcmDateDialog.h>
+#include <QtDcmPreferencesDialog.h>
+#include <QtDcmPreviewDialog.h>
+#include <QtDcmManager.h>
+
+class QtDcmPrivate
+{
+    public:
+        QtDcmManager * manager; /** For managing preferences, data queries and volumes reconstructions */
+        QList<QString> imagesList; /** Contains the images filenames of the current serie (i.e selected in the treewidget)*/
+        QString currentSerieId; /** Id of the current selected serie */
+        QDate beginDate, endDate; /** Begin and end for Q/R retrieve parameters */
+        QMap<QString, QList<QString> > selectedSeries;
+};
 
 QtDCM::QtDCM( QWidget *parent ) :
-  QLabel(parent)
+  QLabel(parent), d(new QtDcmPrivate)
   {
-    widget.setupUi(this);
-    _beginDate = QDate::currentDate();
-    _endDate = QDate::currentDate();
+    setupUi(this);
+    d->beginDate = QDate::currentDate();
+    d->endDate = QDate::currentDate();
 
     //Initialize QTreeWidget
-    widget.treeWidget->setColumnWidth(0, 250);
-    widget.treeWidget->setColumnWidth(1, 100);
-    widget.treeWidget->setColumnWidth(2, 120);
+    treeWidget->setColumnWidth(0, 250);
+    treeWidget->setColumnWidth(1, 100);
+    treeWidget->setColumnWidth(2, 120);
     QStringList labels;
     labels << "Description" << "Type" << "Date" << "ID";
-    widget.treeWidget->setHeaderLabels(labels);
-    widget.treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    treeWidget->setHeaderLabels(labels);
+    treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     //Initialize widgets
-    widget.advancedFrame->hide();
-    widget.advancedButton->setCheckable(true);
-    widget.dateEndButton->hide();
-    widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
-    widget.labelTiret->hide();
-    widget.dateBeginButton->hide();
-    widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
+    advancedFrame->hide();
+    advancedButton->setCheckable(true);
+    dateEndButton->hide();
+    dateEndButton->setText(d->beginDate.toString(Qt::ISODate));
+    labelTiret->hide();
+    dateBeginButton->hide();
+    dateBeginButton->setText(d->beginDate.toString(Qt::ISODate));
 
-    _manager = new QtDcmManager(this);
+    d->manager = new QtDcmManager(this);
     initConnections();
   }
 
 QtDCM::~QtDCM()
   {
-    delete _manager;
+    delete d->manager;
   }
+
+QtDcmManager *
+QtDCM::getManager()
+{
+    return d->manager;
+}
 
 void
 QtDCM::initConnections()
   {
     // Initialize connections
-    QObject::connect(widget.treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
-    QObject::connect(widget.treeWidget, SIGNAL(itemClicked (QTreeWidgetItem*, int)), this, SLOT(itemClicked(QTreeWidgetItem*, int)));
-    QObject::connect(widget.treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
-    QObject::connect(widget.dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
-    QObject::connect(widget.modalityComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateModality(int)));
-    QObject::connect(widget.dateBeginButton, SIGNAL(clicked()), this, SLOT(chooseBeginDate()));
-    QObject::connect(widget.dateEndButton, SIGNAL(clicked()), this, SLOT(chooseEndDate()));
-    QObject::connect(widget.searchButton, SIGNAL(clicked()), this, SLOT(queryPACS()));
-    QObject::connect(widget.nameEdit, SIGNAL(textChanged(QString)), this, SLOT(patientNameTextChanged(QString)));
-    QObject::connect(widget.patientIdEdit, SIGNAL(textChanged(QString)), this, SLOT(patientIdTextChanged(QString)));
-    QObject::connect(widget.serieDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(serieDescriptionTextChanged(QString)));
-    QObject::connect(widget.studyDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(studyDescriptionTextChanged(QString)));
-    QObject::connect(widget.advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedView()));
+    QObject::connect(treeWidget, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(itemSelected(QTreeWidgetItem*, QTreeWidgetItem*)));
+    QObject::connect(treeWidget, SIGNAL(itemClicked (QTreeWidgetItem*, int)), this, SLOT(itemClicked(QTreeWidgetItem*, int)));
+    QObject::connect(treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextExportMenu(QPoint)));
+    QObject::connect(dateComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateDateButtons(int)));
+    QObject::connect(modalityComboBox, SIGNAL(currentIndexChanged ( int ) ), this, SLOT(updateModality(int)));
+    QObject::connect(dateBeginButton, SIGNAL(clicked()), this, SLOT(chooseBeginDate()));
+    QObject::connect(dateEndButton, SIGNAL(clicked()), this, SLOT(chooseEndDate()));
+    QObject::connect(searchButton, SIGNAL(clicked()), this, SLOT(queryPACS()));
+    QObject::connect(nameEdit, SIGNAL(textChanged(QString)), this, SLOT(patientNameTextChanged(QString)));
+    QObject::connect(patientIdEdit, SIGNAL(textChanged(QString)), this, SLOT(patientIdTextChanged(QString)));
+    QObject::connect(serieDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(serieDescriptionTextChanged(QString)));
+    QObject::connect(studyDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(studyDescriptionTextChanged(QString)));
+    QObject::connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedView()));
+    QObject::connect(echoButton, SIGNAL(clicked()), this, SLOT(sendEcho()));
   }
+
+void
+QtDCM::sendEcho()
+{
+    d->manager->sendEchoRequest();
+}
 
 void
 QtDCM::clearDisplay()
   {
-    _selectedSeries.clear();
-    _imagesList.clear();
-    widget.treeWidget->clear();
-    widget.treeWidget->setAnimated(false);
+    d->selectedSeries.clear();
+    d->imagesList.clear();
+    treeWidget->clear();
+    treeWidget->setAnimated(false);
     emit serieSelected(false);
   }
 
@@ -68,62 +96,62 @@ QtDCM::display()
   {
     //Clear view
     this->clearDisplay();
-    for (int i = 0; i < _manager->getPatients().size(); i++)
+    for (int i = 0; i < d->manager->getPatients().size(); i++)
       {
-        if (_manager->getPatients().at(i)->getStudies().size() != 0)
+        if (d->manager->getPatients().at(i)->getStudies().size() != 0)
           {
-            QTreeWidgetItem * child = new QTreeWidgetItem(widget.treeWidget);
+            QTreeWidgetItem * child = new QTreeWidgetItem(treeWidget);
             QTreeWidgetItem * root = NULL;
             // Fill in the QTreeWidget the patient information
-            child->setText(0, _manager->getPatients().at(i)->getName());
-            child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getName()));
+            child->setText(0, d->manager->getPatients().at(i)->getName());
+            child->setData(1, 1, QVariant(d->manager->getPatients().at(i)->getName()));
 
             child->setText(1, "Patient");
             child->setData(2, 1, QVariant("PATIENT"));
 
-            child->setText(3, _manager->getPatients().at(i)->getId());
-            child->setData(4, 1, QVariant(_manager->getPatients().at(i)->getId()));
+            child->setText(3, d->manager->getPatients().at(i)->getId());
+            child->setData(4, 1, QVariant(d->manager->getPatients().at(i)->getId()));
 
             root = child;
-            //        if (_manager->getMode() == "CD")
-            widget.treeWidget->expandItem(child);
-            for (int j = 0; j < _manager->getPatients().at(i)->getStudies().size(); j++)
+            //        if (d->manager->getMode() == "CD")
+            treeWidget->expandItem(child);
+            for (int j = 0; j < d->manager->getPatients().at(i)->getStudies().size(); j++)
               {
                 // Study information
                 child = new QTreeWidgetItem(root);
-                child->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getDescription());
-                child->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDescription()));
+                child->setText(0, d->manager->getPatients().at(i)->getStudies().at(j)->getDescription());
+                child->setData(1, 1, QVariant(d->manager->getPatients().at(i)->getStudies().at(j)->getDescription()));
 
                 child->setText(1, "Study");
                 child->setData(2, 1, QVariant("STUDY"));
 
-                child->setText(2, _manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate));
-                child->setData(3, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate)));
+                child->setText(2, d->manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate));
+                child->setData(3, 1, QVariant(d->manager->getPatients().at(i)->getStudies().at(j)->getDate().toString(Qt::ISODate)));
 
-                child->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getId());
-                child->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getId()));
-                if (_manager->getMode() == "CD")
-                  widget.treeWidget->expandItem(child);
-                for (int k = 0; k < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().size(); k++)
+                child->setText(3, d->manager->getPatients().at(i)->getStudies().at(j)->getId());
+                child->setData(4, 1, QVariant(d->manager->getPatients().at(i)->getStudies().at(j)->getId()));
+                if (d->manager->getMode() == "CD")
+                  treeWidget->expandItem(child);
+                for (int k = 0; k < d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().size(); k++)
                   {
                     //Serie information
                     QTreeWidgetItem * lchild = new QTreeWidgetItem(child);
-                    lchild->setText(0, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription());
-                    lchild->setData(1, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription()));
+                    lchild->setText(0, d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription());
+                    lchild->setData(1, 1, QVariant(d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getDescription()));
 
                     lchild->setText(1, "Serie");
                     lchild->setCheckState(1, Qt::Unchecked);
                     lchild->setData(2, 1, "SERIE");
 
-                    lchild->setText(3, _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
-                    lchild->setData(4, 1, QVariant(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId()));
+                    lchild->setText(3, d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId());
+                    lchild->setData(4, 1, QVariant(d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getId()));
 
-                    for (int l = 0; l < _manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().size(); l++)
+                    for (int l = 0; l < d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().size(); l++)
                       {
                         //Images information
-                        QString filename = QDir::toNativeSeparators(_manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().at(l)->getFilename());
+                        QString filename = QDir::toNativeSeparators(d->manager->getPatients().at(i)->getStudies().at(j)->getSeries().at(k)->getImages().at(l)->getFilename());
                         filename.replace(QChar('\\'), QDir::separator()).replace(QChar('/'), QDir::separator());
-                        QString basepath = _manager->getDicomdir();
+                        QString basepath = d->manager->getDicomdir();
                         basepath.truncate(basepath.lastIndexOf(QDir::separator()));
                         QString goodFilename(filename);
                         if (QFile(basepath + QDir::separator() + goodFilename.toLower()).exists())
@@ -141,13 +169,13 @@ QtDCM::display()
               }
           }
       }
-    widget.treeWidget->setAnimated(true);
+    treeWidget->setAnimated(true);
   }
 
 QList<QString>
 QtDCM::getImagesList()
   {
-    return _imagesList;
+    return d->imagesList;
   }
 
 void
@@ -164,15 +192,15 @@ QtDCM::itemClicked( QTreeWidgetItem* current , int column )
                   {
                     list.append(current->child(i)->data(1, 1).toStringList());
                   }
-                if (!_selectedSeries.contains(_currentSerieId))
-                  _selectedSeries.insert(_currentSerieId, list);
+                if (!d->selectedSeries.contains(d->currentSerieId))
+                  d->selectedSeries.insert(d->currentSerieId, list);
               }
             else
               {
-                if (_selectedSeries.contains(_currentSerieId))
-                  _selectedSeries.remove(_currentSerieId);
+                if (d->selectedSeries.contains(d->currentSerieId))
+                  d->selectedSeries.remove(d->currentSerieId);
               }
-            emit(serieChecked(_selectedSeries.size()));
+            emit(serieChecked(d->selectedSeries.size()));
           }
       }
   }
@@ -180,17 +208,17 @@ QtDCM::itemClicked( QTreeWidgetItem* current , int column )
 void
 QtDCM::itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous )
   {
-    //Empty _imagesList;
-    _imagesList.clear();
+    //Empty d->imagesList;
+    d->imagesList.clear();
     if (current != 0) // Avoid crash when clearDisplay is called
       {
         if (current->data(2, 1).toString() == "SERIE")
           {
             // If a serie is selected, copy all images filenames in a list
-            _currentSerieId = current->data(4, 1).toString();
+            d->currentSerieId = current->data(4, 1).toString();
             for (int i = 0; i < current->childCount(); i++)
               {
-                _imagesList.append(current->child(i)->data(1, 1).toStringList());
+                d->imagesList.append(current->child(i)->data(1, 1).toStringList());
               }
             emit serieSelected(true);
           }
@@ -204,8 +232,8 @@ QtDCM::contextExportMenu( const QPoint point )
   {
     // Get the QTreeWidgetItem corresponding to the clic
     QTreeWidgetItem * item = 0;
-    item = widget.treeWidget->itemAt(point);
-    QMenu menu(widget.treeWidget);
+    item = treeWidget->itemAt(point);
+    QMenu menu(treeWidget);
     QAction * actionDicomdir = new QAction(this);
     QAction * actionPreview = new QAction(this);
     QAction * actionQuery = new QAction(this);
@@ -232,7 +260,7 @@ QtDCM::contextExportMenu( const QPoint point )
     QObject::connect(actionQuery, SIGNAL(triggered()), this, SLOT(queryPACS()));
     menu.addAction(actionQuery);
     // If no item selected (object empty)
-    if (!_selectedSeries.isEmpty())
+    if (!d->selectedSeries.isEmpty())
       {
         menu.addSeparator();
         // If the serie is exportable, create export command in the menu
@@ -240,7 +268,7 @@ QtDCM::contextExportMenu( const QPoint point )
         QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportList()));
         menu.addAction(actionExport);
       }
-    menu.exec(widget.treeWidget->mapToGlobal(point));
+    menu.exec(treeWidget->mapToGlobal(point));
   }
 
 void
@@ -260,10 +288,10 @@ QtDCM::openDicomdir()
     dialog.close();
     if (!fileName.isEmpty()) // A file has been chosen
       {
-        // Set the choosed file to the _manager and update the display
-        widget.treeWidget->setAnimated(false);
-        _manager->setDicomdir(fileName);
-        _manager->loadDicomdir();
+        // Set the choosed file to the d->manager and update the display
+        treeWidget->setAnimated(false);
+        d->manager->setDicomdir(fileName);
+        d->manager->loadDicomdir();
         display();
       }
   }
@@ -271,7 +299,7 @@ QtDCM::openDicomdir()
 void
 QtDCM::exportList()
   {
-    if (_selectedSeries.size() != 0)
+    if (d->selectedSeries.size() != 0)
       {
         // Open a QFileDialog in directory mode.
         QFileDialog * dialog = new QFileDialog(this);
@@ -288,9 +316,9 @@ QtDCM::exportList()
         if (!directory.isEmpty()) // A file has been chosen
           {
             // Set the output directory to the manager and launch the conversion process
-            _manager->setOutputDirectory(directory);
-            _manager->setSeriesToExport(_selectedSeries);
-            _manager->exportSeries();
+            d->manager->setOutputDirectory(directory);
+            d->manager->setSeriesToExport(d->selectedSeries);
+            d->manager->exportSeries();
           }
         delete dialog;
       }
@@ -307,11 +335,11 @@ QtDCM::exportList()
 void
 QtDCM::exportToDirectory( QString directory )
   {
-    if (_selectedSeries.size() != 0)
+    if (d->selectedSeries.size() != 0)
       {
-        _manager->setOutputDirectory(directory);
-        _manager->setSeriesToExport(_selectedSeries);
-        _manager->exportSeries();
+        d->manager->setOutputDirectory(directory);
+        d->manager->setSeriesToExport(d->selectedSeries);
+        d->manager->exportSeries();
       }
     else
       {
@@ -326,7 +354,7 @@ QtDCM::exportToDirectory( QString directory )
 void
 QtDCM::queryPACS()
   {
-    _manager->queryPACS();
+    d->manager->queryPACS();
     this->display();
   }
 
@@ -336,18 +364,18 @@ QtDCM::updateModality( int index )
     switch (index)
       {
       case 0://MR
-        _manager->setModality("MR");
+        d->manager->setModality("MR");
         this->queryPACS();
         break;
       case 1://CT
-        _manager->setModality("CT");
+        d->manager->setModality("CT");
         this->queryPACS();
         break;
       case 2://US
-        _manager->setModality("US");
+        d->manager->setModality("US");
         this->queryPACS();
       case 3://PET
-        _manager->setModality("PET");
+        d->manager->setModality("PET");
         this->queryPACS();
       }
   }
@@ -359,61 +387,61 @@ QtDCM::updateDateButtons( int index )
       {
       //No date is used in the query
       case 0:
-        widget.dateEndButton->hide();
-        widget.labelTiret->hide();
-        widget.dateBeginButton->hide();
-        _manager->setDate1("*");
-        _manager->setDate2("*");
+        dateEndButton->hide();
+        labelTiret->hide();
+        dateBeginButton->hide();
+        d->manager->setDate1("*");
+        d->manager->setDate2("*");
         this->queryPACS();
         break;
         //Query on current date Dicom data
       case 1:
-        widget.dateEndButton->hide();
-        widget.labelTiret->hide();
-        widget.dateBeginButton->setText(QDate::currentDate().toString(Qt::ISODate));
-        widget.dateBeginButton->setEnabled(false);
-        widget.dateBeginButton->setFlat(true);
-        widget.dateBeginButton->show();
-        _beginDate = _endDate = QDate::currentDate();
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        dateEndButton->hide();
+        labelTiret->hide();
+        dateBeginButton->setText(QDate::currentDate().toString(Qt::ISODate));
+        dateBeginButton->setEnabled(false);
+        dateBeginButton->setFlat(true);
+        dateBeginButton->show();
+        d->beginDate = d->endDate = QDate::currentDate();
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->beginDate.toString(Qt::ISODate).replace("-", ""));
         this->queryPACS();
         break;
         //Query on yesterday date Dicom data
       case 2:
-        widget.dateEndButton->hide();
-        widget.labelTiret->hide();
-        widget.dateBeginButton->setText(QDate::currentDate().addDays(-1).toString(Qt::ISODate));
-        widget.dateBeginButton->setEnabled(false);
-        widget.dateBeginButton->setFlat(true);
-        widget.dateBeginButton->show();
-        _beginDate = _endDate = QDate::currentDate().addDays(-1);
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        dateEndButton->hide();
+        labelTiret->hide();
+        dateBeginButton->setText(QDate::currentDate().addDays(-1).toString(Qt::ISODate));
+        dateBeginButton->setEnabled(false);
+        dateBeginButton->setFlat(true);
+        dateBeginButton->show();
+        d->beginDate = d->endDate = QDate::currentDate().addDays(-1);
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->beginDate.toString(Qt::ISODate).replace("-", ""));
         this->queryPACS();
         break;
         //Query on specified date (use date dialog window)
       case 3:
-        widget.dateEndButton->hide();
-        widget.labelTiret->hide();
-        widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
-        widget.dateBeginButton->setEnabled(true);
-        widget.dateBeginButton->setFlat(false);
-        widget.dateBeginButton->show();
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate2(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        dateEndButton->hide();
+        labelTiret->hide();
+        dateBeginButton->setText(d->beginDate.toString(Qt::ISODate));
+        dateBeginButton->setEnabled(true);
+        dateBeginButton->setFlat(false);
+        dateBeginButton->show();
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->beginDate.toString(Qt::ISODate).replace("-", ""));
         break;
       case 4:
         //Query on a range of date (use date dialog window)
-        widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
-        widget.dateEndButton->show();
-        widget.labelTiret->show();
-        widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
-        widget.dateBeginButton->setEnabled(true);
-        widget.dateBeginButton->setFlat(false);
-        widget.dateBeginButton->show();
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
+        dateEndButton->setText(d->beginDate.toString(Qt::ISODate));
+        dateEndButton->show();
+        labelTiret->show();
+        dateBeginButton->setText(d->beginDate.toString(Qt::ISODate));
+        dateBeginButton->setEnabled(true);
+        dateBeginButton->setFlat(false);
+        dateBeginButton->show();
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->endDate.toString(Qt::ISODate).replace("-", ""));
         break;
       }
   }
@@ -423,23 +451,23 @@ QtDCM::chooseBeginDate()
   {
     //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
-    dialog->setDate(_beginDate);
+    dialog->setDate(d->beginDate);
     QDate date;
     if (dialog->exec())
       {
-        _beginDate = dialog->getDate();
-        widget.dateBeginButton->setText(_beginDate.toString(Qt::ISODate));
-        if (_endDate < _beginDate)
+        d->beginDate = dialog->getDate();
+        dateBeginButton->setText(d->beginDate.toString(Qt::ISODate));
+        if (d->endDate < d->beginDate)
           {
-            _endDate = _beginDate;
-            widget.dateEndButton->setText(_beginDate.toString(Qt::ISODate));
+            d->endDate = d->beginDate;
+            dateEndButton->setText(d->beginDate.toString(Qt::ISODate));
           }
-        if (widget.dateComboBox->currentIndex() == 3)
+        if (dateComboBox->currentIndex() == 3)
           {
-            _endDate = _beginDate;
+            d->endDate = d->beginDate;
           }
-        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->endDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
         this->queryPACS();
       }
     dialog->close();
@@ -451,19 +479,19 @@ QtDCM::chooseEndDate()
   {
     //Launch a dialog window with QCalendarWidget
     QtDcmDateDialog * dialog = new QtDcmDateDialog(this);
-    dialog->setDate(_endDate);
+    dialog->setDate(d->endDate);
     QDate date;
     if (dialog->exec())
       {
-        _endDate = dialog->getDate();
-        widget.dateEndButton->setText(_endDate.toString(Qt::ISODate));
-        if (_endDate < _beginDate)
+        d->endDate = dialog->getDate();
+        dateEndButton->setText(d->endDate.toString(Qt::ISODate));
+        if (d->endDate < d->beginDate)
           {
-            _beginDate = _endDate;
-            widget.dateBeginButton->setText(_endDate.toString(Qt::ISODate));
+            d->beginDate = d->endDate;
+            dateBeginButton->setText(d->endDate.toString(Qt::ISODate));
           }
-        _manager->setDate2(_endDate.toString(Qt::ISODate).replace("-", ""));
-        _manager->setDate1(_beginDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate2(d->endDate.toString(Qt::ISODate).replace("-", ""));
+        d->manager->setDate1(d->beginDate.toString(Qt::ISODate).replace("-", ""));
         this->queryPACS();
       }
     dialog->close();
@@ -475,7 +503,7 @@ QtDCM::editPreferences()
   {
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog(this);
-    dialog->setPreferences(_manager->getPreferences());
+    dialog->setPreferences(d->manager->getPreferences());
     if (dialog->exec())
       {
         dialog->updatePreferences();
@@ -489,10 +517,10 @@ QtDCM::patientNameTextChanged( QString name )
   {
     if (name.isEmpty())
       {
-        _manager->setPatientName("*");
+        d->manager->setPatientName("*");
       }
     else
-      _manager->setPatientName("*" + name + "*");
+      d->manager->setPatientName("*" + name + "*");
   }
 
 void
@@ -500,10 +528,10 @@ QtDCM::patientIdTextChanged( QString id )
   {
     if (id.isEmpty())
       {
-        _manager->setPatientId("*");
+        d->manager->setPatientId("*");
       }
     else
-      _manager->setPatientId("*" + id + "*");
+      d->manager->setPatientId("*" + id + "*");
   }
 
 void
@@ -511,10 +539,10 @@ QtDCM::serieDescriptionTextChanged( QString desc )
   {
     if (desc.isEmpty())
       {
-        _manager->setSerieDescription("*");
+        d->manager->setSerieDescription("*");
       }
     else
-      _manager->setSerieDescription("*" + desc + "*");
+      d->manager->setSerieDescription("*" + desc + "*");
   }
 
 void
@@ -522,27 +550,27 @@ QtDCM::studyDescriptionTextChanged( QString desc )
   {
     if (desc.isEmpty())
       {
-        _manager->setStudyDescription("*");
+        d->manager->setStudyDescription("*");
       }
     else
-      _manager->setStudyDescription("*" + desc + "*");
+      d->manager->setStudyDescription("*" + desc + "*");
   }
 
 void
 QtDCM::toggleAdvancedView()
   {
-    if (widget.advancedFrame->isHidden())
+    if (advancedFrame->isHidden())
       {
-        widget.advancedButton->setText("Normal");
-        widget.advancedFrame->show();
+        advancedButton->setText("Normal");
+        advancedFrame->show();
       }
     else
       {
-        widget.advancedButton->setText("Advanced");
-        widget.advancedFrame->hide();
-        widget.studyDescriptionEdit->setText("");
-        widget.serieDescriptionEdit->setText("");
-        widget.patientIdEdit->setText("");
+        advancedButton->setText("Advanced");
+        advancedFrame->hide();
+        studyDescriptionEdit->setText("");
+        serieDescriptionEdit->setText("");
+        patientIdEdit->setText("");
       }
   }
 
@@ -550,11 +578,11 @@ void
 QtDCM::showPreview()
   {
     QtDcmPreviewDialog * dialog = new QtDcmPreviewDialog(this);
-    if (_manager->getMode() == "CD")
-      _manager->setImagesList(_imagesList);
-    _manager->setSerieId(_currentSerieId);
-    _manager->makePreview();
-    dialog->setImages(_manager->getListImages());
+    if (d->manager->getMode() == "CD")
+      d->manager->setImagesList(d->imagesList);
+    d->manager->setSerieId(d->currentSerieId);
+    d->manager->makePreview();
+    dialog->setImages(d->manager->getListImages());
     dialog->updatePreview();
     dialog->exec();
     dialog->close();
