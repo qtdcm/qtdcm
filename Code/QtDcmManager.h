@@ -77,6 +77,12 @@ class QtDcmManager : public QObject
     sendEchoRequest();
 
     /**
+     * Find SCU with Dcmtk code
+     */
+    void
+    findScu();
+
+    /**
      * This method read the dicomdir file and populate the different lists (Patients, Studies, Series and Images)
      *
      * @see QtDcmPatient, QtDcmStudy, QtDcmSerie, QtDcmImage

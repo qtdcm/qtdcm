@@ -9,9 +9,9 @@
 #define QTDCMIMAGE_H_
 
 #include <QtGui>
-#include <QtDcmSerie.h>
 
 class QtDcmSerie;
+class QtDcmImagePrivate;
 
 /**
  * This class is a representation of a dicom image. It contains dicom id and filename of the image.
@@ -22,15 +22,13 @@ class QtDcmImage : public QObject
   {
   Q_OBJECT
   private:
-    QString _id; /** Dicom ID of the image */
-    QString _filename; /** Filename path of the dicom image */
-    QtDcmSerie * _p_serie; /** Parent serie */
+      QtDcmImagePrivate * d;
 
   public:
     /**
      * Default constructor
      */
-    QtDcmImage() {};
+    QtDcmImage();
 
     /**
      * Default destructor
@@ -44,20 +42,14 @@ class QtDcmImage : public QObject
      * @return _id
      */
     QString
-    getId()
-      {
-        return _id;
-      }
+    getId();
     /**
      * Id setter
      *
      * @param id a QString
      */
     void
-    setId( QString id )
-      {
-        _id = id;
-      }
+    setId( QString id );
 
     /**
      * Image filename getter
@@ -65,10 +57,7 @@ class QtDcmImage : public QObject
      * @return _filename
      */
     QString
-    getFilename()
-      {
-        return _filename;
-      }
+    getFilename();
 
     /**
      * Image filename setter
@@ -76,10 +65,7 @@ class QtDcmImage : public QObject
      * @param filename a QString containing absolute path
      */
     void
-    setFilename( QString filename )
-      {
-        _filename = filename;
-      }
+    setFilename( QString filename );
 
     /**
      * Parent serie getter
@@ -88,10 +74,7 @@ class QtDcmImage : public QObject
      * @see QtDcmSerie
      */
     QtDcmSerie *
-    getSerie()
-      {
-        return _p_serie;
-      }
+    getSerie();
 
     /**
      * Parent serie setter
@@ -100,10 +83,7 @@ class QtDcmImage : public QObject
      * @see QtDcmSerie
      */
     void
-    setSerie( QtDcmSerie * serie )
-      {
-        _p_serie = serie;
-      }
+    setSerie( QtDcmSerie * serie );
 
   };
 

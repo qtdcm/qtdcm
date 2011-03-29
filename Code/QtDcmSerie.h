@@ -10,9 +10,7 @@
 
 #include <QtGui>
 
-#include <QtDcmImage.h>
-#include <QtDcmStudy.h>
-
+class QtDcmSeriePrivate;
 class QtDcmStudy;
 class QtDcmImage;
 
@@ -23,17 +21,13 @@ class QtDcmSerie : public QObject
   {
   Q_OBJECT
   private:
-    QString _id; /** Serie dicom identificator */
-    QString _description; /** Serie description */
-    QString _date; /** Study date */
-    QList<QtDcmImage *> _images; /** List of images in the serie */
-    QtDcmStudy * _p_study; /** Pointer on the parent study */
+   QtDcmSeriePrivate * d;
 
   public:
     /**
      * Default constructor
      */
-    QtDcmSerie() {};
+    QtDcmSerie();
 
     /**
      * Default destructor
@@ -47,10 +41,7 @@ class QtDcmSerie : public QObject
      * @return _id a QString
      */
     QString
-    getId()
-      {
-        return _id;
-      }
+    getId();
 
     /**
      * Serie Id setter
@@ -58,10 +49,7 @@ class QtDcmSerie : public QObject
      * @param id is a QString
      */
     void
-    setId( QString id )
-      {
-        _id = id;
-      }
+    setId( QString id );
 
     /**
      * Serie date getter
@@ -69,10 +57,7 @@ class QtDcmSerie : public QObject
      * @return _date a QString
      */
     QString
-    getDate()
-      {
-        return _date;
-      }
+    getDate();
 
     /**
      * Serie date setter
@@ -80,10 +65,7 @@ class QtDcmSerie : public QObject
      * @param date is a QString
      */
     void
-    setDate( QString date )
-      {
-        _date = date;
-      }
+    setDate( QString date );
 
     /**
      * Serie description getter
@@ -91,10 +73,7 @@ class QtDcmSerie : public QObject
      * @return _description a QString
      */
     QString
-    getDescription()
-      {
-        return _description;
-      }
+    getDescription();
 
     /**
      * Serie description setter
@@ -102,10 +81,7 @@ class QtDcmSerie : public QObject
      * @param description a QString
      */
     void
-    setDescription( QString description )
-      {
-        _description = description;
-      }
+    setDescription( QString description );
 
     /**
      * Image list getter
@@ -114,10 +90,7 @@ class QtDcmSerie : public QObject
      * @see QtDcmImage
      */
     QList<QtDcmImage *>
-    getImages()
-      {
-        return _images;
-      }
+    getImages();
 
     /**
      * Image list setter
@@ -126,10 +99,7 @@ class QtDcmSerie : public QObject
      * @see QtDcmImage
      */
     void
-    setImages( QList<QtDcmImage *> images )
-      {
-        _images = images;
-      }
+    setImages( QList<QtDcmImage *> images );
 
     /**
      * Parent study getter
@@ -138,10 +108,7 @@ class QtDcmSerie : public QObject
      * @see QtDcmStudy
      */
     QtDcmStudy *
-    getStudy()
-      {
-        return _p_study;
-      }
+    getStudy();
 
     /**
      * Parent study setter
@@ -150,10 +117,7 @@ class QtDcmSerie : public QObject
      * @see QtDcmStudy
      */
     void
-    setStudy( QtDcmStudy * study )
-      {
-        _p_study = study;
-      }
+    setStudy( QtDcmStudy * study );
   };
 
 #endif /* QTDCMSERIE_H_ */

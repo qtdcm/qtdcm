@@ -1,5 +1,8 @@
 #include "QtDcm.h"
 #include <QtDcmPatient.h>
+#include <QtDcmStudy.h>
+#include <QtDcmSerie.h>
+#include <QtDcmImage.h>
 #include <QtDcmDateDialog.h>
 #include <QtDcmPreferencesDialog.h>
 #include <QtDcmPreviewDialog.h>
@@ -73,12 +76,19 @@ QtDCM::initConnections()
     QObject::connect(studyDescriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(studyDescriptionTextChanged(QString)));
     QObject::connect(advancedButton, SIGNAL(clicked()), this, SLOT(toggleAdvancedView()));
     QObject::connect(echoButton, SIGNAL(clicked()), this, SLOT(sendEcho()));
+    QObject::connect(searchBisButton, SIGNAL(clicked()), this, SLOT(findSCU()));
   }
 
 void
 QtDCM::sendEcho()
 {
     d->manager->sendEchoRequest();
+}
+
+void
+QtDCM::findSCU()
+{
+    d->manager->findScu();
 }
 
 void

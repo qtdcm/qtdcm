@@ -10,6 +10,8 @@
 
 #include <QtGui>
 
+class QtDcmExportThreadPrivate;
+
 /*
  *
  */
@@ -17,13 +19,7 @@ class QtDcmExportThread : public QThread
   {
   Q_OBJECT
   private:
-    QString _program;
-    QString _serverPacsParam;
-    QString _localPacsParam;
-    QString _temporaryDir;
-    QList<QString> _seriesToExport;
-    QString _modality;
-    QString _aetitle;
+  QtDcmExportThreadPrivate * d;
 
   public:
     QtDcmExportThread()
@@ -38,46 +34,25 @@ class QtDcmExportThread : public QThread
     run();
 
     void
-    setProgram( QString program )
-      {
-        _program = program;
-      }
+    setProgram( QString program );
 
     void
-    setServerPacsParam( QString param )
-      {
-        _serverPacsParam = param;
-      }
+    setServerPacsParam( QString param );
 
     void
-    setLocalPacsParam( QString param )
-      {
-        _localPacsParam = param;
-      }
+    setLocalPacsParam( QString param );
 
     void
-    setTemporaryDir( QString dir )
-      {
-        _temporaryDir = dir;
-      }
+    setTemporaryDir( QString dir );
 
     void
-    setSeriesToExport( QList<QString> list )
-      {
-        _seriesToExport = list;
-      }
+    setSeriesToExport( QList<QString> list );
 
     void
-    setModality( QString modality )
-      {
-        _modality = modality;
-      }
+    setModality( QString modality );
 
     void
-    setAetitle( QString ae )
-      {
-        _aetitle = ae;
-      }
+    setAetitle( QString ae );
   };
 
 #endif /* QTDCMEXPORTTHREAD_H_ */

@@ -7,29 +7,45 @@
 
 #include <QtDcmDateDialog.h>
 
-QtDcmDateDialog::QtDcmDateDialog( QWidget * parent )
-  {
-    widget.setupUi(this);
+class QtDcmDateDialogPrivate
+{
+    public:
+        QDate date;
+};
+
+QtDcmDateDialog::QtDcmDateDialog(QWidget * parent) :
+    d(new QtDcmDateDialogPrivate)
+{
+    this->setupUi(this);
     this->setModal(true);
-    this->setParent(parent,Qt::Dialog);
+    this->setParent(parent, Qt::Dialog);
     this->initConnections();
-  }
+}
 
-void QtDcmDateDialog::initConnections()
-  {
-    QObject::connect(widget.calendarWidget, SIGNAL(clicked(QDate)), this, SLOT(setDate(QDate)));
-    QObject::connect(widget.calendarWidget, SIGNAL(currentPageChanged(int,int)), this, SLOT(yearMonthChanged(int,int)));
-  }
+void
+QtDcmDateDialog::initConnections()
+{
+    QObject::connect(calendarWidget, SIGNAL(clicked(QDate)), this, SLOT(setDate(QDate)));
+    QObject::connect(calendarWidget, SIGNAL(currentPageChanged(int,int)), this, SLOT(yearMonthChanged(int,int)));
+}
 
-void QtDcmDateDialog::yearMonthChanged(int year, int month)
-  {
-    int day = _date.day();
-    _date.setDate(year, month, _date.day());
-    widget.calendarWidget->setSelectedDate(_date);
-  }
+void
+QtDcmDateDialog::yearMonthChanged(int year, int month)
+{
+    int day = d->date.day();
+    d->date.setDate(year, month, d->date.day());
+    calendarWidget->setSelectedDate(d->date);
+}
 
-void QtDcmDateDialog::setDate(const QDate & date)
-  {
-    widget.calendarWidget->setSelectedDate(date);
-    _date = date;
-  }
+QDate
+QtDcmDateDialog::getDate()
+{
+    return d->date;
+}
+
+void
+QtDcmDateDialog::setDate(const QDate & date)
+{
+    calendarWidget->setSelectedDate(date);
+    d->date = date;
+}

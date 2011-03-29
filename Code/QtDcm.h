@@ -72,6 +72,9 @@ class QtDCM : public QLabel, public Ui::QtDCM
         void
         sendEcho();
 
+        void
+        findSCU();
+
         /**
          * Slot called when dateComboBox is changed. This slots change the display parameters of the 2 date buttons
          *

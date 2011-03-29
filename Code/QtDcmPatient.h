@@ -9,11 +9,8 @@
 #define QTDCMPATIENT_H_
 
 #include <QtGui>
-#include <QtDcmImage.h>
-#include <QtDcmSerie.h>
-#include <QtDcmStudy.h>
-#include <QtDcmPatient.h>
 
+class QtDcmPatientPrivate;
 class QtDcmStudy;
 
 /**
@@ -23,20 +20,13 @@ class QtDcmPatient : public QObject
   {
   Q_OBJECT
   private:
-    QString _id; /** Patient dicom identificator */
-    QString _name; /** Patient name as found in the dicom format*/
-    QString _birthdate; /** Patient birth date */
-    QString _sex; /** Patient sex */
-
-    QList<QtDcmStudy *> _studies; /** List of a study for this patient */
+  QtDcmPatientPrivate *d;
 
   public:
     /**
      * Default constructor
      */
-    QtDcmPatient()
-      {
-      }
+    QtDcmPatient();
 
     /**
      * Default destructor
@@ -52,10 +42,7 @@ class QtDcmPatient : public QObject
      * @return _id a QString
      */
     QString
-    getId()
-      {
-        return _id;
-      }
+    getId();
 
     /**
      * Id setter
@@ -63,10 +50,7 @@ class QtDcmPatient : public QObject
      * @param id a QString
      */
     void
-    setId( QString id )
-      {
-        _id = id;
-      }
+    setId( QString id );
 
     /**
      * Patient name getter
@@ -74,10 +58,7 @@ class QtDcmPatient : public QObject
      * @return _name a QString
      */
     QString
-    getName()
-      {
-        return _name;
-      }
+    getName();
 
     /**
      * Patient name setter
@@ -85,10 +66,7 @@ class QtDcmPatient : public QObject
      * @param name a QString
      */
     void
-    setName( QString name )
-      {
-        _name = name;
-      }
+    setName( QString name );
 
     /**
      * Patient birthdate getter
@@ -96,10 +74,7 @@ class QtDcmPatient : public QObject
      * @return _birthdate
      */
     QString
-    getBirthdate()
-      {
-        return _birthdate;
-      }
+    getBirthdate();
 
     /**
      * Patient birthdate setter
@@ -107,10 +82,7 @@ class QtDcmPatient : public QObject
      * @param birthdate
      */
     void
-    setBirthdate( QString birthdate )
-      {
-        _birthdate = birthdate;
-      }
+    setBirthdate( QString birthdate );
 
     /**
      * Patient sex getter
@@ -118,10 +90,7 @@ class QtDcmPatient : public QObject
      * @return _sex a QString
      */
     QString
-    getSex()
-      {
-        return _sex;
-      }
+    getSex();
 
     /**
      * Patient sex setter
@@ -129,10 +98,7 @@ class QtDcmPatient : public QObject
      * @param sex a QString
      */
     void
-    setSex( QString sex )
-      {
-        _sex = sex;
-      }
+    setSex( QString sex );
 
     /**
      * Patient studies list getter
@@ -141,10 +107,7 @@ class QtDcmPatient : public QObject
      * @see QtDcmStudy
      */
     QList<QtDcmStudy *>
-    getStudies()
-      {
-        return _studies;
-      }
+    getStudies();
 
     /**
      * Patient studies list setter
@@ -153,27 +116,17 @@ class QtDcmPatient : public QObject
      * @see QtDcmStudy
      */
     void
-    setStudies( QList<QtDcmStudy *> studies )
-      {
-        _studies = studies;
-      }
+    setStudies( QList<QtDcmStudy *> studies );
 
     /**
      * Add study in the list
      */
-    void addStudy(QtDcmStudy * study)
-      {
-        _studies.append(study);
-      }
+    void addStudy(QtDcmStudy * study);
 
     /**
      * Remove study at position index
      */
-    void removeStudy(int index)
-      {
-        _studies.removeAt(index);
-      }
-
+    void removeStudy(int index);
   };
 
 #endif /* QTDCMPATIENT_H_ */

@@ -77,6 +77,7 @@ set(SAMPLE_SRCS
 set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.h
+#  ${QTDCM_SOURCE_DIR}/Code/QtDcmFindCallback.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImage.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
@@ -100,6 +101,7 @@ set(SAMPLE_UIS
 set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})
 
 set(QTDCM_SRCS
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmFindCallback.cpp
 )
 
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})

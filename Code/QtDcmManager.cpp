@@ -23,9 +23,13 @@
 //#endif
 
 #include <QtDcmPatient.h>
+#include <QtDcmStudy.h>
+#include <QtDcmSerie.h>
+#include <QtDcmImage.h>
 #include <QtDcmPreferences.h>
 #include <QtDcmExportThread.h>
 #include <QtDcmQueryThread.h>
+#include <QtDcmFindCallback.h>
 
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTDIO
@@ -40,8 +44,7 @@
 #include <dcmtk/ofstd/ofstream.h>
 #include <dcmtk/dcmdata/dctk.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
-#include <dcmtk/dcmdata/cmdlnarg.h>
-#include <dcmtk/ofstd/ofconapp.h>
+#include "dcmtk/dcmnet/dfindscu.h"
 #include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
@@ -58,8 +61,6 @@
 #include "dcmtk/dcmnet/dimse.h"
 #include "dcmtk/dcmnet/diutil.h"
 #include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/ofstd/ofconapp.h"
 #include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
 
 #ifdef WITH_OPENSSL
@@ -193,7 +194,7 @@ QtDcmManager::sendEchoRequest()
     ASC_setAPTitles(params, d->preferences->getAetitle().toAscii().data(), d->preferences->getServers()[0]->getAetitle().toAscii().data(), NULL);
 
     // the DICOM server accepts connections at server.nowhere.com port 104
-    ASC_setPresentationAddresses(params, d->preferences->getHostname().toAscii().data(), QString(d->preferences->getServers()[0]->getServer() + ":" +  d->preferences->getServers()[0]->getPort()).toAscii().data());
+    ASC_setPresentationAddresses(params, d->preferences->getHostname().toAscii().data(), QString(d->preferences->getServers()[0]->getServer() + ":" + d->preferences->getServers()[0]->getPort()).toAscii().data());
 
     // list of transfer syntaxes, only a single entry here
     const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
@@ -211,6 +212,7 @@ QtDcmManager::sendEchoRequest()
             DcmDataset *sd = NULL; // status detail will be stored here
             // send C-ECHO-RQ and handle response
             DIMSE_echoUser(assoc, id, DIMSE_BLOCKING, 0, &status, &sd);
+
             delete sd; // we don't care about status detail
 
             this->displayMessage("Echo request successful !");
@@ -225,6 +227,29 @@ QtDcmManager::sendEchoRequest()
     ASC_releaseAssociation(assoc); // release association
     ASC_destroyAssociation(&assoc); // delete assoc structure
     ASC_dropNetwork(&net); // delete net structure
+}
+
+void
+QtDcmManager::findScu()
+{
+    OFList<OFString> overrideKeys;
+    overrideKeys.push_back((QString("0008,0052=") + QString("" "PATIENT" "")).toAscii().data());
+    overrideKeys.push_back((QString("0010,0010=") + d->patientName).toAscii().data());
+    OFList<OFString> fileNameList;
+    OFString temp_str;
+    DcmFindSCU findscu;
+    OFCondition cond;
+
+    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::PATIENT);
+
+    if (findscu.initializeNetwork(30).bad())
+        this->displayErrorMessage(tr("Cannot establish network connection"));
+
+    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toAscii().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toAscii().data(), d->preferences->getServers()[0]->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
+        this->displayErrorMessage(tr("Cannot perform query C-FIND"));
+
+    if (findscu.dropNetwork().bad())
+        this->displayErrorMessage(tr("Cannot drop network"));
 }
 
 void
@@ -485,7 +510,7 @@ QtDcmManager::exportSeries()
         d->process->waitForFinished();
         //zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
 
-        this->deleteCurrentSerieDir();
+        //this->deleteCurrentSerieDir();
         delete d->process;
     }
     this->displayMessage(tr("Import termine"));

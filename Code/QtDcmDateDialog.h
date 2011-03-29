@@ -10,16 +10,17 @@
 #include <QtGui>
 #include <ui_qtdcmdatedialog.h>
 
+class QtDcmDateDialogPrivate;
+
 /*
  *
  */
-class QtDcmDateDialog : public QDialog
+class QtDcmDateDialog : public QDialog, public Ui::DateDialog
   {
   Q_OBJECT
   private:
-    QDate _date;
+  QtDcmDateDialogPrivate * d;
   public:
-    Ui::DateDialog widget;
     QtDcmDateDialog( QWidget * parent );
     virtual
     ~QtDcmDateDialog()
@@ -29,17 +30,14 @@ class QtDcmDateDialog : public QDialog
     QCalendarWidget *
     getCalendarWidget()
       {
-        return widget.calendarWidget;
+        return calendarWidget;
       }
 
     /**
      * Call this method to get the selected date in the calendar widget
      */
     QDate
-    getDate()
-      {
-        return _date;
-      }
+    getDate();
 
     void
     initConnections();
