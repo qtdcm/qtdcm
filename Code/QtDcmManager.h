@@ -80,7 +80,25 @@ class QtDcmManager : public QObject
      * Find SCU with Dcmtk code
      */
     void
-    findScu();
+    findPatientScu();
+
+    void
+    findStudiesScu(QString patientName);
+
+    void
+    findSeriesScu(QString patientName, QString studyDescription);
+
+    void
+    findImagesScu(QString patientName, QString id, QString studyDescription);
+
+    void
+    setPatientsTreeWidget(QTreeWidget * widget);
+
+    void
+    setStudiesTreeWidget(QTreeWidget * widget);
+
+    void
+    setSeriesTreeWidget(QTreeWidget * widget);
 
     /**
      * This method read the dicomdir file and populate the different lists (Patients, Studies, Series and Images)

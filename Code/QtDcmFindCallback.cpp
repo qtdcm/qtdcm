@@ -42,12 +42,19 @@
 #include "dcmtk/dcmtls/tlslayer.h"
 #endif
 
+#include <QtDcmPatient.h>
+#include <QtDcmStudy.h>
+#include <QtDcmSerie.h>
+#include <QtDcmImage.h>
+#include <QtDcmFindScuSignalManager.h>
+
 #include <QtDcmFindCallback.h>
 
 class QtDcmFindCallbackPrivate
 {
     public:
         int type;
+        QtDcmFindScuSignalManager * signalManager;
 };
 
 QtDcmFindCallback::QtDcmFindCallback() :
@@ -60,17 +67,68 @@ QtDcmFindCallback::QtDcmFindCallback(int type) :
     d(new QtDcmFindCallbackPrivate)
 {
     d->type = type;
+    d->signalManager = NULL;
+}
+
+void
+QtDcmFindCallback::setSignalManager(QtDcmFindScuSignalManager * manager)
+{
+    d->signalManager = manager;
 }
 
 void
 QtDcmFindCallback::callback(T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers)
 {
-    OFString info;
+    QMap<QString, QString> infosMap;
 
-    responseIdentifiers->print(std::cout);
-//    responseIdentifiers->findAndGetOFString(DCM_PatientAge, info);
-//    qDebug() << "Patient Age : " << QString(info.c_str());
-//
-//    responseIdentifiers->findAndGetOFString(DCM_PatientID, info);
-//    qDebug() << "Patient ID : " << QString(info.c_str());
+    OFString info;
+    switch (d->type) {
+        case QtDcmFindCallback::PATIENT:
+            responseIdentifiers->findAndGetOFString(DCM_PatientName, info);
+            infosMap.insert("Name", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_PatientID, info);
+            infosMap.insert("ID", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_PatientSex, info);
+            infosMap.insert("Sex", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_PatientBirthDate, info);
+            infosMap.insert("Birthdate", QString(info.c_str()));
+            if (d->signalManager) {
+                d->signalManager->foundPatient(infosMap);
+            }
+            break;
+        case QtDcmFindCallback::STUDY:
+            responseIdentifiers->findAndGetOFString(DCM_StudyDescription, info);
+            infosMap.insert("Description", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_StudyDate, info);
+            infosMap.insert("Date", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_StudyID, info);
+            infosMap.insert("ID", QString(info.c_str()));
+            if (d->signalManager) {
+                d->signalManager->foundStudy(infosMap);
+            }
+            break;
+        case QtDcmFindCallback::SERIE:
+            responseIdentifiers->findAndGetOFString(DCM_SeriesDescription, info);
+            infosMap.insert("Description", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_StudyDate, info);
+            infosMap.insert("Date", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_Modality, info);
+            infosMap.insert("Modality", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_SeriesInstanceUID, info);
+            infosMap.insert("ID", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_NumberOfSlices, info);
+            infosMap.insert("InstanceCount", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_InstitutionName, info);
+            infosMap.insert("Institution", QString(info.c_str()));
+            responseIdentifiers->findAndGetOFString(DCM_PerformingPhysicianName, info);
+            infosMap.insert("Operator", QString(info.c_str()));
+            if (d->signalManager) {
+                d->signalManager->foundSerie(infosMap);
+            }
+//            responseIdentifiers->print(std::cout);
+            break;
+        case QtDcmFindCallback::IMAGE:
+            responseIdentifiers->print(std::cout);
+            break;
+    }
 }

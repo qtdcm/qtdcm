@@ -23,11 +23,11 @@ class QtDCM : public QLabel, public Ui::QtDCM
          *
          * @return the pointer on the QTreeWidget
          */
-        QTreeView *
-        getTreeView()
-        {
-            return treeWidget;
-        }
+//        QTreeView *
+//        getTreeView()
+//        {
+//            return treeWidget;
+//        }
 
         /**
          * Get the pointer of the QtDcm manager
@@ -113,6 +113,18 @@ class QtDCM : public QLabel, public Ui::QtDCM
 
         void
         itemClicked(QTreeWidgetItem* current, int);
+
+//        void
+//        patientItemClicked(QTreeWidgetItem* current, int);
+
+        void
+        patientItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+
+        void
+        studyItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+
+        void
+        serieItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
         /**
          * Slot called when right clicking on the QTreeWidget. User can export or open a dicomdir from the context menu
