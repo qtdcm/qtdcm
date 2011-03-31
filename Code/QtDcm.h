@@ -23,13 +23,28 @@ class QtDCM : public QLabel, public Ui::QtDCM
          *
          * @return the pointer on the QTreeWidget
          */
-//        QTreeView *
-//        getTreeView()
-//        {
-//            return treeWidget;
-//        }
+        QTreeView *
+        getPatientsTreeView()
+        {
+            return treeWidgetPatients;
+        }
 
-        enum mode {CD, PACS};
+        QTreeView *
+        getStudiesTreeView()
+        {
+            return treeWidgetStudies;
+        }
+
+        QTreeView *
+        getSeriesTreeView()
+        {
+            return treeWidgetSeries;
+        }
+
+        enum mode
+        {
+            CD, PACS
+        };
 
         /**
          * Get the pointer of the QtDcm manager
@@ -46,28 +61,14 @@ class QtDCM : public QLabel, public Ui::QtDCM
         clearDisplay();
 
         /**
-         * Display in the QTreeWidget the content of the list of patients from the manager
-         *
-         */
-        void
-        displayDicomdir();
-
-        /**
          * Initialize SIGNAL/SLOTS connections of the different widget
          *
          */
         void
         initConnections();
 
-        /**
-         * Get the images filenames list of the current serie
-         *
-         */
-        QList<QString>
-        getImagesList();
-
         void
-        exportToDirectory(QString directory);
+        importToDirectory(QString directory);
 
     public slots:
 
@@ -78,13 +79,6 @@ class QtDCM : public QLabel, public Ui::QtDCM
         findSCU();
 
         /**
-         * Slot called when dateComboBox is changed. This slots change the display parameters of the 2 date buttons
-         *
-         */
-        void
-        updateDateButtons(int index);
-
-        /**
          * Slot that change the modality parameter of the query
          *
          */
@@ -93,6 +87,9 @@ class QtDCM : public QLabel, public Ui::QtDCM
 
         void
         updateSex(int index);
+
+        void
+        updatePACS(int index);
 
         /**
          * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
@@ -108,20 +105,6 @@ class QtDCM : public QLabel, public Ui::QtDCM
         void
         endDateChanged(QDate date);
 
-        /**
-         * Slot called when a selected is made on the QTreeWidget. If a serie is selected, corresponding images filenames
-         * are copied in _imagesList
-         *
-         */
-        void
-        itemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
-
-        void
-        itemClicked(QTreeWidgetItem* current, int);
-
-//        void
-//        patientItemClicked(QTreeWidgetItem* current, int);
-
         void
         patientItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
@@ -131,20 +114,19 @@ class QtDCM : public QLabel, public Ui::QtDCM
         void
         serieItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
-        /**
-         * Slot called when right clicking on the QTreeWidget. User can export or open a dicomdir from the context menu
-         *
-         */
         void
-        contextExportMenu(const QPoint point);
+        serieItemClicked(QTreeWidgetItem* current, int);
 
         /**
          * Slot that launch a QFileDialog for choosing an output directory
          * where the current serie will be exported with dcm2nii (This is done by the _manager).
          *
          */
+        //        void
+        //        exportList();
+
         void
-        exportList();
+        importSelectedSeries();
 
         /**
          * Slot that query the list of server with the user specified parameters
@@ -159,6 +141,9 @@ class QtDCM : public QLabel, public Ui::QtDCM
          */
         void
         openDicomdir();
+
+        void
+        loadPatientsFromDicomdir();
 
         /**
          * Slot that launch the PACS preferences dialog
@@ -195,6 +180,8 @@ class QtDCM : public QLabel, public Ui::QtDCM
         serieSelected(bool selected);
 
     private:
+        void
+        updatePacsComboBox();
         QtDcmPrivate *d;
 };
 

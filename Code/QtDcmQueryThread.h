@@ -9,9 +9,9 @@
 #define QTDCMQUERYTHREAD_H_
 
 #include <QtGui>
-#include <QtDcmManager.h>
 
 class QtDcmManager;
+class QtDcmQueryThreadPrivate;
 /*
  *
  */
@@ -19,10 +19,7 @@ class QtDcmQueryThread : public QThread
   {
   Q_OBJECT
   private:
-    QString _command;
-    QStringList _parameters;
-    QtDcmManager * _manager;
-    QProcess * _process;
+    QtDcmQueryThreadPrivate * d;
 
   public:
     QtDcmQueryThread()
@@ -38,28 +35,16 @@ class QtDcmQueryThread : public QThread
     run();
 
     QProcess *
-    getProcess()
-      {
-        return _process;
-      }
+    getProcess();
 
     void
-    setCommand( QString command )
-      {
-        _command = command;
-      }
+    setCommand( QString command );
 
     void
-    setParameters( QStringList parameters )
-      {
-        _parameters = parameters;
-      }
+    setParameters( QStringList parameters );
 
     void
-    setManager( QtDcmManager * manager )
-      {
-        _manager = manager;
-      }
+    setManager( QtDcmManager * manager );
   };
 
 #endif /* QTDCMQUERYTHREAD_H_ */

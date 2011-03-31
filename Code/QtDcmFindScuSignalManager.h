@@ -39,7 +39,7 @@ class QtDcmFindScuSignalManager : public QObject
         void
         foundSerie(QMap<QString, QString> infosMap);
         void
-        foundImage();
+        foundImage(QMap<QString, QString> infosMap);
 
     private:
         QtDcmFindScuSignalManagerPrivate * d;

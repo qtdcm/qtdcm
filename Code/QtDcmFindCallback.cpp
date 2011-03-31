@@ -116,7 +116,7 @@ QtDcmFindCallback::callback(T_DIMSE_C_FindRQ *request, int responseCount, T_DIMS
             infosMap.insert("Modality", QString(info.c_str()));
             responseIdentifiers->findAndGetOFString(DCM_SeriesInstanceUID, info);
             infosMap.insert("ID", QString(info.c_str()));
-            responseIdentifiers->findAndGetOFString(DCM_NumberOfSlices, info);
+            responseIdentifiers->findAndGetOFString(DCM_AcquisitionNumber, info);
             infosMap.insert("InstanceCount", QString(info.c_str()));
             responseIdentifiers->findAndGetOFString(DCM_InstitutionName, info);
             infosMap.insert("Institution", QString(info.c_str()));
@@ -125,10 +125,14 @@ QtDcmFindCallback::callback(T_DIMSE_C_FindRQ *request, int responseCount, T_DIMS
             if (d->signalManager) {
                 d->signalManager->foundSerie(infosMap);
             }
-//            responseIdentifiers->print(std::cout);
             break;
         case QtDcmFindCallback::IMAGE:
-            responseIdentifiers->print(std::cout);
+            responseIdentifiers->findAndGetOFString(DCM_InstanceNumber, info);
+            infosMap.insert("InstanceCount", QString(info.c_str()));
+            if (d->signalManager) {
+                d->signalManager->foundImage(infosMap);
+            }
+//            responseIdentifiers->print(std::cout);
             break;
     }
 }

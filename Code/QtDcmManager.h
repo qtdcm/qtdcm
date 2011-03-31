@@ -11,8 +11,6 @@
 #include <QtGui>
 #include <QtNetwork>
 
-class QtDcmPatient;
-class QtDcmQueryThread;
 class QtDcmPreferences;
 class QtDcmManagerPrivate;
 
@@ -45,11 +43,11 @@ class QtDcmManager : public QObject
     void
     deleteTemporaryDirs();
 
-    /**
-     * This method parse and fill all the list with the result of C-FIND
-     */
-    void
-    parseQueryResult( QString query );
+//    /**
+//     * This method parse and fill all the list with the result of C-FIND
+//     */
+//    void
+//    parseQueryResult( QString query );
 
   public:
 
@@ -80,7 +78,7 @@ class QtDcmManager : public QObject
      * Find SCU with Dcmtk code
      */
     void
-    findPatientScu();
+    findPatientsScu();
 
     void
     findStudiesScu(QString patientName);
@@ -89,7 +87,19 @@ class QtDcmManager : public QObject
     findSeriesScu(QString patientName, QString studyDescription);
 
     void
-    findImagesScu(QString patientName, QString id, QString studyDescription);
+    findImagesScu(QString uid);
+
+    void
+    findPatientsDicomdir();
+
+    void
+    findStudiesDicomdir(QString patientName);
+
+    void
+    findSeriesDicomdir(QString patientName, QString studyDescription);
+
+    void
+    findImagesDicomdir(QString serieUID);
 
     void
     setPatientsTreeWidget(QTreeWidget * widget);
@@ -101,10 +111,10 @@ class QtDcmManager : public QObject
     setSeriesTreeWidget(QTreeWidget * widget);
 
     /**
-     * This method read the dicomdir file and populate the different lists (Patients, Studies, Series and Images)
+     * This method read the dicomdir file and populate the patient treewidget
      *
-     * @see QtDcmPatient, QtDcmStudy, QtDcmSerie, QtDcmImage
      */
+
     void
     loadDicomdir();
 
@@ -173,6 +183,9 @@ class QtDcmManager : public QObject
      */
     void
     setPreferences( QtDcmPreferences * prefs );
+
+    void
+    setCurrentPacs(int index);
 
     /**
      * Patient name getter
@@ -295,14 +308,23 @@ class QtDcmManager : public QObject
      * @return QList<QtDcmPatient *> the list of patient loaded
      * @see QtDcmPatient
      */
-    QList<QtDcmPatient *>
-    getPatients();
+//    QList<QtDcmPatient *>
+//    getPatients();
 
-    /**
-     * Global method for exporting serie
-     */
-//    void
-//    exportSerie();
+    void
+    addSerieToImport(QString uid);
+
+    void
+    removeSerieToImport(QString uid);
+
+    void
+    clearSeriesToImport();
+
+    int
+    seriesToImportSize();
+
+    void
+    importSelectedSeries();
 
     /**
      * Call dcm2nii in a QProcess object to reconstruct the given list of images
@@ -310,7 +332,7 @@ class QtDcmManager : public QObject
      * @param images
      */
     void
-    exportSerieFromCD();
+    importSerieFromDicomdir();
 
     /**
      * Call dcm2nii in a QProcess object to reconstruct the given list of images
@@ -318,14 +340,7 @@ class QtDcmManager : public QObject
      * @param images
      */
     void
-    exportSerieFromPACS();
-
-    /**
-     * Call dcmqr on the list of server with parameters. Load the results in the patient list
-     *
-     */
-    void
-    queryPACS();
+    importSerieFromPACS();
 
     /**
      * add patient in the list
@@ -353,9 +368,6 @@ class QtDcmManager : public QObject
 
     void
     setSeriesToExport(QMap<QString, QList<QString> > seriesToExport);
-
-    void
-    exportSeries();
 
     void
     setQuery( QByteArray query );

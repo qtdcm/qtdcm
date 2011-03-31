@@ -26,6 +26,7 @@
 #include <QtDcmStudy.h>
 #include <QtDcmSerie.h>
 #include <QtDcmImage.h>
+#include <QtDcmServer.h>
 #include <QtDcmPreferences.h>
 #include <QtDcmExportThread.h>
 #include <QtDcmQueryThread.h>
@@ -84,10 +85,12 @@ class QtDcmManagerPrivate
         QDir logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
         DcmItem * dcmObject; /** This attribute is usefull for parsing the dicomdir */
         DcmFileFormat dfile; /** This attribute is usefull for parsing the dicomdir */
+        DcmStack dicomdirItems; //This stack contains the dicomdir items
         QList<QtDcmPatient *> patients; /** List that contains patients resulting of a query or read from a CD */
         QList<QString> images; /** List of image filename to export from a CD */
         QMap<QString, QList<QString> > seriesToExport;
         QList<QImage> listImages;
+        QList<QString> seriesToImport;
         QString serieId; /** Id of the serie to export from the PACS */
         QProcess * process; /** This attribute launch the reconstruction process */
         QtDcmPreferences * preferences; /** Attribute that give access to the Pacs settings */
@@ -106,6 +109,7 @@ class QtDcmManagerPrivate
         QtDcmQueryThread * queryThread;
         QByteArray query;
 
+        QtDcmServer * currentPacs;
         QtDcmFindScuSignalManager * signalManager;
 };
 
@@ -123,13 +127,15 @@ QtDcmManager::QtDcmManager() :
     d->date2 = "*";
     d->serieDescription = "*";
     d->studyDescription = "*";
-    d->patientSex="*";
+    d->patientSex = "*";
 
     d->preferences = new QtDcmPreferences();
     d->exportThread = new QtDcmExportThread();
     d->queryThread = new QtDcmQueryThread();
 
     d->signalManager = new QtDcmFindScuSignalManager(this);
+
+    d->currentPacs = d->preferences->getServers().at(0);
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -144,7 +150,7 @@ QtDcmManager::QtDcmManager(QWidget * parent) :
     d->outputDir = "";
     d->patientName = "*";
     d->patientId = "*";
-    d->patientSex="*";
+    d->patientSex = "*";
     d->date1 = "*";
     d->date2 = "*";
     d->modality = "*";
@@ -157,6 +163,8 @@ QtDcmManager::QtDcmManager(QWidget * parent) :
     d->queryThread = new QtDcmQueryThread();
 
     d->signalManager = new QtDcmFindScuSignalManager(this);
+
+    d->currentPacs = d->preferences->getServers().at(0);
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -220,10 +228,10 @@ QtDcmManager::sendEchoRequest()
     ASC_createAssociationParameters(&params, ASC_DEFAULTMAXPDU);
 
     // set calling and called AE titles
-    ASC_setAPTitles(params, d->preferences->getAetitle().toUtf8().data(), d->preferences->getServers()[0]->getAetitle().toUtf8().data(), NULL);
+    ASC_setAPTitles(params, d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), NULL);
 
     // the DICOM server accepts connections at server.nowhere.com port 104
-    ASC_setPresentationAddresses(params, d->preferences->getHostname().toUtf8().data(), QString(d->preferences->getServers()[0]->getServer() + ":" + d->preferences->getServers()[0]->getPort()).toAscii().data());
+    ASC_setPresentationAddresses(params, d->preferences->getHostname().toUtf8().data(), QString(d->currentPacs->getServer() + ":" + d->currentPacs->getPort()).toAscii().data());
 
     // list of transfer syntaxes, only a single entry here
     const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
@@ -258,8 +266,10 @@ QtDcmManager::sendEchoRequest()
 }
 
 void
-QtDcmManager::findPatientScu()
+QtDcmManager::findPatientsScu()
 {
+    d->seriesToImport.clear();
+    d->mode = "PACS";
     OFList<OFString> overrideKeys;
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "PATIENT" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + d->patientName).toUtf8().data());
@@ -280,23 +290,7 @@ QtDcmManager::findPatientScu()
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(),
-                             d->preferences->getServers()[0]->getPort().toInt(),
-                             d->preferences->getAetitle().toUtf8().data(),
-                             d->preferences->getServers()[0]->getAetitle().toUtf8().data(),
-                             UID_FINDPatientRootQueryRetrieveInformationModel,
-                             EXS_Unknown,
-                             DIMSE_BLOCKING,
-                             0,
-                             ASC_DEFAULTMAXPDU,
-                             false,
-                             false,
-                             1,
-                             false,
-                             -1,
-                             &overrideKeys,
-                             callback,
-                             &fileNameList).bad())
+    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -306,6 +300,7 @@ QtDcmManager::findPatientScu()
 void
 QtDcmManager::findStudiesScu(QString patientName)
 {
+    d->seriesToImport.clear();
     OFList<OFString> overrideKeys;
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "STUDY" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
@@ -314,15 +309,7 @@ QtDcmManager::findStudiesScu(QString patientName)
     overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
 
     //Study level
-    overrideKeys.push_back(QString("StudyID").toUtf8().data());
-    overrideKeys.push_back(QString("StudyTime").toUtf8().data());
-
-    //Serie level
-    overrideKeys.push_back(QString("SeriesInstanceUID").toUtf8().data());
-    overrideKeys.push_back(QString("Modality").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
-    overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
+    overrideKeys.push_back(QString("StudyInstanceUID").toUtf8().data());
 
     //Image level
     OFList<OFString> fileNameList;
@@ -336,23 +323,7 @@ QtDcmManager::findStudiesScu(QString patientName)
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(),
-                             d->preferences->getServers()[0]->getPort().toInt(),
-                             d->preferences->getAetitle().toUtf8().data(),
-                             d->preferences->getServers()[0]->getAetitle().toUtf8().data(),
-                             UID_FINDPatientRootQueryRetrieveInformationModel,
-                             EXS_Unknown,
-                             DIMSE_BLOCKING,
-                             0,
-                             ASC_DEFAULTMAXPDU,
-                             false,
-                             false,
-                             1,
-                             false,
-                             -1,
-                             &overrideKeys,
-                             callback,
-                             &fileNameList).bad())
+    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->preferences->getServers()[0]->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -362,24 +333,23 @@ QtDcmManager::findStudiesScu(QString patientName)
 void
 QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
 {
+    d->seriesToImport.clear();
     OFList<OFString> overrideKeys;
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "SERIES" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back((QString("StudyDescription=") + studyDescription).toUtf8().data());
+    overrideKeys.push_back(QString("StudyDescription=" + studyDescription).toUtf8().data());
     overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
     overrideKeys.push_back(QString("Modality=" + d->modality).toUtf8().data());
 
     //Study level
-    overrideKeys.push_back(QString("StudyID").toUtf8().data());
     overrideKeys.push_back(QString("StudyDate").toUtf8().data());
-    overrideKeys.push_back(QString("StudyTime").toUtf8().data());
 
     //Serie level
     overrideKeys.push_back(QString("SeriesInstanceUID").toUtf8().data());
     overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
     overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
     overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
-    overrideKeys.push_back(QString("NumberOfSlices").toUtf8().data());
+    overrideKeys.push_back(QString("AcquisitionNumber").toUtf8().data());
 
     //Image level
     OFList<OFString> fileNameList;
@@ -393,23 +363,7 @@ QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toAscii().data(),
-                             d->preferences->getServers()[0]->getPort().toInt(),
-                             d->preferences->getAetitle().toAscii().data(),
-                             d->preferences->getServers()[0]->getAetitle().toAscii().data(),
-                             UID_FINDPatientRootQueryRetrieveInformationModel,
-                             EXS_Unknown,
-                             DIMSE_BLOCKING,
-                             0,
-                             ASC_DEFAULTMAXPDU,
-                             false,
-                             false,
-                             1,
-                             false,
-                             -1,
-                             &overrideKeys,
-                             callback,
-                             &fileNameList).bad())
+    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toAscii().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toAscii().data(), d->preferences->getServers()[0]->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -417,28 +371,15 @@ QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
 }
 
 void
-QtDcmManager::findImagesScu(QString patientName, QString id, QString studyDescription)
+QtDcmManager::findImagesScu(QString serieInstanceUID)
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGES" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back((QString("StudyDescription=") + studyDescription).toUtf8().data());
-    overrideKeys.push_back(QString("SeriesInstanceUID=" + id).toUtf8().data());
-
-    //Study level
-    overrideKeys.push_back(QString("StudyID").toUtf8().data());
-    overrideKeys.push_back(QString("StudyDate").toUtf8().data());
-    overrideKeys.push_back(QString("StudyTime").toUtf8().data());
-
-    //Serie level
-    overrideKeys.push_back(QString("SeriesDescription").toUtf8().data());
-    overrideKeys.push_back(QString("Modality").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
-    overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
-    // pleins d'autres trucs à mettre ici !
+    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGE" "")).toUtf8().data());
+    overrideKeys.push_back(QString("SeriesInstanceUID=" + serieInstanceUID).toUtf8().data());
 
     //Image level
+    overrideKeys.push_back(QString("InstanceNumber").toUtf8().data());
+
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
@@ -450,23 +391,7 @@ QtDcmManager::findImagesScu(QString patientName, QString id, QString studyDescri
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(),
-                             d->preferences->getServers()[0]->getPort().toInt(),
-                             d->preferences->getAetitle().toUtf8().data(),
-                             d->preferences->getServers()[0]->getAetitle().toUtf8().data(),
-                             UID_FINDPatientRootQueryRetrieveInformationModel,
-                             EXS_Unknown,
-                             DIMSE_BLOCKING,
-                             0,
-                             ASC_DEFAULTMAXPDU,
-                             false,
-                             false,
-                             1,
-                             false,
-                             -1,
-                             &overrideKeys,
-                             callback,
-                             &fileNameList).bad())
+    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->preferences->getServers()[0]->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -476,14 +401,9 @@ QtDcmManager::findImagesScu(QString patientName, QString id, QString studyDescri
 void
 QtDcmManager::loadDicomdir()
 {
-    d->seriesToExport.clear();
+    if (d->dicomdir.isEmpty())
+        return;
     d->mode = "CD";
-    //Convenience declarations for DCMTK
-    static const OFString Patient("PATIENT");
-    static const OFString Image("IMAGE");
-    static const OFString Series("SERIES");
-    static const OFString Study("STUDY");
-
     //Load dicomdir in a DCMTK DicomFileFormat object
     OFCondition status;
     if (!(status = d->dfile.loadFile(d->dicomdir.toUtf8().data())).good()) {
@@ -491,130 +411,300 @@ QtDcmManager::loadDicomdir()
     }
     //Get the dicomdir dataset in a DCMTK DcmObject
     d->dcmObject = d->dfile.getDataset();
+    this->findPatientsDicomdir();
+}
+
+void
+QtDcmManager::findPatientsDicomdir()
+{
+    d->seriesToImport.clear();
+
+    static const OFString Patient("PATIENT");
 
     // Loading all the dicomdir items in a stack
-    DcmStack items;
-    if (!d->dcmObject->findAndGetElements(DCM_Item, items).good()) {
+    DcmStack itemsTmp;
+    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good()) {
         return;
     }
-    //Using temporary lists for storing detected studies, series and images
-    QList<QtDcmStudy *> tmpStudy;
-    QList<QtDcmSerie *> tmpSerie;
-    QList<QtDcmImage *> tmpImage;
-    d->patients.clear();
+
+    while (itemsTmp.card() > 0) {
+        DcmItem * obj = (DcmItem*) itemsTmp.top();
+        d->dicomdirItems.push(itemsTmp.top());
+        itemsTmp.pop();
+    }
 
     //Unstacking and loading the different lists
-    while (items.card() > 0) {
-        DcmItem* lobj = (DcmItem*) items.top();
+    while (d->dicomdirItems.card() > 0) {
+        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
         DcmStack dirent;
 
         OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
         if (!condition.good()) {
-            items.pop();
+            d->dicomdirItems.pop();
             continue;
         }
-
         while (dirent.card()) {
             DcmElement* elt = (DcmElement*) dirent.top();
             OFString cur;
             elt->getOFStringArray(cur);
-
             if (cur == Patient) {
-                d->patients.append(new QtDcmPatient());
-                d->patients.last()->setStudies(tmpStudy);
-                tmpStudy.clear();
-
                 DcmElement* lelt;
-                if (lobj->findAndGetElement(DCM_PatientID, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    d->patients.last()->setId(QString(strID.c_str()));
-                }
+                QMap<QString, QString> infosMap;
                 if (lobj->findAndGetElement(DCM_PatientName, lelt).good()) {
                     OFString strName;
                     lelt->getOFStringArray(strName);
-                    d->patients.last()->setName(QString(strName.c_str()));
+                    infosMap.insert("Name", QString(strName.c_str()));
+                }
+                if (lobj->findAndGetElement(DCM_PatientID, lelt).good()) {
+                    OFString strID;
+                    lelt->getOFStringArray(strID);
+                    infosMap.insert("ID", QString(strID.c_str()));
                 }
                 if (lobj->findAndGetElement(DCM_PatientBirthDate, lelt).good()) {
                     OFString strBirth;
                     lelt->getOFStringArray(strBirth);
-                    d->patients.last()->setBirthdate(QString(strBirth.c_str()));
+                    infosMap.insert("Birthdate", QString(strBirth.c_str()));
                 }
                 if (lobj->findAndGetElement(DCM_PatientSex, lelt).good()) {
                     OFString strSex;
                     lelt->getOFStringArray(strSex);
-                    d->patients.last()->setSex(QString(strSex.c_str()));
+                    infosMap.insert("Sex", QString(strSex.c_str()));
+                }
+                d->signalManager->foundPatient(infosMap);
+            }
+            dirent.pop();
+        }
+        d->dicomdirItems.pop();
+    }
+    d->dicomdirItems.clear();
+}
+
+void
+QtDcmManager::findStudiesDicomdir(QString patientName)
+{
+    bool proceed = false;
+    d->seriesToImport.clear();
+    static const OFString Patient("PATIENT");
+    static const OFString Study("STUDY");
+    //    static const OFString Series("SERIES");
+    //    static const OFString Image("IMAGE");
+
+    // Loading all the dicomdir items in a stack
+    DcmStack itemsTmp;
+    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
+        return;
+
+    while (itemsTmp.card() > 0) {
+        DcmItem * obj = (DcmItem*) itemsTmp.top();
+        d->dicomdirItems.push(itemsTmp.top());
+        itemsTmp.pop();
+    }
+
+    //Unstacking and loading the different lists
+    while (d->dicomdirItems.card() > 0) {
+        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
+        DcmStack dirent;
+
+        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
+        if (!condition.good()) {
+            d->dicomdirItems.pop();
+            continue;
+        }
+        while (dirent.card()) {
+            DcmElement* elt = (DcmElement*) dirent.top();
+            OFString cur;
+            elt->getOFStringArray(cur);
+            if (cur == Patient) {
+                DcmElement* lelt;
+                if (lobj->findAndGetElement(DCM_PatientName, lelt).good()) {
+                    OFString strName;
+                    lelt->getOFStringArray(strName);
+                    proceed = (QString(strName.c_str()) == patientName);
                 }
             }
-            else if (cur == Study) {
-                tmpStudy.append(new QtDcmStudy());
-                tmpStudy.last()->setSeries(tmpSerie);
-                tmpSerie.clear();
-
+            if ((cur == Study) && proceed) {
                 DcmElement* lelt;
+                QMap<QString, QString> infosMap;
                 if (lobj->findAndGetElement(DCM_StudyInstanceUID, lelt).good()) {
                     OFString strID;
                     lelt->getOFStringArray(strID);
-                    tmpStudy.last()->setId(QString(strID.c_str()));
+                    infosMap.insert("ID", QString(strID.c_str()));
                 }
                 if (lobj->findAndGetElement(DCM_StudyDescription, lelt).good()) {
                     OFString strDescription;
                     lelt->getOFStringArray(strDescription);
-                    tmpStudy.last()->setDescription(QString(strDescription.c_str()));
+                    infosMap.insert("Description", QString(strDescription.c_str()));
                 }
                 if (lobj->findAndGetElement(DCM_StudyDate, lelt).good()) {
                     OFString strDate;
                     lelt->getOFStringArray(strDate);
-                    QString date = QString(strDate.c_str());
-                    QDate qdate = QDate(date.mid(0, 4).toInt(), date.mid(4, 2).toInt(), date.mid(6, 2).toInt());
-                    tmpStudy.last()->setDate(qdate);
+                    infosMap.insert("Date", QString(strDate.c_str()));
                 }
-                if (lobj->findAndGetElement(DCM_StudyTime, lelt).good()) {
-                    OFString strTime;
-                    lelt->getOFStringArray(strTime);
-                    tmpStudy.last()->setTime(QString(strTime.c_str()));
+                d->signalManager->foundStudy(infosMap);
+            }
+            dirent.pop();
+        }
+        d->dicomdirItems.pop();
+    }
+    d->dicomdirItems.clear();
+}
+
+void
+QtDcmManager::findSeriesDicomdir(QString patientName, QString studyID)
+{
+    d->seriesToImport.clear();
+    bool proceed = false;
+    static const OFString Patient("PATIENT");
+    static const OFString Study("STUDY");
+    static const OFString Series("SERIES");
+//    static const OFString Image("IMAGE");
+
+    // Loading all the dicomdir items in a stack
+    DcmStack itemsTmp;
+    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
+        return;
+
+    while (itemsTmp.card() > 0) {
+        DcmItem * obj = (DcmItem*) itemsTmp.top();
+        d->dicomdirItems.push(itemsTmp.top());
+        itemsTmp.pop();
+    }
+
+    OFString strName;
+    OFString strDate;
+    //Unstacking and loading the different lists
+    while (d->dicomdirItems.card() > 0) {
+        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
+        DcmStack dirent;
+
+        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
+        if (!condition.good()) {
+            d->dicomdirItems.pop();
+            continue;
+        }
+        while (dirent.card()) {
+            DcmElement* elt = (DcmElement*) dirent.top();
+            OFString cur;
+            elt->getOFStringArray(cur);
+            if (cur == Patient) {
+                DcmElement* lelt;
+                if (lobj->findAndGetElement(DCM_PatientName, lelt).good())
+                    lelt->getOFStringArray(strName);
+            }
+            if (cur == Study) {
+                DcmElement* lelt;
+                if (lobj->findAndGetElement(DCM_StudyDescription, lelt).good()) {
+                    OFString strID;
+                    lelt->getOFStringArray(strID);
+                    proceed = ((QString(strName.c_str()) == patientName) && (QString(strID.c_str()) == studyID));
+                }
+                if (lobj->findAndGetElement(DCM_StudyDate, lelt).good()) {
+                    lelt->getOFStringArray(strDate);
                 }
             }
-            else if (cur == Series) {
-                tmpSerie.append(new QtDcmSerie());
-                tmpSerie.last()->setImages(tmpImage);
-                tmpImage.clear();
-
+            if ((cur == Series) && proceed) {
                 DcmElement* lelt;
+                QMap<QString, QString> infosMap;
                 if (lobj->findAndGetElement(DCM_SeriesInstanceUID, lelt).good()) {
                     OFString strID;
                     lelt->getOFStringArray(strID);
-                    tmpSerie.last()->setId(QString(strID.c_str()));
+                    infosMap.insert("ID", QString(strID.c_str()));
                 }
                 if (lobj->findAndGetElement(DCM_SeriesDescription, lelt).good()) {
                     OFString strDescription;
                     lelt->getOFStringArray(strDescription);
-                    QString description = QString(strDescription.c_str());
-                    if (description == "")
-                        tmpSerie.last()->setDescription("No description");
-                    else
-                        tmpSerie.last()->setDescription(description);
+                    infosMap.insert("Description", QString(strDescription.c_str()));
                 }
-            }
-            else // C'est une image
-            {
-                tmpImage.append(new QtDcmImage());
-                DcmElement* lelt;
-                if (lobj->findAndGetElement(DCM_ReferencedFileID, lelt).good()) {
-                    OFString str;
-                    lelt->getOFStringArray(str);
-                    tmpImage.last()->setFilename(QString(str.c_str()));
+                if (lobj->findAndGetElement(DCM_Modality, lelt).good()) {
+                    OFString strModality;
+                    lelt->getOFStringArray(strModality);
+                    infosMap.insert("Modality", QString(strModality.c_str()));
                 }
-                if (lobj->findAndGetElement(DCM_ReferencedSOPInstanceUIDInFile, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    tmpImage.last()->setId(QString(strID.c_str()));
+                if (lobj->findAndGetElement(DCM_InstitutionName, lelt).good()) {
+                    OFString strInstitution;
+                    lelt->getOFStringArray(strInstitution);
+                    infosMap.insert("Institution", QString(strInstitution.c_str()));
                 }
+                if (lobj->findAndGetElement(DCM_AcquisitionNumber, lelt).good()) {
+                    OFString strCount;
+                    lelt->getOFStringArray(strCount);
+                    infosMap.insert("InstanceCount", QString(strCount.c_str()));
+                }
+                if (lobj->findAndGetElement(DCM_PerformingPhysicianName, lelt).good()) {
+                    OFString strOperator;
+                    lelt->getOFStringArray(strOperator);
+                    infosMap.insert("Operator", QString(strOperator.c_str()));
+                }
+                infosMap.insert("Date", QString(strDate.c_str()));
+                d->signalManager->foundSerie(infosMap);
             }
             dirent.pop();
         }
-        items.pop();
+        d->dicomdirItems.pop();
     }
+    d->dicomdirItems.clear();
+}
+
+void
+QtDcmManager::findImagesDicomdir(QString uid)
+{
+    bool proceed = false;
+    static const OFString Patient("PATIENT");
+    static const OFString Study("STUDY");
+    static const OFString Series("SERIES");
+    static const OFString Image("IMAGE");
+
+    // Loading all the dicomdir items in a stack
+    DcmStack itemsTmp;
+    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
+        return;
+
+    while (itemsTmp.card() > 0) {
+        DcmItem * obj = (DcmItem*) itemsTmp.top();
+        d->dicomdirItems.push(itemsTmp.top());
+        itemsTmp.pop();
+    }
+
+    OFString strName;
+    OFString strDate;
+    //Unstacking and loading the different lists
+    while (d->dicomdirItems.card() > 0) {
+        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
+        DcmStack dirent;
+
+        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
+        if (!condition.good()) {
+            d->dicomdirItems.pop();
+            continue;
+        }
+        while (dirent.card()) {
+            DcmElement* elt = (DcmElement*) dirent.top();
+            OFString cur;
+            elt->getOFStringArray(cur);
+            if (cur == Series) {
+                DcmElement* lelt;
+                QMap<QString, QString> infosMap;
+                if (lobj->findAndGetElement(DCM_SeriesInstanceUID, lelt).good()) {
+                    OFString strID;
+                    lelt->getOFStringArray(strID);
+                    proceed = (QString(strID.c_str()) == uid);
+                }
+            }
+            if ((cur == Image) && proceed) {
+                DcmElement* lelt;
+                QMap<QString, QString> infosMapImage;
+                if (lobj->findAndGetElement(DCM_InstanceNumber, lelt).good()) {
+                    OFString strNumber;
+                    lelt->getOFStringArray(strNumber);
+                    infosMapImage.insert("InstanceCount", QString(strNumber.c_str()));
+                }
+                d->signalManager->foundImage(infosMapImage);
+            }
+            dirent.pop();
+        }
+        d->dicomdirItems.pop();
+    }
+    d->dicomdirItems.clear();
 }
 
 void
@@ -688,226 +778,118 @@ QtDcmManager::deleteCurrentSerieDir()
         qDebug() << tr("Probleme lors de la suppression du répertoire temporaire");
 }
 
+//void
+//QtDcmManager::exportSeries()
+//{
+//    d->dcm2nii = d->preferences->getDcm2nii();
+//    if (d->outputDir == "")
+//        return;
+//
+//    if (!QFile(d->dcm2nii).exists()) {
+//        //message d'erreur !
+//        this->displayErrorMessage(tr("Impossible de trouver dcm2nii, verifiez votre installation"));
+//        return;
+//    }
+//
+//    if (d->mode == "CD")
+//        this->exportSerieFromCD();
+//    else {
+//        this->exportSerieFromPACS();
+//        while (d->exportThread->isRunning()) {
+//            qApp->processEvents();
+//        }
+//        d->progress->close();
+//        delete d->progress;
+//    }
+//
+//    QList<QString> series = d->seriesToExport.keys();
+//    for (int j = 0; j < series.size(); j++) {
+//        d->serieId = series.at(j);
+//        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
+//        //Conversion de la serie avec dcm2nii
+//        QStringList arguments;
+//        arguments << "-s" << "N";
+//        arguments << "-x" << "N";
+//        arguments << "-r" << "N";
+//        arguments << "-g" << "N";
+//        arguments << "-o" << d->outputDir << d->currentSerieDir.absolutePath();
+//
+//        d->process = new QProcess(this);
+//        d->process->setStandardOutputFile(d->logsDir.absolutePath() + QDir::separator() + "log" + d->serieId + ".txt");
+//        d->process->start(d->dcm2nii, arguments);
+//        d->process->waitForFinished();
+//        //zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
+//
+//        //this->deleteCurrentSerieDir();
+//        delete d->process;
+//    }
+//    this->displayMessage(tr("Import termine"));
+//}
+
 void
-QtDcmManager::exportSeries()
+QtDcmManager::importSerieFromDicomdir()
 {
-    d->dcm2nii = d->preferences->getDcm2nii();
-    if (d->outputDir == "")
-        return;
-
-    if (!QFile(d->dcm2nii).exists()) {
-        //message d'erreur !
-        this->displayErrorMessage(tr("Impossible de trouver dcm2nii, verifiez votre installation"));
-        return;
-    }
-
-    if (d->mode == "CD")
-        this->exportSerieFromCD();
-    else {
-        this->exportSerieFromPACS();
-        while (d->exportThread->isRunning()) {
-            qApp->processEvents();
-        }
-        d->progress->close();
-        delete d->progress;
-    }
-
-    QList<QString> series = d->seriesToExport.keys();
-    for (int j = 0; j < series.size(); j++) {
-        d->serieId = series.at(j);
-        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
-        //Conversion de la serie avec dcm2nii
-        QStringList arguments;
-        arguments << "-s" << "N";
-        arguments << "-x" << "N";
-        arguments << "-r" << "N";
-        arguments << "-g" << "N";
-        arguments << "-o" << d->outputDir << d->currentSerieDir.absolutePath();
-
-        d->process = new QProcess(this);
-        d->process->setStandardOutputFile(d->logsDir.absolutePath() + QDir::separator() + "log" + d->serieId + ".txt");
-        d->process->start(d->dcm2nii, arguments);
-        d->process->waitForFinished();
-        //zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
-
-        //this->deleteCurrentSerieDir();
-        delete d->process;
-    }
-    this->displayMessage(tr("Import termine"));
+    //    // Launch progress dialog window, to follow images copy
+    //    d->progress = new QProgressDialog(tr("Copie des images depuis le CD..."), "", 0, 100, d->parent);
+    //    d->progress->setWindowModality(Qt::WindowModal);
+    //    QPushButton * cancelButton = new QPushButton;
+    //    d->progress->setCancelButton(cancelButton);
+    //    cancelButton->hide();
+    //    d->progress->setValue(0);
+    //    qApp->processEvents();
+    //    d->progress->show();
+    //    qApp->processEvents();
+    //
+    //    //Copie des fichiers images dans le répertoire temporaire
+    //    QList<QString> series = d->seriesToExport.keys();
+    //    for (int j = 0; j < series.size(); j++) {
+    //        d->progress->setValue(0);
+    //        d->serieId = series.at(j);
+    //        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
+    //        if (!d->tempDir.exists(series.at(j))) {
+    //            this->generateCurrentSerieDir();
+    //        }
+    //        for (int i = 0; i < d->seriesToExport.value(series.at(j)).size(); i++) {
+    //            QFile image(d->seriesToExport.value(series.at(j)).at(i));
+    //            if (image.exists()) {
+    //                QString zeroStr;
+    //                zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
+    //                image.copy(d->currentSerieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number(i));
+    //                d->progress->setValue(100 * i / d->seriesToExport.value(series.at(j)).size());
+    //                qApp->processEvents();
+    //            }
+    //        }
+    //        d->progress->setValue(100);
+    //        qApp->processEvents();
+    //    }
+    //    d->progress->close();
+    //    delete d->progress;
 }
 
 void
-QtDcmManager::exportSerieFromCD()
+QtDcmManager::importSerieFromPACS()
 {
-    // Launch progress dialog window, to follow images copy
-    d->progress = new QProgressDialog(tr("Copie des images depuis le CD..."), "", 0, 100, d->parent);
-    d->progress->setWindowModality(Qt::WindowModal);
-    QPushButton * cancelButton = new QPushButton;
-    d->progress->setCancelButton(cancelButton);
-    cancelButton->hide();
-    d->progress->setValue(0);
-    qApp->processEvents();
-    d->progress->show();
-    qApp->processEvents();
-
-    //Copie des fichiers images dans le répertoire temporaire
-    QList<QString> series = d->seriesToExport.keys();
-    for (int j = 0; j < series.size(); j++) {
-        d->progress->setValue(0);
-        d->serieId = series.at(j);
-        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
-        if (!d->tempDir.exists(series.at(j))) {
-            this->generateCurrentSerieDir();
-        }
-        for (int i = 0; i < d->seriesToExport.value(series.at(j)).size(); i++) {
-            QFile image(d->seriesToExport.value(series.at(j)).at(i));
-            if (image.exists()) {
-                QString zeroStr;
-                zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
-                image.copy(d->currentSerieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number(i));
-                d->progress->setValue(100 * i / d->seriesToExport.value(series.at(j)).size());
-                qApp->processEvents();
-            }
-        }
-        d->progress->setValue(100);
-        qApp->processEvents();
-    }
-    d->progress->close();
-    delete d->progress;
-}
-
-void
-QtDcmManager::exportSerieFromPACS()
-{
-    QString program = d->preferences->getDcm4che();
-
-    d->exportThread->setProgram(d->preferences->getDcm4che());
-    d->exportThread->setServerPacsParam(d->preferences->getServers().at(0)->getAetitle() + "@" + d->preferences->getServers().at(0)->getServer() + ":" + d->preferences->getServers().at(0)->getPort());
-    d->exportThread->setLocalPacsParam(d->preferences->getAetitle() + "@" + d->preferences->getHostname() + ":" + d->preferences->getPort());
-    d->exportThread->setSeriesToExport(d->seriesToExport.keys());
-    d->exportThread->setTemporaryDir(d->tempDir.absolutePath());
-    d->exportThread->setModality(d->modality);
-    d->exportThread->setAetitle(d->preferences->getAetitle());
-
-    d->progress = new QProgressDialog(tr("Chargement des images..."), "", 0, 0, d->parent);
-    d->progress->setWindowModality(Qt::WindowModal);
-    QPushButton * cancelButton = new QPushButton;
-    d->progress->setCancelButton(cancelButton);
-    cancelButton->hide();
-    cancelButton->hide();
-    d->progress->setValue(0);
-    d->progress->show();
-    qApp->processEvents();
-
-    d->exportThread->start();
-}
-
-void
-QtDcmManager::queryPACS()
-{
-    d->seriesToExport.clear();
-    d->mode = "PACS";
-    QString program = d->preferences->getDcm4che();
-    if (QFile(program).exists()) {
-        QStringList arguments;
-        QString localDicomParam = d->preferences->getAetitle() + "@" + d->preferences->getHostname() + ":" + d->preferences->getPort();
-        QString serverPACSParam = d->preferences->getServers().at(0)->getAetitle() + "@" + d->preferences->getServers().at(0)->getServer() + ":" + d->preferences->getServers().at(0)->getPort();
-        QString serieDescription = "-qSeriesDescription=" + d->serieDescription;
-        QString patientName = "-qPatientName=" + d->patientName;
-        QString patientId = "-qPatientId=" + d->patientId;
-        QString studyDescription = "-qStudyDescription=" + d->studyDescription;
-        QString modality = "-qModality=" + d->modality;
-        QString date = "-qStudyDate=" + d->date1 + "-" + d->date2;
-
-        arguments << "-L" << localDicomParam << serverPACSParam;
-        arguments << "-S" << serieDescription;
-        arguments << patientName;
-        arguments << studyDescription << modality << date;
-
-        d->progress = new QProgressDialog(tr("Requete en cours..."), "", 0, 0, d->parent);
-        d->progress->setWindowModality(Qt::WindowModal);
-        QPushButton * cancel = new QPushButton("Cancel");
-        d->progress->setCancelButton(cancel);
-        d->progress->show();
-        qApp->processEvents();
-
-        d->queryThread->setCommand(program);
-        d->queryThread->setParameters(arguments);
-        d->queryThread->setManager(this);
-        d->queryThread->start();
-
-        while (d->queryThread->isRunning()) {
-            if (d->progress->isHidden())
-                d->queryThread->terminate();
-            qApp->processEvents();
-        }
-
-        d->progress->close();
-        delete d->progress;
-
-        //Parse the result of the query and store in the different lists and display in the QTreeWidget
-        this->parseQueryResult(d->query);
-    }
-    else {
-        //message d'erreur !
-        this->displayErrorMessage(tr("Impossible de trouver dcmqr, verifiez votre installation"));
-    }
-}
-
-void
-QtDcmManager::parseQueryResult(QString query)
-{
-    d->patients.clear();
-    QStringList lines = query.split("\n");
-    QString currentStudyId;
-    int numPatient = 0;
-    int cptStudy = 0;
-    for (int i = 0; i < lines.size(); i++) {
-        QRegExp rx(".*Query Response #.:.*");
-        if (rx.exactMatch(lines[i])) // Detect patient name
-        {
-            numPatient = lines[i].split('#')[1].split(':')[0].toInt() - 1;
-            // Add patient in the list
-            d->patients.append(new QtDcmPatient());
-            QString name = lines[i + 6].section('[', 1).split(']')[0];
-            d->patients.last()->setName(name);
-        }
-
-        rx.setPattern(".*Query Response #. for Query Request.*");
-        if (rx.exactMatch(lines[i])) //Detect new serie
-        {
-            numPatient = lines[i].split('#')[2].split('/')[0].toInt() - 1;
-            //First get the corresponding study information
-            QString studyDate = lines[i + 2].section('[', 1).split(']')[0];
-            QDate qdate = QDate(studyDate.mid(0, 4).toInt(), studyDate.mid(4, 2).toInt(), studyDate.mid(6, 2).toInt());
-
-            QString studyDesc = lines[i + 7].section('[', 1).split(']')[0];
-            QString studyId = lines[i + 10].section('[', 1).split(']')[0];
-            if (studyId != currentStudyId) // Is it a new study ?
-            {
-                cptStudy++;
-                //Add the new study in the patients studies list and set study Id and description
-                d->patients.at(numPatient)->addStudy(new QtDcmStudy());
-                d->patients.at(numPatient)->getStudies().last()->setId(studyId);
-                d->patients.at(numPatient)->getStudies().last()->setDescription(studyDesc);
-                d->patients.at(numPatient)->getStudies().last()->setDate(qdate);
-            }
-            currentStudyId = studyId;
-
-            //Get the found serie Id and description
-            QString serieDesc = lines[i + 8].section('[', 1).split(']')[0];
-            QString serieId = lines[i + 11].section('[', 1).split(']')[0];
-            d->patients.at(numPatient)->getStudies().last()->addSerie(new QtDcmSerie());
-            //Set the description and Id of the found serie
-            d->patients.at(numPatient)->getStudies().last()->getSeries().last()->setId(serieId);
-            d->patients.at(numPatient)->getStudies().last()->getSeries().last()->setDescription(serieDesc);
-        }
-    }
-    //Aucune occurence = 0 study renvoyee
-    if (cptStudy == 0) {
-        //petit message d'information !
-        this->displayMessage(tr("Aucune occurence pour cette recherche"));
-    }
+    //    QString program = d->preferences->getDcm4che();
+    //
+    //    d->exportThread->setProgram(d->preferences->getDcm4che());
+    //    d->exportThread->setServerPacsParam(d->preferences->getServers().at(0)->getAetitle() + "@" + d->preferences->getServers().at(0)->getServer() + ":" + d->preferences->getServers().at(0)->getPort());
+    //    d->exportThread->setLocalPacsParam(d->preferences->getAetitle() + "@" + d->preferences->getHostname() + ":" + d->preferences->getPort());
+    //    d->exportThread->setSeriesToExport(d->seriesToExport.keys());
+    //    d->exportThread->setTemporaryDir(d->tempDir.absolutePath());
+    //    d->exportThread->setModality(d->modality);
+    //    d->exportThread->setAetitle(d->preferences->getAetitle());
+    //
+    //    d->progress = new QProgressDialog(tr("Chargement des images..."), "", 0, 0, d->parent);
+    //    d->progress->setWindowModality(Qt::WindowModal);
+    //    QPushButton * cancelButton = new QPushButton;
+    //    d->progress->setCancelButton(cancelButton);
+    //    cancelButton->hide();
+    //    cancelButton->hide();
+    //    d->progress->setValue(0);
+    //    d->progress->show();
+    //    qApp->processEvents();
+    //
+    //    d->exportThread->start();
 }
 
 void
@@ -917,17 +899,17 @@ QtDcmManager::makePreview()
     d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
     if (!d->tempDir.exists(d->serieId)) {
         //Utiliser l'UID de la serie pour copier les images
-        if (d->mode == "CD") {
-            this->exportSerieFromCD();
-        }
-        else {
-            this->exportSerieFromPACS();
-            while (d->exportThread->isRunning()) {
-                qApp->processEvents();
-            }
-            d->progress->close();
-            delete d->progress;
-        }
+        //        if (d->mode == "CD") {
+        //            this->exportSerieFromCD();
+        //        }
+        //        else {
+        //            this->exportSerieFromPACS();
+        //            while (d->exportThread->isRunning()) {
+        //                qApp->processEvents();
+        //            }
+        //            d->progress->close();
+        //            delete d->progress;
+        //        }
     }
     d->progress = new QProgressDialog(tr("Creation de l'apercu..."), "", 0, 0, d->parent);
     d->progress->setWindowModality(Qt::WindowModal);
@@ -1010,6 +992,13 @@ void
 QtDcmManager::setDicomdir(QString dicomdir)
 {
     d->dicomdir = dicomdir;
+    //Load dicomdir in a DCMTK DicomFileFormat object
+    OFCondition status;
+    if (!(status = d->dfile.loadFile(d->dicomdir.toUtf8().data())).good()) {
+        return;
+    }
+    //Get the dicomdir dataset in a DCMTK DcmObject
+    d->dcmObject = d->dfile.getDataset();
 }
 
 QString
@@ -1034,6 +1023,13 @@ void
 QtDcmManager::setPreferences(QtDcmPreferences * prefs)
 {
     d->preferences = prefs;
+}
+
+void
+QtDcmManager::setCurrentPacs(int index)
+{
+    if (index < d->preferences->getServers().size())
+        d->currentPacs = d->preferences->getServers().at(index);
 }
 
 QString
@@ -1126,12 +1122,6 @@ QtDcmManager::getDate2()
     return d->date2;
 }
 
-QList<QtDcmPatient *>
-QtDcmManager::getPatients()
-{
-    return d->patients;
-}
-
 void
 QtDcmManager::addPatient()
 {
@@ -1178,4 +1168,43 @@ void
 QtDcmManager::setQuery(QByteArray query)
 {
     d->query = query;
+}
+
+void
+QtDcmManager::addSerieToImport(QString uid)
+{
+    if (!d->seriesToImport.contains(uid))
+        d->seriesToImport.append(uid);
+}
+
+void
+QtDcmManager::removeSerieToImport(QString uid)
+{
+    if (d->seriesToImport.contains(uid))
+        d->seriesToImport.removeOne(uid);
+}
+
+void
+QtDcmManager::clearSeriesToImport()
+{
+    d->seriesToImport.clear();
+}
+
+int
+QtDcmManager::seriesToImportSize()
+{
+    return d->seriesToImport.size();
+}
+
+void
+QtDcmManager::importSelectedSeries()
+{
+    if (d->mode == "CD") {
+        qDebug() << "Import from dicomdir";
+        qDebug() << d->seriesToImport;
+    }
+    else {
+        qDebug() << "Import from PACS";
+        qDebug() << d->seriesToImport;
+    }
 }
