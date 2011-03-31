@@ -59,7 +59,7 @@ QtDcmFindScuSignalManager::foundPatient(QMap<QString, QString> infosMap)
         QTreeWidgetItem * patientItem = new QTreeWidgetItem(d->patientsTreeWidget->invisibleRootItem());
         patientItem->setText(0, infosMap["Name"]);
         patientItem->setText(1, infosMap["ID"]);
-        patientItem->setText(2, QDate::fromString(infosMap["Birthdate"],"yyyyMMdd").toString(Qt::SystemLocaleShortDate));
+        patientItem->setText(2, QDate::fromString(infosMap["Birthdate"],"yyyyMMdd").toString("dd/MM/yyyy"));
         patientItem->setText(3, infosMap["Sex"]);
     }
 }
@@ -70,7 +70,7 @@ QtDcmFindScuSignalManager::foundStudy(QMap<QString, QString> infosMap)
     if (d->studiesTreeWidget) {
         QTreeWidgetItem * studyItem = new QTreeWidgetItem(d->studiesTreeWidget->invisibleRootItem());
         studyItem->setText(0, infosMap["Description"]);
-        studyItem->setText(1, QDate::fromString(infosMap["Date"],"yyyyMMdd").toString(Qt::SystemLocaleShortDate));
+        studyItem->setText(1, QDate::fromString(infosMap["Date"],"yyyyMMdd").toString("dd/MM/yyyy"));
         studyItem->setText(2, infosMap["ID"]);
     }
 }
@@ -82,11 +82,12 @@ QtDcmFindScuSignalManager::foundSerie(QMap<QString, QString> infosMap)
         QTreeWidgetItem * serieItem = new QTreeWidgetItem(d->seriesTreeWidget->invisibleRootItem());
         serieItem->setText(0, infosMap["Description"]);
         serieItem->setText(1, infosMap["Modality"]);
-        serieItem->setText(2, QDate::fromString(infosMap["Date"],"yyyyMMdd").toString(Qt::SystemLocaleShortDate));
+        serieItem->setText(2, QDate::fromString(infosMap["Date"],"yyyyMMdd").toString("dd/MM/yyyy"));
         serieItem->setText(3, infosMap["ID"]);
         serieItem->setData(4,0,QVariant(infosMap["InstanceCount"]));
         serieItem->setData(5,0,QVariant(infosMap["Institution"]));
         serieItem->setData(6,0,QVariant(infosMap["Operator"]));
+        serieItem->setCheckState(0, Qt::Unchecked);
     }
 }
 

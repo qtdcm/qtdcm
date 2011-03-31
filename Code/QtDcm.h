@@ -29,6 +29,8 @@ class QtDCM : public QLabel, public Ui::QtDCM
 //            return treeWidget;
 //        }
 
+        enum mode {CD, PACS};
+
         /**
          * Get the pointer of the QtDcm manager
          *
@@ -48,7 +50,7 @@ class QtDCM : public QLabel, public Ui::QtDCM
          *
          */
         void
-        display();
+        displayDicomdir();
 
         /**
          * Initialize SIGNAL/SLOTS connections of the different widget
@@ -89,19 +91,22 @@ class QtDCM : public QLabel, public Ui::QtDCM
         void
         updateModality(int index);
 
+        void
+        updateSex(int index);
+
         /**
          * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
          *
          */
         void
-        chooseBeginDate();
+        startDateChanged(QDate date);
 
         /**
          * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
          *
          */
         void
-        chooseEndDate();
+        endDateChanged(QDate date);
 
         /**
          * Slot called when a selected is made on the QTreeWidget. If a serie is selected, corresponding images filenames
@@ -169,12 +174,6 @@ class QtDCM : public QLabel, public Ui::QtDCM
         patientNameTextChanged(QString);
 
         /**
-         * Slot called when user modify patient id edit line
-         */
-        void
-        patientIdTextChanged(QString);
-
-        /**
          * Slot called when user modify serie description edit line
          */
         void
@@ -185,12 +184,6 @@ class QtDCM : public QLabel, public Ui::QtDCM
          */
         void
         studyDescriptionTextChanged(QString);
-
-        /**
-         * Slot called when advanced button is clicked
-         */
-        void
-        toggleAdvancedView();
 
         void
         showPreview();

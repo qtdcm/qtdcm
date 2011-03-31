@@ -206,6 +206,9 @@ class QtDcmManager : public QObject
     void
     setPatientId( QString patientId );
 
+    void
+    setPatientSex(QString sex);
+
     /**
      * Serie description getter
      *

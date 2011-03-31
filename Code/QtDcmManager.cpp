@@ -93,6 +93,7 @@ class QtDcmManagerPrivate
         QtDcmPreferences * preferences; /** Attribute that give access to the Pacs settings */
         QString patientName; /** Attribute representing the patient name used for query PACS */
         QString patientId; /** Attribute representing the patient id used for query PACS */
+        QString patientSex;
         QString modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
         QString date1; /** Attribute for the begin date of the query (usefull for date based queries) */
         QString date2; /** Attribute for the end date of the query (usefull for date based queries) */
@@ -117,11 +118,12 @@ QtDcmManager::QtDcmManager() :
     d->outputDir = "";
     d->patientName = "*";
     d->patientId = "*";
-    d->modality = "MR";
+    d->modality = "*";
     d->date1 = "*";
     d->date2 = "*";
     d->serieDescription = "*";
     d->studyDescription = "*";
+    d->patientSex="*";
 
     d->preferences = new QtDcmPreferences();
     d->exportThread = new QtDcmExportThread();
@@ -142,9 +144,10 @@ QtDcmManager::QtDcmManager(QWidget * parent) :
     d->outputDir = "";
     d->patientName = "*";
     d->patientId = "*";
+    d->patientSex="*";
     d->date1 = "*";
     d->date2 = "*";
-    d->modality = "MR";
+    d->modality = "*";
     d->serieDescription = "*";
     d->studyDescription = "*";
     d->preferences = new QtDcmPreferences();
@@ -260,28 +263,11 @@ QtDcmManager::findPatientScu()
     OFList<OFString> overrideKeys;
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "PATIENT" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + d->patientName).toUtf8().data());
-//    overrideKeys.push_back((QString("StudyDescription=") + d->studyDescription).toAscii().data());
-//    overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toAscii().data());
 
     //Patient level
     overrideKeys.push_back(QString("PatientID").toUtf8().data());
-    overrideKeys.push_back(QString("PatientSex").toUtf8().data());
+    overrideKeys.push_back(QString("PatientSex=" + d->patientSex).toUtf8().data());
     overrideKeys.push_back(QString("PatientBirthDate").toUtf8().data());
-
-    //Study level
-//    overrideKeys.push_back(QString("StudyID").toAscii().data());
-//    overrideKeys.push_back(QString("StudyDate").toAscii().data());
-//    overrideKeys.push_back(QString("StudyTime").toAscii().data());
-//
-//    //Serie level
-//    overrideKeys.push_back(QString("SeriesInstanceUID").toAscii().data());
-//    overrideKeys.push_back(QString("Modality").toAscii().data());
-//    overrideKeys.push_back(QString("InstitutionName").toAscii().data());
-//    overrideKeys.push_back(QString("InstitutionAddress").toAscii().data());
-//    overrideKeys.push_back(QString("PerformingPhysicianName").toAscii().data());
-
-    //Image level
-
 
     OFList<OFString> fileNameList;
     OFString temp_str;
@@ -324,11 +310,11 @@ QtDcmManager::findStudiesScu(QString patientName)
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "STUDY" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
     overrideKeys.push_back((QString("StudyDescription=") + d->studyDescription).toUtf8().data());
+    overrideKeys.push_back(QString("StudyDate=" + d->date1 + "-" + d->date2).toUtf8().data());
     overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
 
     //Study level
     overrideKeys.push_back(QString("StudyID").toUtf8().data());
-    overrideKeys.push_back(QString("StudyDate").toUtf8().data());
     overrideKeys.push_back(QString("StudyTime").toUtf8().data());
 
     //Serie level
@@ -381,6 +367,7 @@ QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
     overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
     overrideKeys.push_back((QString("StudyDescription=") + studyDescription).toUtf8().data());
     overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
+    overrideKeys.push_back(QString("Modality=" + d->modality).toUtf8().data());
 
     //Study level
     overrideKeys.push_back(QString("StudyID").toUtf8().data());
@@ -389,7 +376,6 @@ QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
 
     //Serie level
     overrideKeys.push_back(QString("SeriesInstanceUID").toUtf8().data());
-    overrideKeys.push_back(QString("Modality").toUtf8().data());
     overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
     overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
     overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
@@ -629,7 +615,6 @@ QtDcmManager::loadDicomdir()
         }
         items.pop();
     }
-
 }
 
 void
@@ -1073,6 +1058,12 @@ void
 QtDcmManager::setPatientId(QString patientId)
 {
     d->patientId = patientId;
+}
+
+void
+QtDcmManager::setPatientSex(QString sex)
+{
+    d->patientSex = sex;
 }
 
 QString
