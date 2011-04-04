@@ -323,7 +323,7 @@ QtDcmManager::findStudiesScu(QString patientName)
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->preferences->getServers()[0]->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
+    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -363,7 +363,7 @@ QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toAscii().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toAscii().data(), d->preferences->getServers()[0]->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
+    if (findscu.performQuery(d->currentPacs->getServer().toAscii().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toAscii().data(), d->currentPacs->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
@@ -391,11 +391,18 @@ QtDcmManager::findImagesScu(QString serieInstanceUID)
     if (findscu.initializeNetwork(30).bad())
         this->displayErrorMessage(tr("Cannot establish network connection"));
 
-    if (findscu.performQuery(d->preferences->getServers()[0]->getServer().toUtf8().data(), d->preferences->getServers()[0]->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->preferences->getServers()[0]->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
+    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
         this->displayErrorMessage(tr("Cannot perform query C-FIND"));
 
     if (findscu.dropNetwork().bad())
         this->displayErrorMessage(tr("Cannot drop network"));
+}
+
+void
+QtDcmManager::moveImagesScu(QString serieInstanceUID)
+{
+    // Verifier repertoire temporaire
+    qDebug() << "On move les images !";
 }
 
 void
@@ -557,7 +564,7 @@ QtDcmManager::findSeriesDicomdir(QString patientName, QString studyID)
     static const OFString Patient("PATIENT");
     static const OFString Study("STUDY");
     static const OFString Series("SERIES");
-//    static const OFString Image("IMAGE");
+    //    static const OFString Image("IMAGE");
 
     // Loading all the dicomdir items in a stack
     DcmStack itemsTmp;
@@ -827,7 +834,7 @@ QtDcmManager::deleteCurrentSerieDir()
 //}
 
 void
-QtDcmManager::importSerieFromDicomdir()
+QtDcmManager::importSeriesFromDicomdir()
 {
     //    // Launch progress dialog window, to follow images copy
     //    d->progress = new QProgressDialog(tr("Copie des images depuis le CD..."), "", 0, 100, d->parent);
@@ -867,8 +874,17 @@ QtDcmManager::importSerieFromDicomdir()
 }
 
 void
-QtDcmManager::importSerieFromPACS()
+QtDcmManager::importSeriesFromPACS()
 {
+    for (int i = 0; i < d->seriesToImport.size(); i++) {
+        if (!d->tempDir.exists()) {
+            d->tempDir.mkdir(d->seriesToImport.at(i));
+        }
+        this->moveImagesScu(d->seriesToImport.at(i));
+    }
+
+    // ici j'appelle la classe de conversion (ou dcm2nii) !
+
     //    QString program = d->preferences->getDcm4che();
     //
     //    d->exportThread->setProgram(d->preferences->getDcm4che());
@@ -1206,5 +1222,6 @@ QtDcmManager::importSelectedSeries()
     else {
         qDebug() << "Import from PACS";
         qDebug() << d->seriesToImport;
+        this->importSeriesFromPACS();
     }
 }

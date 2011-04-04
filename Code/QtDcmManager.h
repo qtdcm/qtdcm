@@ -90,6 +90,9 @@ class QtDcmManager : public QObject
     findImagesScu(QString uid);
 
     void
+    moveImagesScu(QString serieInstanceUID);
+
+    void
     findPatientsDicomdir();
 
     void
@@ -114,7 +117,6 @@ class QtDcmManager : public QObject
      * This method read the dicomdir file and populate the patient treewidget
      *
      */
-
     void
     loadDicomdir();
 
@@ -332,7 +334,7 @@ class QtDcmManager : public QObject
      * @param images
      */
     void
-    importSerieFromDicomdir();
+    importSeriesFromDicomdir();
 
     /**
      * Call dcm2nii in a QProcess object to reconstruct the given list of images
@@ -340,7 +342,7 @@ class QtDcmManager : public QObject
      * @param images
      */
     void
-    importSerieFromPACS();
+    importSeriesFromPACS();
 
     /**
      * add patient in the list
