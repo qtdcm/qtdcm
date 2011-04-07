@@ -57,6 +57,9 @@ include_directories(${DCMTK_INCLUDE_DIR})
 
 add_definitions(-DHAVE_CONFIG_H -fPIC)
 
+set(QTDCM_RCCS
+    ${QTDCM_SOURCE_DIR}/Resources/qtdcm.qrc
+)
 
 set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
@@ -105,6 +108,7 @@ set(QTDCM_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindCallback.cpp
 )
 
+qt4_add_resources(QTDCM_RCC_SRCS ${QTDCM_RCCS})
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
@@ -120,7 +124,7 @@ qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 #ENDIF(LANGUAGE_TS_FILES)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
-add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})# ${qm_files})
+add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})# ${qm_files})
 target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} dcmimage tiff jpeg ijg12 ijg16 ijg8 /lib/libwrap.so.0)
 
 

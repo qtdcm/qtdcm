@@ -69,12 +69,6 @@ class QtDcmManager : public QObject
     ~QtDcmManager();
 
     /**
-     * Send echo to the default stored SCP
-     */
-    void
-    sendEchoRequest();
-
-    /**
      * Find SCU with Dcmtk code
      */
     void

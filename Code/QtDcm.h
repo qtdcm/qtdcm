@@ -71,10 +71,6 @@ class QtDCM : public QLabel, public Ui::QtDCM
         importToDirectory(QString directory);
 
     public slots:
-
-        void
-        sendEcho();
-
         void
         findSCU();
 

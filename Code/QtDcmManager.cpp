@@ -219,53 +219,6 @@ QtDcmManager::displayMessage(QString info)
 }
 
 void
-QtDcmManager::sendEchoRequest()
-{
-    T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
-    ASC_initializeNetwork(NET_REQUESTOR, 0, 1000 /* timeout */, &net);
-
-    T_ASC_Parameters *params; // parameters of association request
-    ASC_createAssociationParameters(&params, ASC_DEFAULTMAXPDU);
-
-    // set calling and called AE titles
-    ASC_setAPTitles(params, d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), NULL);
-
-    // the DICOM server accepts connections at server.nowhere.com port 104
-    ASC_setPresentationAddresses(params, d->preferences->getHostname().toUtf8().data(), QString(d->currentPacs->getServer() + ":" + d->currentPacs->getPort()).toAscii().data());
-
-    // list of transfer syntaxes, only a single entry here
-    const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
-
-    // add presentation context to association request
-    ASC_addPresentationContext(params, 1, UID_VerificationSOPClass, ts, 1);
-
-    // request DICOM association
-    T_ASC_Association *assoc;
-    if (ASC_requestAssociation(net, params, &assoc).good()) {
-        if (ASC_countAcceptedPresentationContexts(params) == 1) {
-            // the remote SCP has accepted the Verification Service Class
-            DIC_US id = assoc->nextMsgID++; // generate next message ID
-            DIC_US status; // DIMSE status of C-ECHO-RSP will be stored here
-            DcmDataset *sd = NULL; // status detail will be stored here
-            // send C-ECHO-RQ and handle response
-            DIMSE_echoUser(assoc, id, DIMSE_BLOCKING, 0, &status, &sd);
-
-            delete sd; // we don't care about status detail
-            this->displayMessage("Echo request successful !");
-
-        }
-        else
-            this->displayErrorMessage("Wrong presentation context, echo request failed");
-    }
-    else
-        this->displayErrorMessage("Wrong dicom association, echo request failed");
-
-    ASC_releaseAssociation(assoc); // release association
-    ASC_destroyAssociation(&assoc); // delete assoc structure
-    ASC_dropNetwork(&net); // delete net structure
-}
-
-void
 QtDcmManager::findPatientsScu()
 {
     d->seriesToImport.clear();

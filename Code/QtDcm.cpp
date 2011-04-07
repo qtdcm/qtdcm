@@ -2,8 +2,10 @@
 #include <QtDcmPatient.h>
 #include <QtDcmStudy.h>
 #include <QtDcmSerie.h>
+#include <QtDcmServer.h>
 #include <QtDcmImage.h>
 #include <QtDcmDateDialog.h>
+#include <QtDcmPreferences.h>
 #include <QtDcmPreferencesDialog.h>
 #include <QtDcmPreviewDialog.h>
 #include <QtDcmManager.h>
@@ -107,12 +109,6 @@ QtDCM::updatePacsComboBox()
     pacsComboBox->clear();
     for (int i = 0; i < d->manager->getPreferences()->getServers().size(); i++)
         pacsComboBox->addItem(d->manager->getPreferences()->getServers().at(i)->getName());
-}
-
-void
-QtDCM::sendEcho()
-{
-    d->manager->sendEchoRequest();
 }
 
 void
@@ -299,6 +295,7 @@ void
 QtDCM::updatePACS(int index)
 {
     d->manager->setCurrentPacs(index);
+    this->findSCU();
 }
 
 void

@@ -11,34 +11,23 @@
 #include <QtGui>
 
 #include <ui_qtdcmpreferencesdialog.h>
-#include <QtDcmPreferences.h>
+
+class QtDcmPreferences;
+class QtDcmPreferencesDialogPrivate;
 
 /*
  *
  */
-class QtDcmPreferencesDialog : public QDialog
+class QtDcmPreferencesDialog : public QDialog, public Ui::PreferencesDialog
   {
   Q_OBJECT
-  private:
-    QtDcmPreferences * _preferences;
-
-    void
-    initConnections();
-
   public:
-    Ui::PreferencesDialog widget;
     QtDcmPreferencesDialog( QWidget * parent );
     virtual
-    ~QtDcmPreferencesDialog()
-      {
-      }
-    ;
+    ~QtDcmPreferencesDialog() {};;
 
     QtDcmPreferences *
-    getPreferences()
-      {
-        return _preferences;
-      }
+    getPreferences();
 
     void
     setPreferences( QtDcmPreferences * prefs );
@@ -65,6 +54,18 @@ class QtDcmPreferencesDialog : public QDialog
     setDcm2nii();
     void
     setDcm4che();
+    void
+    sendEcho();
+
+    signals:
+    void
+    sendEchoToPacs(int index);
+
+  private:
+    QtDcmPreferencesDialogPrivate * d;
+
+    void
+    initConnections();
   };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */

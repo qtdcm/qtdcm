@@ -48,10 +48,33 @@
           <property name="text">
            <string>Search</string>
           </property>
+          <property name="icon">
+           <iconset resource="../Resources/qtdcm.qrc">
+            <normaloff>:/Images/search.svg</normaloff>:/Images/search.svg</iconset>
+          </property>
          </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="maximumSize">
+             <size>
+              <width>24</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../Resources/qtdcm.qrc">:/Images/pacs.svg</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QLabel" name="label_2">
             <property name="maximumSize">
@@ -61,7 +84,7 @@
              </size>
             </property>
             <property name="text">
-             <string>PACS :</string>
+             <string> PACS</string>
             </property>
            </widget>
           </item>
@@ -79,22 +102,12 @@
           <item>
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Name :</string>
+             <string>Patient name</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -117,22 +130,12 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>Study description :</string>
+             <string>Study description</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -148,22 +151,12 @@
           <item>
            <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>Serie description :</string>
+             <string>Serie description</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -350,6 +343,10 @@
          <property name="text">
           <string notr="true">1</string>
          </property>
+         <property name="icon">
+          <iconset resource="../Resources/qtdcm.qrc">
+           <normaloff>:/Images/users.svg</normaloff>:/Images/users.svg</iconset>
+         </property>
         </column>
        </widget>
       </item>
@@ -379,6 +376,10 @@
         <property name="text">
          <string notr="true">1</string>
         </property>
+        <property name="icon">
+         <iconset resource="../Resources/qtdcm.qrc">
+          <normaloff>:/Images/folder.svg</normaloff>:/Images/folder.svg</iconset>
+        </property>
        </column>
       </widget>
      </item>
@@ -393,6 +394,10 @@
        <column>
         <property name="text">
          <string notr="true">1</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Resources/qtdcm.qrc">
+          <normaloff>:/Images/paradigm.svg</normaloff>:/Images/paradigm.svg</iconset>
         </property>
        </column>
       </widget>
@@ -579,6 +584,10 @@
           <property name="text">
            <string>Import</string>
           </property>
+          <property name="icon">
+           <iconset resource="../Resources/qtdcm.qrc">
+            <normaloff>:/Images/save.svg</normaloff>:/Images/save.svg</iconset>
+          </property>
          </widget>
         </item>
         <item row="2" column="0">
@@ -601,6 +610,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../Resources/qtdcm.qrc"/>
+ </resources>
  <connections/>
 </ui>

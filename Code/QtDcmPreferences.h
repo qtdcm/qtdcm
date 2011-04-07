@@ -9,7 +9,9 @@
 #define QTDCMPREFERENCES_H_
 
 #include <QtGui>
-#include <QtDcmServer.h>
+
+class QtDcmServer;
+class QtDcmPreferencesPrivate;
 /**
  * Class that manages the settings of QtDcm
  *
@@ -31,219 +33,172 @@
  * @todo Add path to dcm2nii and dcm4che in the preferences
  */
 class QtDcmPreferences : public QObject
-  {
-  Q_OBJECT
-  private:
-    QFile _iniFile; /** File stored on the file system that contains the preferences */
-    QString _aetitle; /** Local aetitle of QtDcm */
-    QString _port; /** Local port of qtdcm */
-    QString _hostname;
-    QString _encoding; /** Local character encoding */
+{
+    Q_OBJECT
+    public:
+        /**
+         * Default constructor
+         */
+        QtDcmPreferences();
 
-    QString _dcm2nii; /** Absolute filename of the dcm2nii binary on the system */
-    QString _dcm4che; /** Absolute filename of the dcm4che binary on the system */
+        /**
+         * Default destructor
+         */
+        virtual
+        ~QtDcmPreferences()
+        {
+        }
+        ;
 
-    QList<QtDcmServer *> _servers; /** List of server that QtDcm can query */
+        /**
+         * Read the settings from the ini file.
+         * This method use the QSettings object and initialize the private attributes with the content of the ini file.
+         */
+        void
+        readSettings();
 
-    /**
-     * This method create the ini file with default parameters if it doesn't exist (first execution of qtdcm)
-     */
-    void
-    setDefaultIniFile();
+        /**
+         * Store current settings in the ini file.
+         * This method use the QSettings object to store the current settings in the ini file.
+         */
+        void
+        writeSettings();
 
-  public:
-    /**
-     * Default constructor
-     */
-    QtDcmPreferences();
+        /**
+         * QtDcm local AETitle getter
+         *
+         * @return _aetitle as a QString
+         */
+        QString
+        getAetitle() const;
 
-    /**
-     * Default destructor
-     */
-    virtual
-    ~QtDcmPreferences()
-      {
-      }
-    ;
+        /**
+         * QtDcm local encoding getter
+         *
+         * @return _encoding as a QString
+         */
+        QString
+        getEncoding() const;
 
-    /**
-     * Read the settings from the ini file.
-     * This method use the QSettings object and initialize the private attributes with the content of the ini file.
-     */
-    void
-    readSettings();
+        /**
+         * QtDcm local application TCP port getter
+         *
+         * @return _port as a QString
+         */
+        QString
+        getPort() const;
 
-    /**
-     * Store current settings in the ini file.
-     * This method use the QSettings object to store the current settings in the ini file.
-     */
-    void
-    writeSettings();
+        /**
+         * QtDcm server list getter
+         *
+         * @return _servers as a QList of server
+         * @see QtDcmServer
+         */
+        QList<QtDcmServer *>
+        getServers();
 
-    /**
-     * QtDcm local AETitle getter
-     *
-     * @return _aetitle as a QString
-     */
-    QString
-    getAetitle() const
-      {
-        return _aetitle;
-      }
+        /**
+         * Dcm2nii  getter
+         *
+         * @return _dcm2nii as a QString
+         */
+        QString
+        getDcm2nii();
 
-    /**
-     * QtDcm local encoding getter
-     *
-     * @return _encoding as a QString
-     */
-    QString
-    getEncoding() const
-      {
-        return _encoding;
-      }
+        /**
+         * Dcm4che getter
+         *
+         * @return _dcm4che as a QString
+         */
+        QString
+        getDcm4che();
 
-    /**
-     * QtDcm local application TCP port getter
-     *
-     * @return _port as a QString
-     */
-    QString
-    getPort() const
-      {
-        return _port;
-      }
+        /**
+         * Dcm2nii path setter
+         *
+         * @param as a QString
+         */
+        void
+        setDcm2nii(QString path);
 
-    /**
-     * QtDcm server list getter
-     *
-     * @return _servers as a QList of server
-     * @see QtDcmServer
-     */
-    QList<QtDcmServer *>
-    getServers()
-      {
-        return _servers;
-      }
+        /**
+         * Dcm4che setter
+         *
+         * @param as a QString
+         */
+        void
+        setDcm4che(QString path);
 
-    /**
-     * Dcm2nii  getter
-     *
-     * @return _dcm2nii as a QString
-     */
-    QString
-    getDcm2nii()
-      {
-        return _dcm2nii;
-      }
+        /**
+         * QtDcm local AETitle setter
+         *
+         * @param _aetitle as a QString
+         */
+        void
+        setHostname(QString hostname);
 
-    /**
-     * Dcm4che getter
-     *
-     * @return _dcm4che as a QString
-     */
-    QString
-    getDcm4che()
-      {
-        return _dcm4che;
-      }
+        QString
+        getHostname();
 
-    /**
-     * Dcm2nii path setter
-     *
-     * @param as a QString
-     */
-    void
-    setDcm2nii( QString path )
-      {
-        _dcm2nii = path;
-      }
+        /**
+         * QtDcm local AETitle setter
+         *
+         * @param _aetitle as a QString
+         */
+        void
+        setAetitle(QString aetitle);
 
-    /**
-     * Dcm4che setter
-     *
-     * @param as a QString
-     */
-    void
-    setDcm4che( QString path )
-      {
-        _dcm4che = path;
-      }
+        /**
+         * QtDcm local encoding setter
+         *
+         * @param encoding as a QString
+         */
+        void
+        setEncoding(QString encoding);
 
-    /**
-     * QtDcm local AETitle setter
-     *
-     * @param _aetitle as a QString
-     */
-    void
-    setHostname( QString _hostname )
-      {
-        this->_hostname = _hostname;
-      }
+        /**
+         * QtDcm local application TCP port setter
+         *
+         * @param _port as a QString
+         */
+        void
+        setPort(QString port);
 
-    QString
-    getHostname()
-      {
-        return _hostname;
-      }
+        /**
+         * Add server to the QList
+         */
+        void
+        addServer();
 
-    /**
-     * QtDcm local AETitle setter
-     *
-     * @param _aetitle as a QString
-     */
-    void
-    setAetitle( QString _aetitle )
-      {
-        this->_aetitle = _aetitle;
-      }
+        /**
+         * Remove server from the QList at position i
+         *
+         * @param i index of the server to be removed in the list
+         */
+        void
+        removeServer(int index);
 
-    /**
-     * QtDcm local encoding setter
-     *
-     * @param encoding as a QString
-     */
-    void
-    setEncoding( QString encoding )
-      {
-        this->_encoding = encoding;
-      }
+        /**
+         * QtDcm server list setter
+         *
+         * @param servers as a QList of servers
+         * @see QtDcmServer
+         */
+        void
+        setServers(QList<QtDcmServer *> servers);
 
-    /**
-     * QtDcm local application TCP port setter
-     *
-     * @param _port as a QString
-     */
-    void
-    setPort( QString _port )
-      {
-        this->_port = _port;
-      }
+    public slots:
+        void
+        sendEcho(int index);
 
-    /**
-     * Add server to the QList
-     */
-    void
-    addServer();
+    private:
+        /**
+         * This method create the ini file with default parameters if it doesn't exist (first execution of qtdcm)
+         */
+        void
+        setDefaultIniFile();
 
-    /**
-     * Remove server from the QList at position i
-     *
-     * @param i index of the server to be removed in the list
-     */
-    void
-    removeServer( int index );
-
-    /**
-     * QtDcm server list setter
-     *
-     * @param servers as a QList of servers
-     * @see QtDcmServer
-     */
-    void
-    setServers( QList<QtDcmServer *> servers )
-      {
-        this->_servers = servers;
-      }
-  };
+        QtDcmPreferencesPrivate * d;
+};
 
 #endif /* QTDCMPREFERENCES_H_ */
