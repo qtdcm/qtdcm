@@ -388,6 +388,8 @@ class QtDcmManager : public QObject
     public slots:
         void
         updateProgressBar(int i);
+        void
+        moveSeriesFinished();
 
     private:
         QtDcmManagerPrivate *d;

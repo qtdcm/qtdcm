@@ -155,7 +155,7 @@ QtDcmMoveDicomdir::run()
         }
         progress += step;
     }
-    emit updateProgress(100);
+    exit();
 }
 
 QString

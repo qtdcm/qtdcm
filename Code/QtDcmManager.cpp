@@ -381,12 +381,12 @@ QtDcmManager::moveSelectedSeries()
     qApp->processEvents();
     // Verifier repertoire temporaire
     if (d->mode == "CD") {
-        qDebug() << "Depuis un dicomdir !";
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir(this);
         mover->setDcmItem(d->dfile.getDataset());
         mover->setOutputDir(d->tempDir.absolutePath());
         mover->setSeries(d->seriesToImport);
         QObject::connect(mover, SIGNAL(updateProgress(int)), this, SLOT(updateProgressBar(int)));
+        QObject::connect(mover, SIGNAL(finished()), this, SLOT(moveSeriesFinished()));
         mover->start();
     }
     else {
@@ -397,15 +397,19 @@ QtDcmManager::moveSelectedSeries()
         //        QObject::connect(mover, SIGNAL(updateProgress(int, QString)), this, SLOT(updateProgressBar(int, QString)));
         mover->start();
     }
-//    d->progress->hide();
-//    d->progress->setValue(0);
+}
+
+void
+QtDcmManager::moveSeriesFinished()
+{
+    d->progress->setValue(100);
+    d->progress->hide();
+    d->progress->setValue(0);
 }
 
 void
 QtDcmManager::updateProgressBar(int i)
 {
-    //qDebug() << i;
-
     d->progress->setValue(i);
     qApp->processEvents();
 }
