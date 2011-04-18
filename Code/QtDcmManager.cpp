@@ -65,6 +65,8 @@
 
 #include <QtDcmFindScu.h>
 #include <QtDcmFindDicomdir.h>
+#include <QtDcmMoveScu.h>
+#include <QtDcmMoveDicomdir.h>
 
 #include <QtDcmManager.h>
 
@@ -72,7 +74,7 @@ class QtDcmManagerPrivate
 {
     public:
         QWidget * parent; /** Here the parent is corresponding to the QtDCM object */
-        QProgressDialog * progress; /** Dialog window showing file copy in progress */
+        //        QProgressDialog * progress; /** Dialog window showing file copy in progress */
         QString dicomdir; /** Dicomdir absolute file path */
         QString outputDir; /** Output directory for reconstructed serie absolute path */
         QDir currentSerieDir; /** Directory containing current serie dicom slice */
@@ -107,6 +109,7 @@ class QtDcmManagerPrivate
         QTreeWidget * patientsTreeWidget;
         QTreeWidget * studiesTreeWidget;
         QTreeWidget * seriesTreeWidget;
+        QProgressBar * progress;
 };
 
 QtDcmManager::QtDcmManager() :
@@ -128,6 +131,7 @@ QtDcmManager::QtDcmManager() :
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;
+    d->progress = NULL;
 
     d->preferences = new QtDcmPreferences();
     d->exportThread = new QtDcmExportThread();
@@ -160,6 +164,7 @@ QtDcmManager::QtDcmManager(QWidget * parent) :
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;
+    d->progress = NULL;
 
     d->exportThread = new QtDcmExportThread();
     d->queryThread = new QtDcmQueryThread();
@@ -194,6 +199,12 @@ void
 QtDcmManager::setSeriesTreeWidget(QTreeWidget * widget)
 {
     d->seriesTreeWidget = widget;
+}
+
+void
+QtDcmManager::setProgressBar(QProgressBar * progress)
+{
+    d->progress = progress;
 }
 
 void
@@ -306,13 +317,6 @@ QtDcmManager::foundImage(QMap<QString, QString> infosMap)
 }
 
 void
-QtDcmManager::moveImagesScu(QString serieInstanceUID)
-{
-    // Verifier repertoire temporaire
-    qDebug() << "On move les images !";
-}
-
-void
 QtDcmManager::loadDicomdir()
 {
     if (d->dicomdir.isEmpty())
@@ -368,9 +372,43 @@ QtDcmManager::findImagesDicomdir(QString uid)
     delete finder;
 }
 
+void
+QtDcmManager::moveSelectedSeries()
+{
+    if (!d->tempDir.exists())
+        return;
+    d->progress->show();
+    qApp->processEvents();
+    // Verifier repertoire temporaire
+    if (d->mode == "CD") {
+        qDebug() << "Depuis un dicomdir !";
+        QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir(this);
+        mover->setDcmItem(d->dfile.getDataset());
+        mover->setOutputDir(d->tempDir.absolutePath());
+        mover->setSeries(d->seriesToImport);
+        QObject::connect(mover, SIGNAL(updateProgress(int)), this, SLOT(updateProgressBar(int)));
+        mover->start();
+    }
+    else {
+        qDebug() << "Depuis un PACS !";
+        QtDcmMoveScu * mover = new QtDcmMoveScu(this);
+        mover->setOutputDir(d->tempDir.absolutePath());
+        mover->setSerieUID(d->seriesToImport.at(0));
+        //        QObject::connect(mover, SIGNAL(updateProgress(int, QString)), this, SLOT(updateProgressBar(int, QString)));
+        mover->start();
+    }
+//    d->progress->hide();
+//    d->progress->setValue(0);
+}
 
+void
+QtDcmManager::updateProgressBar(int i)
+{
+    //qDebug() << i;
 
-
+    d->progress->setValue(i);
+    qApp->processEvents();
+}
 
 void
 QtDcmManager::createTemporaryDirs()
@@ -404,18 +442,16 @@ QtDcmManager::deleteTemporaryDirs()
         d->logsDir.remove(listLogs.at(i));
     }
     d->tempDir.rmdir("logs");
-
     QStringList listSerie = d->tempDir.entryList(QDir::Dirs, QDir::Name);
     for (int i = 0; i < listSerie.size(); i++) {
-        QDir serieDir(d->tempDir.absolutePath() + QDir::separator() + listSerie.at(i));
-        QStringList listFiles = serieDir.entryList(QDir::Files, QDir::Name);
-        if (!(listSerie.at(i) == "." || listSerie.at(i) == "."))
+        if (!(listSerie.at(i) == "." || listSerie.at(i) == "..")) {
+            QDir serieDir(d->tempDir.absolutePath() + QDir::separator() + listSerie.at(i));
+            QStringList listFiles = serieDir.entryList(QDir::Files, QDir::Name);
             for (int j = 0; j < listFiles.size(); j++) {
-                {
-                    serieDir.remove(listFiles.at(j));
-                }
-                d->tempDir.rmdir(listSerie.at(i));
+                serieDir.remove(listFiles.at(j));
             }
+            d->tempDir.rmdir(listSerie.at(i));
+        }
     }
     QDir(QDir::tempPath()).rmdir(d->tempDir.dirName());
 }
@@ -427,7 +463,6 @@ QtDcmManager::generateCurrentSerieDir()
         d->currentSerieDir = d->tempDir.absolutePath() + QDir::separator() + d->serieId;
         d->tempDir.mkdir(d->serieId);
     }
-
 }
 
 void
@@ -492,106 +527,11 @@ QtDcmManager::deleteCurrentSerieDir()
 //}
 
 void
-QtDcmManager::importSeriesFromDicomdir()
-{
-    //    // Launch progress dialog window, to follow images copy
-    //    d->progress = new QProgressDialog(tr("Copie des images depuis le CD..."), "", 0, 100, d->parent);
-    //    d->progress->setWindowModality(Qt::WindowModal);
-    //    QPushButton * cancelButton = new QPushButton;
-    //    d->progress->setCancelButton(cancelButton);
-    //    cancelButton->hide();
-    //    d->progress->setValue(0);
-    //    qApp->processEvents();
-    //    d->progress->show();
-    //    qApp->processEvents();
-    //
-    //    //Copie des fichiers images dans le répertoire temporaire
-    //    QList<QString> series = d->seriesToExport.keys();
-    //    for (int j = 0; j < series.size(); j++) {
-    //        d->progress->setValue(0);
-    //        d->serieId = series.at(j);
-    //        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
-    //        if (!d->tempDir.exists(series.at(j))) {
-    //            this->generateCurrentSerieDir();
-    //        }
-    //        for (int i = 0; i < d->seriesToExport.value(series.at(j)).size(); i++) {
-    //            QFile image(d->seriesToExport.value(series.at(j)).at(i));
-    //            if (image.exists()) {
-    //                QString zeroStr;
-    //                zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
-    //                image.copy(d->currentSerieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number(i));
-    //                d->progress->setValue(100 * i / d->seriesToExport.value(series.at(j)).size());
-    //                qApp->processEvents();
-    //            }
-    //        }
-    //        d->progress->setValue(100);
-    //        qApp->processEvents();
-    //    }
-    //    d->progress->close();
-    //    delete d->progress;
-}
-
-void
-QtDcmManager::importSeriesFromPACS()
-{
-    for (int i = 0; i < d->seriesToImport.size(); i++) {
-        if (!d->tempDir.exists()) {
-            d->tempDir.mkdir(d->seriesToImport.at(i));
-        }
-        this->moveImagesScu(d->seriesToImport.at(i));
-    }
-
-    // ici j'appelle la classe de conversion (ou dcm2nii) !
-
-    //    QString program = d->preferences->getDcm4che();
-    //
-    //    d->exportThread->setProgram(d->preferences->getDcm4che());
-    //    d->exportThread->setServerPacsParam(d->preferences->getServers().at(0)->getAetitle() + "@" + d->preferences->getServers().at(0)->getServer() + ":" + d->preferences->getServers().at(0)->getPort());
-    //    d->exportThread->setLocalPacsParam(d->preferences->getAetitle() + "@" + d->preferences->getHostname() + ":" + d->preferences->getPort());
-    //    d->exportThread->setSeriesToExport(d->seriesToExport.keys());
-    //    d->exportThread->setTemporaryDir(d->tempDir.absolutePath());
-    //    d->exportThread->setModality(d->modality);
-    //    d->exportThread->setAetitle(d->preferences->getAetitle());
-    //
-    //    d->progress = new QProgressDialog(tr("Chargement des images..."), "", 0, 0, d->parent);
-    //    d->progress->setWindowModality(Qt::WindowModal);
-    //    QPushButton * cancelButton = new QPushButton;
-    //    d->progress->setCancelButton(cancelButton);
-    //    cancelButton->hide();
-    //    cancelButton->hide();
-    //    d->progress->setValue(0);
-    //    d->progress->show();
-    //    qApp->processEvents();
-    //
-    //    d->exportThread->start();
-}
-
-void
 QtDcmManager::makePreview()
 {
     d->seriesToExport.insert(d->serieId, d->images);
     d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
-    if (!d->tempDir.exists(d->serieId)) {
-        //Utiliser l'UID de la serie pour copier les images
-        //        if (d->mode == "CD") {
-        //            this->exportSerieFromCD();
-        //        }
-        //        else {
-        //            this->exportSerieFromPACS();
-        //            while (d->exportThread->isRunning()) {
-        //                qApp->processEvents();
-        //            }
-        //            d->progress->close();
-        //            delete d->progress;
-        //        }
-    }
-    d->progress = new QProgressDialog(tr("Creation de l'apercu..."), "", 0, 0, d->parent);
-    d->progress->setWindowModality(Qt::WindowModal);
-    QPushButton * cancelButton = new QPushButton;
-    d->progress->setCancelButton(cancelButton);
-    cancelButton->hide();
-    d->progress->show();
-    qApp->processEvents();
+
     QStringList list = d->currentSerieDir.entryList(QDir::Files, QDir::Name);
     d->listImages.clear();
 
@@ -599,7 +539,7 @@ QtDcmManager::makePreview()
     DJDecoderRegistration::registerCodecs(EDC_photometricInterpretation, EUC_default, EPC_default, OFFalse);
 
     for (int i = 0; i < list.size(); i++) {
-        qApp->processEvents();
+        //        qApp->processEvents();
         //QImage * current_image_ = NULL;
         // get pixeldata
         DcmFileFormat file;
@@ -650,8 +590,8 @@ QtDcmManager::makePreview()
             }
         }
     }
-    d->progress->close();
-    delete d->progress;
+    //    d->progress->close();
+    //    delete d->progress;
     d->seriesToExport.clear();
 }
 
@@ -872,18 +812,4 @@ int
 QtDcmManager::seriesToImportSize()
 {
     return d->seriesToImport.size();
-}
-
-void
-QtDcmManager::importSelectedSeries()
-{
-    if (d->mode == "CD") {
-        qDebug() << "Import from dicomdir";
-        qDebug() << d->seriesToImport;
-    }
-    else {
-        qDebug() << "Import from PACS";
-        qDebug() << d->seriesToImport;
-        this->importSeriesFromPACS();
-    }
 }

@@ -64,6 +64,8 @@ QtDCM::QtDCM(QWidget *parent) :
     d->manager->setPatientsTreeWidget(treeWidgetPatients);
     d->manager->setStudiesTreeWidget(treeWidgetStudies);
     d->manager->setSeriesTreeWidget(treeWidgetSeries);
+    d->manager->setProgressBar(importProgressBar);
+    importProgressBar->hide();
 
     d->manager->setDate1(startDateEdit->date().toString("yyyyMMdd"));
     d->manager->setDate2(endDateEdit->date().toString("yyyyMMdd"));
@@ -226,7 +228,7 @@ QtDCM::importSelectedSeries()
         {
             // Set the output directory to the manager and launch the conversion process
             d->manager->setOutputDirectory(directory);
-            d->manager->importSelectedSeries();
+            d->manager->moveSelectedSeries();
         }
         delete dialog;
     }
@@ -237,7 +239,7 @@ QtDCM::importToDirectory(QString directory)
 {
     if (d->manager->seriesToImportSize() != 0) {
         d->manager->setOutputDirectory(directory);
-        d->manager->importSelectedSeries();
+        d->manager->moveSelectedSeries();
     }
 }
 

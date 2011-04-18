@@ -66,6 +66,8 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmMoveScu.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmMoveDicomdir.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImage.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.cpp
@@ -84,6 +86,8 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmMoveScu.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmMoveDicomdir.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImage.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
