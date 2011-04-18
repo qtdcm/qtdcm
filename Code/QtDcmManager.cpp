@@ -45,7 +45,6 @@
 #include <dcmtk/ofstd/ofstream.h>
 #include <dcmtk/dcmdata/dctk.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
 #include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
@@ -55,11 +54,6 @@
 // For color images
 #include <dcmtk/dcmimage/diregist.h>
 
-//#define INCLUDEd->CSTDLIB
-//#define INCLUDEd->CSTRING
-#include "dcmtk/ofstd/ofstdinc.h"
-
-#include "dcmtk/dcmnet/dimse.h"
 #include "dcmtk/dcmnet/diutil.h"
 #include "dcmtk/dcmdata/dcdict.h"
 #include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
@@ -69,7 +63,8 @@
 #include "dcmtk/dcmtls/tlslayer.h"
 #endif
 
-#include <QtDcmFindScuSignalManager.h>
+#include <QtDcmFindScu.h>
+#include <QtDcmFindDicomdir.h>
 
 #include <QtDcmManager.h>
 
@@ -83,9 +78,7 @@ class QtDcmManagerPrivate
         QDir currentSerieDir; /** Directory containing current serie dicom slice */
         QDir tempDir; /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
         QDir logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
-        DcmItem * dcmObject; /** This attribute is usefull for parsing the dicomdir */
         DcmFileFormat dfile; /** This attribute is usefull for parsing the dicomdir */
-        DcmStack dicomdirItems; //This stack contains the dicomdir items
         QList<QtDcmPatient *> patients; /** List that contains patients resulting of a query or read from a CD */
         QList<QString> images; /** List of image filename to export from a CD */
         QMap<QString, QList<QString> > seriesToExport;
@@ -110,7 +103,10 @@ class QtDcmManagerPrivate
         QByteArray query;
 
         QtDcmServer * currentPacs;
-        QtDcmFindScuSignalManager * signalManager;
+
+        QTreeWidget * patientsTreeWidget;
+        QTreeWidget * studiesTreeWidget;
+        QTreeWidget * seriesTreeWidget;
 };
 
 QtDcmManager::QtDcmManager() :
@@ -129,11 +125,13 @@ QtDcmManager::QtDcmManager() :
     d->studyDescription = "*";
     d->patientSex = "*";
 
+    d->patientsTreeWidget = NULL;
+    d->studiesTreeWidget = NULL;
+    d->seriesTreeWidget = NULL;
+
     d->preferences = new QtDcmPreferences();
     d->exportThread = new QtDcmExportThread();
     d->queryThread = new QtDcmQueryThread();
-
-    d->signalManager = new QtDcmFindScuSignalManager(this);
 
     d->currentPacs = d->preferences->getServers().at(0);
 
@@ -159,10 +157,12 @@ QtDcmManager::QtDcmManager(QWidget * parent) :
     d->preferences = new QtDcmPreferences();
     d->parent = parent;
 
+    d->patientsTreeWidget = NULL;
+    d->studiesTreeWidget = NULL;
+    d->seriesTreeWidget = NULL;
+
     d->exportThread = new QtDcmExportThread();
     d->queryThread = new QtDcmQueryThread();
-
-    d->signalManager = new QtDcmFindScuSignalManager(this);
 
     d->currentPacs = d->preferences->getServers().at(0);
 
@@ -181,19 +181,19 @@ QtDcmManager::~QtDcmManager()
 void
 QtDcmManager::setPatientsTreeWidget(QTreeWidget * widget)
 {
-    d->signalManager->attachPatientsTreeWidget(widget);
+    d->patientsTreeWidget = widget;
 }
 
 void
 QtDcmManager::setStudiesTreeWidget(QTreeWidget * widget)
 {
-    d->signalManager->attachStudiesTreeWidget(widget);
+    d->studiesTreeWidget = widget;
 }
 
 void
 QtDcmManager::setSeriesTreeWidget(QTreeWidget * widget)
 {
-    d->signalManager->attachSeriesTreeWidget(widget);
+    d->seriesTreeWidget = widget;
 }
 
 void
@@ -223,132 +223,86 @@ QtDcmManager::findPatientsScu()
 {
     d->seriesToImport.clear();
     d->mode = "PACS";
-    OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "PATIENT" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + d->patientName).toUtf8().data());
 
-    //Patient level
-    overrideKeys.push_back(QString("PatientID").toUtf8().data());
-    overrideKeys.push_back(QString("PatientSex=" + d->patientSex).toUtf8().data());
-    overrideKeys.push_back(QString("PatientBirthDate").toUtf8().data());
-
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
-    OFCondition cond;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback();
-    callback->setSignalManager(d->signalManager);
-
-    if (findscu.initializeNetwork(30).bad())
-        this->displayErrorMessage(tr("Cannot establish network connection"));
-
-    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        this->displayErrorMessage(tr("Cannot perform query C-FIND"));
-
-    if (findscu.dropNetwork().bad())
-        this->displayErrorMessage(tr("Cannot drop network"));
+    QtDcmFindScu * finder = new QtDcmFindScu(this);
+    finder->findPatientsScu(d->patientName, d->patientSex);
+    delete finder;
 }
 
 void
 QtDcmManager::findStudiesScu(QString patientName)
 {
     d->seriesToImport.clear();
-    OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "STUDY" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back((QString("StudyDescription=") + d->studyDescription).toUtf8().data());
-    overrideKeys.push_back(QString("StudyDate=" + d->date1 + "-" + d->date2).toUtf8().data());
-    overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
 
-    //Study level
-    overrideKeys.push_back(QString("StudyInstanceUID").toUtf8().data());
-
-    //Image level
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
-    OFCondition cond;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::STUDY);
-    callback->setSignalManager(d->signalManager);
-
-    if (findscu.initializeNetwork(30).bad())
-        this->displayErrorMessage(tr("Cannot establish network connection"));
-
-    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        this->displayErrorMessage(tr("Cannot perform query C-FIND"));
-
-    if (findscu.dropNetwork().bad())
-        this->displayErrorMessage(tr("Cannot drop network"));
+    QtDcmFindScu * finder = new QtDcmFindScu(this);
+    finder->findStudiesScu(patientName, d->studyDescription, d->date1, d->date2);
+    delete finder;
 }
 
 void
 QtDcmManager::findSeriesScu(QString patientName, QString studyDescription)
 {
     d->seriesToImport.clear();
-    OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "SERIES" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back(QString("StudyDescription=" + studyDescription).toUtf8().data());
-    overrideKeys.push_back((QString("SeriesDescription=") + d->serieDescription).toUtf8().data());
-    overrideKeys.push_back(QString("Modality=" + d->modality).toUtf8().data());
 
-    //Study level
-    overrideKeys.push_back(QString("StudyDate").toUtf8().data());
-
-    //Serie level
-    overrideKeys.push_back(QString("SeriesInstanceUID").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
-    overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
-    overrideKeys.push_back(QString("AcquisitionNumber").toUtf8().data());
-
-    //Image level
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
-    OFCondition cond;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::SERIE);
-    callback->setSignalManager(d->signalManager);
-
-    if (findscu.initializeNetwork(30).bad())
-        this->displayErrorMessage(tr("Cannot establish network connection"));
-
-    if (findscu.performQuery(d->currentPacs->getServer().toAscii().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toAscii().data(), d->currentPacs->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        this->displayErrorMessage(tr("Cannot perform query C-FIND"));
-
-    if (findscu.dropNetwork().bad())
-        this->displayErrorMessage(tr("Cannot drop network"));
+    QtDcmFindScu * finder = new QtDcmFindScu(this);
+    finder->findSeriesScu(patientName, studyDescription, d->serieDescription, d->modality);
+    delete finder;
 }
 
 void
 QtDcmManager::findImagesScu(QString serieInstanceUID)
 {
-    OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGE" "")).toUtf8().data());
-    overrideKeys.push_back(QString("SeriesInstanceUID=" + serieInstanceUID).toUtf8().data());
+    QtDcmFindScu * finder = new QtDcmFindScu(this);
+    finder->findImagesScu(serieInstanceUID);
+    delete finder;
+}
 
-    //Image level
-    overrideKeys.push_back(QString("InstanceNumber").toUtf8().data());
+void
+QtDcmManager::foundPatient(QMap<QString, QString> infosMap)
+{
+    if (d->patientsTreeWidget) {
+        QTreeWidgetItem * patientItem = new QTreeWidgetItem(d->patientsTreeWidget->invisibleRootItem());
+        patientItem->setText(0, infosMap["Name"]);
+        patientItem->setText(1, infosMap["ID"]);
+        patientItem->setText(2, QDate::fromString(infosMap["Birthdate"], "yyyyMMdd").toString("dd/MM/yyyy"));
+        patientItem->setText(3, infosMap["Sex"]);
+    }
+}
 
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
-    OFCondition cond;
+void
+QtDcmManager::foundStudy(QMap<QString, QString> infosMap)
+{
+    if (d->studiesTreeWidget) {
+        QTreeWidgetItem * studyItem = new QTreeWidgetItem(d->studiesTreeWidget->invisibleRootItem());
+        studyItem->setText(0, infosMap["Description"]);
+        studyItem->setText(1, QDate::fromString(infosMap["Date"], "yyyyMMdd").toString("dd/MM/yyyy"));
+        studyItem->setText(2, infosMap["ID"]);
+    }
+}
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::IMAGE);
-    callback->setSignalManager(d->signalManager);
+void
+QtDcmManager::foundSerie(QMap<QString, QString> infosMap)
+{
+    if (d->seriesTreeWidget) {
+        QTreeWidgetItem * serieItem = new QTreeWidgetItem(d->seriesTreeWidget->invisibleRootItem());
+        serieItem->setText(0, infosMap["Description"]);
+        serieItem->setText(1, infosMap["Modality"]);
+        serieItem->setText(2, QDate::fromString(infosMap["Date"], "yyyyMMdd").toString("dd/MM/yyyy"));
+        serieItem->setText(3, infosMap["ID"]);
+        serieItem->setData(4, 0, QVariant(infosMap["InstanceCount"]));
+        serieItem->setData(5, 0, QVariant(infosMap["Institution"]));
+        serieItem->setData(6, 0, QVariant(infosMap["Operator"]));
+        serieItem->setCheckState(0, Qt::Unchecked);
+    }
+}
 
-    if (findscu.initializeNetwork(30).bad())
-        this->displayErrorMessage(tr("Cannot establish network connection"));
-
-    if (findscu.performQuery(d->currentPacs->getServer().toUtf8().data(), d->currentPacs->getPort().toInt(), d->preferences->getAetitle().toUtf8().data(), d->currentPacs->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        this->displayErrorMessage(tr("Cannot perform query C-FIND"));
-
-    if (findscu.dropNetwork().bad())
-        this->displayErrorMessage(tr("Cannot drop network"));
+void
+QtDcmManager::foundImage(QMap<QString, QString> infosMap)
+{
+    if (d->seriesTreeWidget) {
+        if (infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data(4, 0).toInt())
+            d->seriesTreeWidget->currentItem()->setData(4, 0, QVariant(infosMap["InstanceCount"]));
+    }
 }
 
 void
@@ -369,8 +323,6 @@ QtDcmManager::loadDicomdir()
     if (!(status = d->dfile.loadFile(d->dicomdir.toUtf8().data())).good()) {
         return;
     }
-    //Get the dicomdir dataset in a DCMTK DcmObject
-    d->dcmObject = d->dfile.getDataset();
     this->findPatientsDicomdir();
 }
 
@@ -379,293 +331,46 @@ QtDcmManager::findPatientsDicomdir()
 {
     d->seriesToImport.clear();
 
-    static const OFString Patient("PATIENT");
-
-    // Loading all the dicomdir items in a stack
-    DcmStack itemsTmp;
-    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good()) {
-        return;
-    }
-
-    while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
-        d->dicomdirItems.push(itemsTmp.top());
-        itemsTmp.pop();
-    }
-
-    //Unstacking and loading the different lists
-    while (d->dicomdirItems.card() > 0) {
-        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
-        DcmStack dirent;
-
-        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
-        if (!condition.good()) {
-            d->dicomdirItems.pop();
-            continue;
-        }
-        while (dirent.card()) {
-            DcmElement* elt = (DcmElement*) dirent.top();
-            OFString cur;
-            elt->getOFStringArray(cur);
-            if (cur == Patient) {
-                DcmElement* lelt;
-                QMap<QString, QString> infosMap;
-                if (lobj->findAndGetElement(DCM_PatientName, lelt).good()) {
-                    OFString strName;
-                    lelt->getOFStringArray(strName);
-                    infosMap.insert("Name", QString(strName.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_PatientID, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    infosMap.insert("ID", QString(strID.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_PatientBirthDate, lelt).good()) {
-                    OFString strBirth;
-                    lelt->getOFStringArray(strBirth);
-                    infosMap.insert("Birthdate", QString(strBirth.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_PatientSex, lelt).good()) {
-                    OFString strSex;
-                    lelt->getOFStringArray(strSex);
-                    infosMap.insert("Sex", QString(strSex.c_str()));
-                }
-                d->signalManager->foundPatient(infosMap);
-            }
-            dirent.pop();
-        }
-        d->dicomdirItems.pop();
-    }
-    d->dicomdirItems.clear();
+    QtDcmFindDicomdir * finder = new QtDcmFindDicomdir(this);
+    finder->setDcmItem(d->dfile.getDataset());
+    finder->findPatients();
+    delete finder;
 }
 
 void
 QtDcmManager::findStudiesDicomdir(QString patientName)
 {
-    bool proceed = false;
     d->seriesToImport.clear();
-    static const OFString Patient("PATIENT");
-    static const OFString Study("STUDY");
-    //    static const OFString Series("SERIES");
-    //    static const OFString Image("IMAGE");
 
-    // Loading all the dicomdir items in a stack
-    DcmStack itemsTmp;
-    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
-        return;
-
-    while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
-        d->dicomdirItems.push(itemsTmp.top());
-        itemsTmp.pop();
-    }
-
-    //Unstacking and loading the different lists
-    while (d->dicomdirItems.card() > 0) {
-        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
-        DcmStack dirent;
-
-        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
-        if (!condition.good()) {
-            d->dicomdirItems.pop();
-            continue;
-        }
-        while (dirent.card()) {
-            DcmElement* elt = (DcmElement*) dirent.top();
-            OFString cur;
-            elt->getOFStringArray(cur);
-            if (cur == Patient) {
-                DcmElement* lelt;
-                if (lobj->findAndGetElement(DCM_PatientName, lelt).good()) {
-                    OFString strName;
-                    lelt->getOFStringArray(strName);
-                    proceed = (QString(strName.c_str()) == patientName);
-                }
-            }
-            if ((cur == Study) && proceed) {
-                DcmElement* lelt;
-                QMap<QString, QString> infosMap;
-                if (lobj->findAndGetElement(DCM_StudyInstanceUID, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    infosMap.insert("ID", QString(strID.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_StudyDescription, lelt).good()) {
-                    OFString strDescription;
-                    lelt->getOFStringArray(strDescription);
-                    infosMap.insert("Description", QString(strDescription.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_StudyDate, lelt).good()) {
-                    OFString strDate;
-                    lelt->getOFStringArray(strDate);
-                    infosMap.insert("Date", QString(strDate.c_str()));
-                }
-                d->signalManager->foundStudy(infosMap);
-            }
-            dirent.pop();
-        }
-        d->dicomdirItems.pop();
-    }
-    d->dicomdirItems.clear();
+    QtDcmFindDicomdir * finder = new QtDcmFindDicomdir(this);
+    finder->setDcmItem(d->dfile.getDataset());
+    finder->findStudies(patientName);
+    delete finder;
 }
 
 void
-QtDcmManager::findSeriesDicomdir(QString patientName, QString studyID)
+QtDcmManager::findSeriesDicomdir(QString patientName, QString studyDescription)
 {
     d->seriesToImport.clear();
-    bool proceed = false;
-    static const OFString Patient("PATIENT");
-    static const OFString Study("STUDY");
-    static const OFString Series("SERIES");
-    //    static const OFString Image("IMAGE");
 
-    // Loading all the dicomdir items in a stack
-    DcmStack itemsTmp;
-    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
-        return;
-
-    while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
-        d->dicomdirItems.push(itemsTmp.top());
-        itemsTmp.pop();
-    }
-
-    OFString strName;
-    OFString strDate;
-    //Unstacking and loading the different lists
-    while (d->dicomdirItems.card() > 0) {
-        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
-        DcmStack dirent;
-
-        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
-        if (!condition.good()) {
-            d->dicomdirItems.pop();
-            continue;
-        }
-        while (dirent.card()) {
-            DcmElement* elt = (DcmElement*) dirent.top();
-            OFString cur;
-            elt->getOFStringArray(cur);
-            if (cur == Patient) {
-                DcmElement* lelt;
-                if (lobj->findAndGetElement(DCM_PatientName, lelt).good())
-                    lelt->getOFStringArray(strName);
-            }
-            if (cur == Study) {
-                DcmElement* lelt;
-                if (lobj->findAndGetElement(DCM_StudyDescription, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    proceed = ((QString(strName.c_str()) == patientName) && (QString(strID.c_str()) == studyID));
-                }
-                if (lobj->findAndGetElement(DCM_StudyDate, lelt).good()) {
-                    lelt->getOFStringArray(strDate);
-                }
-            }
-            if ((cur == Series) && proceed) {
-                DcmElement* lelt;
-                QMap<QString, QString> infosMap;
-                if (lobj->findAndGetElement(DCM_SeriesInstanceUID, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    infosMap.insert("ID", QString(strID.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_SeriesDescription, lelt).good()) {
-                    OFString strDescription;
-                    lelt->getOFStringArray(strDescription);
-                    infosMap.insert("Description", QString(strDescription.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_Modality, lelt).good()) {
-                    OFString strModality;
-                    lelt->getOFStringArray(strModality);
-                    infosMap.insert("Modality", QString(strModality.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_InstitutionName, lelt).good()) {
-                    OFString strInstitution;
-                    lelt->getOFStringArray(strInstitution);
-                    infosMap.insert("Institution", QString(strInstitution.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_AcquisitionNumber, lelt).good()) {
-                    OFString strCount;
-                    lelt->getOFStringArray(strCount);
-                    infosMap.insert("InstanceCount", QString(strCount.c_str()));
-                }
-                if (lobj->findAndGetElement(DCM_PerformingPhysicianName, lelt).good()) {
-                    OFString strOperator;
-                    lelt->getOFStringArray(strOperator);
-                    infosMap.insert("Operator", QString(strOperator.c_str()));
-                }
-                infosMap.insert("Date", QString(strDate.c_str()));
-                d->signalManager->foundSerie(infosMap);
-            }
-            dirent.pop();
-        }
-        d->dicomdirItems.pop();
-    }
-    d->dicomdirItems.clear();
+    QtDcmFindDicomdir * finder = new QtDcmFindDicomdir(this);
+    finder->setDcmItem(d->dfile.getDataset());
+    finder->findSeries(patientName, studyDescription);
+    delete finder;
 }
 
 void
 QtDcmManager::findImagesDicomdir(QString uid)
 {
-    bool proceed = false;
-    static const OFString Patient("PATIENT");
-    static const OFString Study("STUDY");
-    static const OFString Series("SERIES");
-    static const OFString Image("IMAGE");
-
-    // Loading all the dicomdir items in a stack
-    DcmStack itemsTmp;
-    if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
-        return;
-
-    while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
-        d->dicomdirItems.push(itemsTmp.top());
-        itemsTmp.pop();
-    }
-
-    OFString strName;
-    OFString strDate;
-    //Unstacking and loading the different lists
-    while (d->dicomdirItems.card() > 0) {
-        DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
-        DcmStack dirent;
-
-        OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
-        if (!condition.good()) {
-            d->dicomdirItems.pop();
-            continue;
-        }
-        while (dirent.card()) {
-            DcmElement* elt = (DcmElement*) dirent.top();
-            OFString cur;
-            elt->getOFStringArray(cur);
-            if (cur == Series) {
-                DcmElement* lelt;
-                QMap<QString, QString> infosMap;
-                if (lobj->findAndGetElement(DCM_SeriesInstanceUID, lelt).good()) {
-                    OFString strID;
-                    lelt->getOFStringArray(strID);
-                    proceed = (QString(strID.c_str()) == uid);
-                }
-            }
-            if ((cur == Image) && proceed) {
-                DcmElement* lelt;
-                QMap<QString, QString> infosMapImage;
-                if (lobj->findAndGetElement(DCM_InstanceNumber, lelt).good()) {
-                    OFString strNumber;
-                    lelt->getOFStringArray(strNumber);
-                    infosMapImage.insert("InstanceCount", QString(strNumber.c_str()));
-                }
-                d->signalManager->foundImage(infosMapImage);
-            }
-            dirent.pop();
-        }
-        d->dicomdirItems.pop();
-    }
-    d->dicomdirItems.clear();
+    QtDcmFindDicomdir * finder = new QtDcmFindDicomdir(this);
+    finder->setDcmItem(d->dfile.getDataset());
+    finder->findImages(uid);
+    delete finder;
 }
+
+
+
+
 
 void
 QtDcmManager::createTemporaryDirs()
@@ -966,8 +671,6 @@ QtDcmManager::setDicomdir(QString dicomdir)
     if (!(status = d->dfile.loadFile(d->dicomdir.toUtf8().data())).good()) {
         return;
     }
-    //Get the dicomdir dataset in a DCMTK DcmObject
-    d->dcmObject = d->dfile.getDataset();
 }
 
 QString
@@ -992,6 +695,12 @@ void
 QtDcmManager::setPreferences(QtDcmPreferences * prefs)
 {
     d->preferences = prefs;
+}
+
+QtDcmServer *
+QtDcmManager::getCurrentPacs()
+{
+    return d->currentPacs;
 }
 
 void

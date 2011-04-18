@@ -158,9 +158,9 @@ QtDCM::serieItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
     if (current != 0) // Avoid crash when clearDisplay is called
     {
-        if (d->mode == QtDCM::PACS)
-            d->manager->findImagesScu(current->text(3));
-        else
+        if (d->mode == QtDCM::CD)
+//            d->manager->findImagesScu(current->text(3));
+//        else
             d->manager->findImagesDicomdir(current->text(3));
         elementCountLabel->setText(current->data(4, 0).toString());
         institutionLabel->setText(current->data(5, 0).toString());

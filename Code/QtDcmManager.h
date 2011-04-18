@@ -11,7 +11,9 @@
 #include <QtGui>
 #include <QtNetwork>
 
+class QtDcmServer;
 class QtDcmPreferences;
+class QtDcmFindScuSignalManager;
 class QtDcmManagerPrivate;
 
 /**
@@ -82,6 +84,15 @@ class QtDcmManager : public QObject
 
     void
     findImagesScu(QString uid);
+
+    void
+    foundPatient(QMap<QString, QString> infosMap);
+    void
+    foundStudy(QMap<QString, QString> infosMap);
+    void
+    foundSerie(QMap<QString, QString> infosMap);
+    void
+    foundImage(QMap<QString, QString> infosMap);
 
     void
     moveImagesScu(QString serieInstanceUID);
@@ -170,6 +181,10 @@ class QtDcmManager : public QObject
      */
     QtDcmPreferences *
     getPreferences();
+
+
+    QtDcmServer *
+    getCurrentPacs();
 
     /**
      * Set the pointer to the QtDcmPreferences instance

@@ -14,7 +14,7 @@
 struct T_DIMSE_C_FindRQ;
 struct T_DIMSE_C_FindRSP;
 class DcmDataset;
-class QtDcmFindScuSignalManager;
+class QtDcmManager;
 
 class QtDcmFindCallbackPrivate;
 
@@ -33,7 +33,7 @@ class QtDcmFindCallback : public DcmFindSCUCallback
         };
 
         void
-        setSignalManager(QtDcmFindScuSignalManager * manager);
+        setManager(QtDcmManager * manager);
 
         virtual void
         callback(T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers);
