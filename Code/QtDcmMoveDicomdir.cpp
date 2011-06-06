@@ -36,107 +36,125 @@
 
 #include <QtDcmManager.h>
 #include <QtDcmMoveDicomdir.h>
+#include <QtDcmConvert.h>
 
-class QtDcmMoveDicomdirPrivate
-{
-    public:
-        QtDcmManager * manager;
-        QString outputDir;
-        DcmItem * dcmObject;
-        DcmStack dicomdirItems;
-        QList<QString> filenames;
-        QList<QString> series;
+class QtDcmMoveDicomdirPrivate {
+public:
+    QtDcmManager * manager;
+    QtDcmConvert * converter;
+    QString outputDir;
+    QString importDir;
+    DcmItem * dcmObject;
+    DcmStack dicomdirItems;
+    QList<QString> filenames;
+    QList<QString> series;
 };
 
-QtDcmMoveDicomdir::QtDcmMoveDicomdir(QObject * parent) :
-    d(new QtDcmMoveDicomdirPrivate)
-{
-    d->manager = dynamic_cast<QtDcmManager *> (parent);
+QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) :
+        d ( new QtDcmMoveDicomdirPrivate ) {
+    d->manager = dynamic_cast<QtDcmManager *> ( parent );
+    d->converter = new QtDcmConvert ( this );
 }
 
-QtDcmMoveDicomdir::~QtDcmMoveDicomdir()
-{
+QtDcmMoveDicomdir::~QtDcmMoveDicomdir() {
 }
 
 void
-QtDcmMoveDicomdir::setDcmItem(DcmItem * item)
-{
+QtDcmMoveDicomdir::setDcmItem ( DcmItem * item ) {
     d->dcmObject = item;
 }
 
 void
-QtDcmMoveDicomdir::setSeries(QList<QString> series)
-{
+QtDcmMoveDicomdir::setSeries ( QList<QString> series ) {
     d->series = series;
 }
 
 void
-QtDcmMoveDicomdir::setOutputDir(QString dir)
-{
+QtDcmMoveDicomdir::setOutputDir ( QString dir ) {
     d->outputDir = dir;
 }
 
 void
-QtDcmMoveDicomdir::run()
-{
-    int step = (int)(100.0 / d->series.size());
+QtDcmMoveDicomdir::setImportDir ( QString dir ) {
+    d->importDir = dir;
+}
+
+void
+QtDcmMoveDicomdir::run() {
+    int step = ( int ) ( 100.0 / d->series.size() );
     int progress = 0;
-    for (int s = 0; s < d->series.size(); s++) {
-        QDir serieDir(d->outputDir + QDir::separator() + d->series.at(s));
-        if (!serieDir.exists())
-            QDir(d->outputDir).mkdir(d->series.at(s));
+    for ( int s = 0; s < d->series.size(); s++ ) {
+        QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( s ) );
+        if ( !serieDir.exists() )
+            QDir ( d->outputDir ).mkdir ( d->series.at ( s ) );
 
         d->filenames.clear();
         bool proceed = false;
-        static const OFString Patient("PATIENT");
-        static const OFString Study("STUDY");
-        static const OFString Series("SERIES");
-        static const OFString Image("IMAGE");
+        static const OFString Patient ( "PATIENT" );
+        static const OFString Study ( "STUDY" );
+        static const OFString Series ( "SERIES" );
+        static const OFString Image ( "IMAGE" );
 
         // Loading all the dicomdir items in a stack
         DcmStack itemsTmp;
-        if (!d->dcmObject->findAndGetElements(DCM_Item, itemsTmp).good())
+        if ( !d->dcmObject->findAndGetElements ( DCM_Item, itemsTmp ).good() )
             return;
 
-        while (itemsTmp.card() > 0) {
-            DcmItem * obj = (DcmItem*) itemsTmp.top();
-            d->dicomdirItems.push(itemsTmp.top());
+        while ( itemsTmp.card() > 0 ) {
+            d->dicomdirItems.push ( itemsTmp.top() );
             itemsTmp.pop();
         }
 
         OFString strName;
         OFString strDate;
+        OFString strDesc;
         //Unstacking and loading the different lists
-        while (d->dicomdirItems.card() > 0) {
-            DcmItem* lobj = (DcmItem*) d->dicomdirItems.top();
+        while ( d->dicomdirItems.card() > 0 ) {
+            DcmItem* lobj = ( DcmItem* ) d->dicomdirItems.top();
             DcmStack dirent;
 
-            OFCondition condition = lobj->findAndGetElements(DCM_DirectoryRecordType, dirent);
-            if (!condition.good()) {
+            OFCondition condition = lobj->findAndGetElements ( DCM_DirectoryRecordType, dirent );
+            if ( !condition.good() ) {
                 d->dicomdirItems.pop();
                 continue;
             }
-            while (dirent.card()) {
-                DcmElement* elt = (DcmElement*) dirent.top();
+            while ( dirent.card() ) {
+                DcmElement* elt = ( DcmElement* ) dirent.top();
                 OFString cur;
-                elt->getOFStringArray(cur);
-                if (cur == Series) {
+                elt->getOFStringArray ( cur );
+                if (cur ==Patient)
+                {
                     DcmElement* lelt;
-                    QMap<QString, QString> infosMap;
-                    if (lobj->findAndGetElement(DCM_SeriesInstanceUID, lelt).good()) {
+                    if ( lobj->findAndGetElement ( DCM_PatientName, lelt ).good() )
+                        lelt->getOFStringArray ( strName );
+                }
+                if (cur == Study)
+                {
+                    DcmElement* lelt;
+                    if ( lobj->findAndGetElement ( DCM_StudyDate, lelt ).good() )
+                        lelt->getOFStringArray ( strDate );
+                }
+                if ( cur == Series ) {
+                    DcmElement* lelt;
+                    if ( lobj->findAndGetElement ( DCM_SeriesInstanceUID, lelt ).good() ) {
                         OFString strID;
-                        lelt->getOFStringArray(strID);
-                        proceed = (QString(strID.c_str()) == d->series.at(s));
+                        lelt->getOFStringArray ( strID );
+                        proceed = ( QString ( strID.c_str() ) == d->series.at ( s ) );
+                    }
+                    if (proceed) {
+                        if ( lobj->findAndGetElement ( DCM_SeriesDescription, lelt ).good() )
+                            lelt->getOFStringArray ( strDesc );
                     }
                 }
-                if ((cur == Image) && proceed) {
+                if ( ( cur == Image ) && proceed ) {
                     DcmElement* lelt;
-                    QMap<QString, QString> infosMapImage;
-                    if (lobj->findAndGetElement(DCM_ReferencedFileID, lelt).good()) {
+                    if ( lobj->findAndGetElement ( DCM_ReferencedFileID, lelt ).good() ) {
                         OFString strFilename;
-                        lelt->getOFStringArray(strFilename);
-                        d->filenames.append(this->fixFilename(QString(strFilename.c_str())));
+                        lelt->getOFStringArray ( strFilename );
+                        d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
                     }
+                    if ( lobj->findAndGetElement ( DCM_SeriesDescription, lelt ).good() )
+                        lelt->getOFStringArray ( strDesc );
                 }
                 dirent.pop();
             }
@@ -144,27 +162,33 @@ QtDcmMoveDicomdir::run()
         }
         d->dicomdirItems.clear();
 
-        for (int i = 0; i < d->filenames.size(); i++) {
-            QFile image(d->filenames.at(i));
-            if (image.exists()) {
+        for ( int i = 0; i < d->filenames.size(); i++ ) {
+            QFile image ( d->filenames.at ( i ) );
+            if ( image.exists() ) {
                 QString zeroStr;
-                zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
-                image.copy(serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number(i));
-                emit updateProgress(progress + (int)(((float) (step * (i + 1) / d->filenames.size()))));
+                zeroStr.fill ( QChar ( '0' ), 5 - QString::number ( i ).size() );
+                image.copy ( serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number ( i ));
+                emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
             }
         }
+        qDebug() << QString(strDesc.c_str());
+        d->converter->setInputDirectory ( serieDir.absolutePath() );
+        d->converter->setOutputFilename( QString(strDate.c_str()).replace(" ", "_") + "_" + QString(strName.c_str()).replace(" ", "_").replace("^", "_") + "_" + QString(strDesc.c_str()).replace(" ", "_") + ".nii" );
+        d->converter->setOutputDirectory ( d->importDir );
+        d->converter->convert();
+
         progress += step;
     }
     exit();
 }
 
 QString
-QtDcmMoveDicomdir::fixFilename(QString name)
-{
-    QString basename = QFileInfo(d->manager->getDicomdir()).path();
-    name.replace(QChar('/'), QDir::separator()).replace(QChar('\\'), QDir::separator());
+QtDcmMoveDicomdir::fixFilename ( QString name ) {
+    QString basename = QFileInfo ( d->manager->getDicomdir() ).path();
+    name.replace ( QChar ( '/' ), QDir::separator() ).replace ( QChar ( '\\' ), QDir::separator() );
     QString filename = basename + QDir::separator() + name.toUpper();
-    if (!QFile(filename).exists())
+    if ( !QFile ( filename ).exists() )
         filename = basename + QDir::separator() + name.toLower();
     return filename;
 }
+// kate: indent-mode cstyle; space-indent on; indent-width 0; 

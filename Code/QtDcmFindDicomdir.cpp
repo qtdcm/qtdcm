@@ -77,7 +77,7 @@ QtDcmFindDicomdir::findPatients()
     }
 
     while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
+//         DcmItem * obj = (DcmItem*) itemsTmp.top();
         d->dicomdirItems.push(itemsTmp.top());
         itemsTmp.pop();
     }
@@ -141,7 +141,7 @@ QtDcmFindDicomdir::findStudies(QString patientName)
         return;
 
     while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
+//         DcmItem * obj = (DcmItem*) itemsTmp.top();
         d->dicomdirItems.push(itemsTmp.top());
         itemsTmp.pop();
     }
@@ -209,7 +209,7 @@ QtDcmFindDicomdir::findSeries(QString patientName, QString studyDescription)
         return;
 
     while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
+//         DcmItem * obj = (DcmItem*) itemsTmp.top();
         d->dicomdirItems.push(itemsTmp.top());
         itemsTmp.pop();
     }
@@ -304,7 +304,7 @@ QtDcmFindDicomdir::findImages(QString seriesUID)
         return;
 
     while (itemsTmp.card() > 0) {
-        DcmItem * obj = (DcmItem*) itemsTmp.top();
+//         DcmItem * obj = (DcmItem*) itemsTmp.top();
         d->dicomdirItems.push(itemsTmp.top());
         itemsTmp.pop();
     }

@@ -28,6 +28,9 @@ class QtDcmMoveDicomdir : public QThread
         setOutputDir(QString dir);
 
         void
+        setImportDir(QString dir);
+
+        void
         setSeries(QList<QString> series);
 
         void

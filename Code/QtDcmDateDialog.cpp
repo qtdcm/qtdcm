@@ -32,7 +32,7 @@ QtDcmDateDialog::initConnections()
 void
 QtDcmDateDialog::yearMonthChanged(int year, int month)
 {
-    int day = d->date.day();
+//     int day = d->date.day();
     d->date.setDate(year, month, d->date.day());
     calendarWidget->setSelectedDate(d->date);
 }

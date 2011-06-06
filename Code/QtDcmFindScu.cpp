@@ -78,8 +78,8 @@ QtDcmFindScu::findPatientsScu(QString patientName, QString patientSex)
     OFList<OFString> overrideKeys;
     overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "PATIENT" "")).toUtf8().data());
     overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-
-    //Patient level
+    
+    //Patient leqvel
     overrideKeys.push_back(QString("PatientID").toUtf8().data());
     overrideKeys.push_back(QString("PatientSex=" + patientSex).toUtf8().data());
     overrideKeys.push_back(QString("PatientBirthDate").toUtf8().data());
