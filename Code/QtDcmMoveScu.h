@@ -9,76 +9,154 @@
 #define QTDCMMOVESCU_H_
 
 #include <QtGui>
+#include "dcmtk/ofstd/ofstd.h"
+#include "dcmtk/ofstd/ofconapp.h"
+#include "dcmtk/dcmnet/dicom.h"
 #include "dcmtk/dcmnet/dimse.h"
+#include "dcmtk/dcmnet/diutil.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdict.h"
+#include "dcmtk/dcmdata/cmdlnarg.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
+#include "dcmtk/dcmdata/dcdicent.h"
+#include "dcmtk/dcmdata/dcostrmz.h"   /* for dcmZlibCompressionLevel */
 
-struct T_DIMSE_C_MOVERQ;
-struct T_DIMSE_C_MOVERSP;
-struct T_ASC_Network;
-struct T_ASC_Association;
-class DcmDataset;
+#define INCLUDE_CSTDLIB
+#define INCLUDE_CSTDIO
+#define INCLUDE_CSTRING
+#define INCLUDE_CSTDARG
+#define INCLUDE_CERRNO
+#define INCLUDE_CCTYPE
+#define INCLUDE_CSIGNAL
+
+#include <QtDcmConvert.h>
+
 class QtDcmMoveScuPrivate;
 
 class QtDcmMoveScu : public QThread
 {
-    Q_OBJECT
-    public:
-        QtDcmMoveScu(QObject * parent);
+     Q_OBJECT
+public:
+    QtDcmMoveScu(QObject * parent);
 
-        virtual
-        ~QtDcmMoveScu();
+    virtual
+    ~QtDcmMoveScu();
 
-        void
-        setOutputDir(QString dir);
+    void
+    setOutputDir(QString dir);
 
-        void
-        setSeries(QList<QString> series);
+    void
+    setImportDir(QString dir);
 
-        bool isAssociated();
+    void
+    setSeries(QList<QString> series);
 
-        bool isConnected();
+    void
+    run();
 
-        void
-        run();
+signals:
+    void
+    updateProgress(int i);
 
-    signals:
-        void
-        updateProgress(int i);
+protected:
+    typedef struct {
+        T_ASC_Association *assoc;
+        T_ASC_PresentationContextID presId;
+    } MyCallbackInfo;
 
-    private:
-        void
-        moveScu(QString uid);
+        typedef enum {
+        QMPatientRoot = 0,
+        QMStudyRoot = 1,
+        QMPatientStudyOnly = 2
+    } QueryModel;
 
-        void
-        addOverrideKey(QString key);
+    typedef struct {
+        const char *findSyntax;
+        const char *moveSyntax;
+    } QuerySyntax;
 
-        void
-        cmove();
+    OFCondition
+    move(QString uid);
 
-        void
-        acceptSubAssoc();
+    void
+    addOverrideKey(QString key);
 
-        void
-        storeSCP(T_DIMSE_Message * msg);
+    OFCondition
+    addPresentationContext(T_ASC_Parameters *params, T_ASC_PresentationContextID pid, const char* abstractSyntax, E_TransferSyntax preferredTransferSyntax);
 
-        void
-        storeSCPCallback(void *callbackData, char *imageFileName, DcmDataset **imageDataSet, DcmDataset **statusDetail);
+    OFCondition
+    cmove(T_ASC_Association * assoc, const char *fname);
 
-        void
-        subOpSCP();
+    static OFCondition
+    acceptSubAssoc(T_ASC_Network * aNet, T_ASC_Association ** assoc);
 
-        static void
-        subOpCallback(void * /*subOpCallbackData*/, T_ASC_Network *aNet, T_ASC_Association **subAssoc);
+    static OFCondition
+    echoSCP(T_ASC_Association * assoc, T_DIMSE_Message * msg, T_ASC_PresentationContextID presID);
 
-        static void
-        moveCallback(void *callbackData, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp);
+    static OFCondition
+    storeSCP(T_ASC_Association *assoc, T_DIMSE_Message *msg, T_ASC_PresentationContextID presID, void* subOpCallbackData);
 
-        void
-        substituteOverrideKeys(DcmDataset *dset);
+    static void
+    storeSCPCallback(void* callbackData, T_DIMSE_StoreProgress* progress, T_DIMSE_C_StoreRQ* req, char* imageFile, DcmDataset** imageDataSet, T_DIMSE_C_StoreRSP* rsp, DcmDataset** statusDetail);
 
-        void
-        moveSCU();
+    static OFCondition
+    subOpSCP(T_ASC_Association **subAssoc, void * subOpCallbackData);
 
-        QtDcmMoveScuPrivate * d;
+    static void
+    subOpCallback(void * /*subOpCallbackData*/, T_ASC_Network *aNet, T_ASC_Association **subAssoc);
+
+    static void
+    moveCallback(void *callbackData, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp);
+
+    void
+    substituteOverrideKeys(DcmDataset *dset);
+
+    OFCondition
+    moveSCU(T_ASC_Association * assoc, const char *fname);
+
+private:
+    QtDcmMoveScuPrivate * d;
+
+    //For dcmtk stuff
+    T_ASC_Network*        net;              /* the global DICOM network */
+    T_ASC_Parameters*     params;
+    T_ASC_PresentationContextID presId;
+    
+    DcmFileFormat*      file;
+    char*               imageFile;
+    T_ASC_Association*  assoc;
+
+    QueryModel queryModel;
+    T_DIMSE_BlockingMode  blockMode;
+    OFBool useMetaheader;
+    OFBool bitPreserving;
+    OFBool ignore;
+    E_TransferSyntax writeTransferSyntax;
+    OFBool correctUIDPadding;
+    E_GrpLenEncoding groupLength;
+    E_EncodingType sequenceType;
+    E_PaddingEncoding paddingType;
+    OFCmdUnsignedInt filepad;
+    OFCmdUnsignedInt itempad;
+    const char *moveDestination;
+    int dimseTimeout;
+    int acseTimeout;
+    OFCmdUnsignedInt maxPDU;
+    E_TransferSyntax networkTransferSyntax;
+    OFCmdUnsignedInt repeatCount;
+    OFBool abortAssociation;
+    OFCmdSignedInt cancelAfterNResponses;
+    OFBool ignorePendingDatasets;
+    OFBool useStoreSCP;
+
+    DcmDataset *overrideKeys;
+
+    
+    OFString outputDirectory;
 };
 
 #endif /* QTDCMMOVESCU_H_ */
+// kate: indent-mode cstyle; space-indent on; indent-width 0; 
