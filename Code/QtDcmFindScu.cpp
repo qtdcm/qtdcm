@@ -221,4 +221,30 @@ QtDcmFindScu::findImagesScu(QString seriesUID)
         d->manager->displayErrorMessage(tr("Cannot drop network"));
 }
 
+void
+QtDcmFindScu::findImageScu(QString seriesUID, QString instanceNumber)
+{
+    OFList<OFString> overrideKeys;
+    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGE" "")).toUtf8().data());
+    overrideKeys.push_back(QString("SeriesInstanceUID=" + seriesUID).toUtf8().data());
+    overrideKeys.push_back(QString("InstanceNumber=" + instanceNumber).toUtf8().data());
 
+    //Image level
+    overrideKeys.push_back(QString("SOPInstanceUID").toUtf8().data());
+
+    OFList<OFString> fileNameList;
+    OFString temp_str;
+    DcmFindSCU findscu;
+
+    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::IMAGE);
+    callback->setManager(d->manager);
+
+    if (findscu.initializeNetwork(30).bad())
+        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+
+    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
+        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+
+    if (findscu.dropNetwork().bad())
+        d->manager->displayErrorMessage(tr("Cannot drop network"));
+}

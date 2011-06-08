@@ -47,6 +47,9 @@ class QtDcmFindScu : public QObject
         void
         findImagesScu(QString seriesUID);
 
+        void
+        findImageScu(QString seriesUID, QString instanceNumber);
+
     private:
         QtDcmFindScuPrivate * d;
 };

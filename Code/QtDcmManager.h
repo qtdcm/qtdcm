@@ -98,6 +98,9 @@ class QtDcmManager : public QObject
         moveSelectedSeries();
 
         void
+        getPreviewFromSelectedSerie(QString uid, int elementCount);
+
+        void
         findPatientsDicomdir();
 
         void
@@ -383,13 +386,15 @@ class QtDcmManager : public QObject
         setQuery(QByteArray query);
 
         void
-        makePreview();
+        setPreviewImageUID(QString uid);
 
     public slots:
         void
         updateProgressBar(int i);
         void
         moveSeriesFinished();
+        void
+        makePreview(QString filename);
 
     private:
         QtDcmManagerPrivate *d;

@@ -48,15 +48,28 @@ public:
     DcmStack dicomdirItems;
     QList<QString> filenames;
     QList<QString> series;
+    QtDcmMoveDicomdir::mode mode;
+    int index;
 };
 
 QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) :
         d ( new QtDcmMoveDicomdirPrivate ) {
     d->manager = dynamic_cast<QtDcmManager *> ( parent );
     d->converter = new QtDcmConvert ( this );
+    d->mode = QtDcmMoveDicomdir::IMPORT;
 }
 
 QtDcmMoveDicomdir::~QtDcmMoveDicomdir() {
+}
+
+void QtDcmMoveDicomdir::setMode(QtDcmMoveDicomdir::mode mode)
+{
+    d->mode = mode;
+}
+
+QtDcmMoveDicomdir::mode QtDcmMoveDicomdir::getMode()
+{
+    return d->mode;
 }
 
 void
@@ -68,6 +81,12 @@ void
 QtDcmMoveDicomdir::setSeries ( QList<QString> series ) {
     d->series = series;
 }
+
+void QtDcmMoveDicomdir::setIndex(int index)
+{
+    d->index = index;
+}
+
 
 void
 QtDcmMoveDicomdir::setOutputDir ( QString dir ) {
@@ -90,6 +109,7 @@ QtDcmMoveDicomdir::run() {
 
         d->filenames.clear();
         bool proceed = false;
+        bool proceedIndex = false;
         static const OFString Patient ( "PATIENT" );
         static const OFString Study ( "STUDY" );
         static const OFString Series ( "SERIES" );
@@ -148,10 +168,23 @@ QtDcmMoveDicomdir::run() {
                 }
                 if ( ( cur == Image ) && proceed ) {
                     DcmElement* lelt;
+                    if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() ) {
+                        OFString strNumber;
+                        lelt->getOFStringArray ( strNumber );
+                        if (d->mode == QtDcmMoveDicomdir::PREVIEW)
+                            proceedIndex = (QString ( strNumber.c_str() ).toInt() == d->index);
+                    }
                     if ( lobj->findAndGetElement ( DCM_ReferencedFileID, lelt ).good() ) {
                         OFString strFilename;
                         lelt->getOFStringArray ( strFilename );
-                        d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
+                        if (d->mode == QtDcmMoveDicomdir::IMPORT)
+                            d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
+                        else
+                        {
+                            if (proceedIndex)
+                                d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
+                        }
+
                     }
                     if ( lobj->findAndGetElement ( DCM_SeriesDescription, lelt ).good() )
                         lelt->getOFStringArray ( strDesc );
@@ -162,22 +195,33 @@ QtDcmMoveDicomdir::run() {
         }
         d->dicomdirItems.clear();
 
-        for ( int i = 0; i < d->filenames.size(); i++ ) {
-            QFile image ( d->filenames.at ( i ) );
-            if ( image.exists() ) {
-                QString zeroStr;
-                zeroStr.fill ( QChar ( '0' ), 5 - QString::number ( i ).size() );
-                image.copy ( serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number ( i ));
-                emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
+        if (d->mode == QtDcmMoveDicomdir::IMPORT)
+        {
+            for ( int i = 0; i < d->filenames.size(); i++ ) {
+                QFile image ( d->filenames.at ( i ) );
+                if ( image.exists() ) {
+                    QString zeroStr;
+                    zeroStr.fill ( QChar ( '0' ), 5 - QString::number ( i ).size() );
+                    image.copy ( serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number ( i ));
+                    emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
+                }
+            }
+            qDebug() << QString(strDesc.c_str());
+            d->converter->setInputDirectory ( serieDir.absolutePath() );
+            d->converter->setOutputFilename( QString(strDate.c_str()).replace(" ", "_") + "_" + QString(strName.c_str()).replace(" ", "_").replace("^", "_") + "_" + QString(strDesc.c_str()).replace(" ", "_") + ".nii" );
+            d->converter->setOutputDirectory ( d->importDir );
+            d->converter->convert();
+
+            progress += step;
+        }
+        else
+        {
+            if (!d->filenames.isEmpty())
+            {
+                QFile filename (d->filenames.first());
+                emit previewSlice(filename.fileName());
             }
         }
-        qDebug() << QString(strDesc.c_str());
-        d->converter->setInputDirectory ( serieDir.absolutePath() );
-        d->converter->setOutputFilename( QString(strDate.c_str()).replace(" ", "_") + "_" + QString(strName.c_str()).replace(" ", "_").replace("^", "_") + "_" + QString(strDesc.c_str()).replace(" ", "_") + ".nii" );
-        d->converter->setOutputDirectory ( d->importDir );
-        d->converter->convert();
-
-        progress += step;
     }
     exit();
 }

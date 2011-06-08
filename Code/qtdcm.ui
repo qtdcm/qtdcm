@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>979</width>
-    <height>678</height>
+    <width>938</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -439,14 +439,14 @@
             <widget class="QLabel" name="imageLabel">
              <property name="minimumSize">
               <size>
-               <width>100</width>
-               <height>100</height>
+               <width>130</width>
+               <height>130</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>100</width>
-               <height>100</height>
+               <width>130</width>
+               <height>130</height>
               </size>
              </property>
              <property name="text">
@@ -563,6 +563,9 @@
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Expanding</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>

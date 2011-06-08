@@ -45,6 +45,19 @@ public:
     virtual
     ~QtDcmMoveScu();
 
+    enum mode
+    {
+        IMPORT, PREVIEW
+    };
+
+    void
+    setMode(mode mode);
+
+    QtDcmMoveScu::mode
+    getMode();
+
+    void setImageId(QString id);
+    
     void
     setOutputDir(QString dir);
 
@@ -60,6 +73,8 @@ public:
 signals:
     void
     updateProgress(int i);
+    void
+    previewSlice(QString filename);
 
 protected:
     typedef struct {
@@ -100,7 +115,7 @@ protected:
     storeSCP(T_ASC_Association *assoc, T_DIMSE_Message *msg, T_ASC_PresentationContextID presID, void* subOpCallbackData);
 
     static void
-    storeSCPCallback(void* callbackData, T_DIMSE_StoreProgress* progress, T_DIMSE_C_StoreRQ* req, char* imageFile, DcmDataset** imageDataSet, T_DIMSE_C_StoreRSP* rsp, DcmDataset** statusDetail);
+    storeSCPCallback(void* caller, T_DIMSE_StoreProgress* progress, T_DIMSE_C_StoreRQ* req, char* imageFile, DcmDataset** imageDataSet, T_DIMSE_C_StoreRSP* rsp, DcmDataset** statusDetail);
 
     static OFCondition
     subOpSCP(T_ASC_Association **subAssoc, void * subOpCallbackData);
@@ -109,7 +124,7 @@ protected:
     subOpCallback(void * /*subOpCallbackData*/, T_ASC_Network *aNet, T_ASC_Association **subAssoc);
 
     static void
-    moveCallback(void *callbackData, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp);
+    moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp);
 
     void
     substituteOverrideKeys(DcmDataset *dset);

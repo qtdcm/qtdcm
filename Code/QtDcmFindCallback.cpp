@@ -122,12 +122,11 @@ QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount, T_DI
         }
         break;
     case QtDcmFindCallback::IMAGE:
-//            responseIdentifiers->findAndGetOFString(DCM_InstanceNumber, info);
-//            infosMap.insert("InstanceCount", QString(info.c_str()));
+        responseIdentifiers->findAndGetOFString(DCM_SOPInstanceUID, info);
         if ( d->manager ) {
-            d->manager->foundImage ( infosMap );
+            d->manager->setPreviewImageUID(QString(info.c_str()));
         }
-//            responseIdentifiers->print(std::cout);
+        responseIdentifiers->print(std::cout);
         break;
     }
 }

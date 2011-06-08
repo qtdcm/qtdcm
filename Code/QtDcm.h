@@ -41,6 +41,12 @@ class QtDCM : public QLabel, public Ui::QtDCM
             return treeWidgetSeries;
         }
 
+        QLabel *
+        getPreviewLabel()
+        {
+            return imageLabel;
+        }
+
         enum mode
         {
             CD, PACS

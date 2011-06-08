@@ -21,7 +21,7 @@
 //#ifdef WITHd->ZLIB
 //#include <zlib.h>        /* for zlibVersion() */
 //#endif
-
+#include <QtDcm.h>
 #include <QtDcmPatient.h>
 #include <QtDcmStudy.h>
 #include <QtDcmSerie.h>
@@ -103,6 +103,7 @@ public:
     QtDcmExportThread * exportThread;
     QtDcmQueryThread * queryThread;
     QByteArray query;
+    QString previewImageUID;
 
     QtDcmServer * currentPacs;
 
@@ -157,7 +158,7 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) :
     d->serieDescription = "*";
     d->studyDescription = "*";
     d->preferences = new QtDcmPreferences();
-    d->parent = parent;
+    d->parent = dynamic_cast<QtDCM *> (parent);
 
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
@@ -293,6 +294,7 @@ QtDcmManager::foundSerie ( QMap<QString, QString> infosMap ) {
 
 void
 QtDcmManager::foundImage ( QMap<QString, QString> infosMap ) {
+//     QtDcmManager::foundImage ( QString uid) {
     if ( d->seriesTreeWidget ) {
         if ( infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data ( 4, 0 ).toInt() )
             d->seriesTreeWidget->currentItem()->setData ( 4, 0, QVariant ( infosMap["InstanceCount"] ) );
@@ -355,6 +357,7 @@ QtDcmManager::moveSelectedSeries() {
     qApp->processEvents();
     if ( d->mode == "CD" ) {
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
+        mover->setMode(QtDcmMoveDicomdir::IMPORT);
         mover->setDcmItem ( d->dfile.getDataset() );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setImportDir(d->outputDir);
@@ -371,6 +374,36 @@ QtDcmManager::moveSelectedSeries() {
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
         mover->start();
     }
+}
+
+void QtDcmManager::getPreviewFromSelectedSerie(QString uid, int elementIndex)
+{
+    if ( !d->tempDir.exists() )
+        return;
+    if ( d->mode == "CD" ) {
+        QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
+        mover->setMode(QtDcmMoveDicomdir::PREVIEW);
+        mover->setDcmItem ( d->dfile.getDataset() );
+        mover->setOutputDir ( d->tempDir.absolutePath() );
+        mover->setSeries ( QStringList() << uid );
+        mover->setIndex(elementIndex);
+        QObject::connect ( mover, SIGNAL ( previewSlice(QString) ), this, SLOT ( makePreview(QString) ) );
+        mover->start();
+    }
+    else
+    {
+        QtDcmFindScu * find = new QtDcmFindScu(this);
+        find->findImageScu(uid, QString::number(elementIndex));
+        delete find;
+        QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
+        mover->setMode(QtDcmMoveScu::PREVIEW);
+        mover->setOutputDir ( d->tempDir.absolutePath() );
+        mover->setSeries ( QStringList() << uid );
+        mover->setImageId(d->previewImageUID);
+        QObject::connect ( mover, SIGNAL ( previewSlice(QString) ), this, SLOT ( makePreview(QString) ) );
+        mover->start();
+    }
+    return;
 }
 
 void
@@ -450,120 +483,58 @@ QtDcmManager::deleteCurrentSerieDir() {
         qDebug() << tr ( "Probleme lors de la suppression du répertoire temporaire" );
 }
 
-//void
-//QtDcmManager::exportSeries()
-//{
-//    d->dcm2nii = d->preferences->getDcm2nii();
-//    if (d->outputDir == "")
-//        return;
-//
-//    if (!QFile(d->dcm2nii).exists()) {
-//        //message d'erreur !
-//        this->displayErrorMessage(tr("Impossible de trouver dcm2nii, verifiez votre installation"));
-//        return;
-//    }
-//
-//    if (d->mode == "CD")
-//        this->exportSerieFromCD();
-//    else {
-//        this->exportSerieFromPACS();
-//        while (d->exportThread->isRunning()) {
-//            qApp->processEvents();
-//        }
-//        d->progress->close();
-//        delete d->progress;
-//    }
-//
-//    QList<QString> series = d->seriesToExport.keys();
-//    for (int j = 0; j < series.size(); j++) {
-//        d->serieId = series.at(j);
-//        d->currentSerieDir = QDir(d->tempDir.absolutePath() + QDir::separator() + d->serieId);
-//        //Conversion de la serie avec dcm2nii
-//        QStringList arguments;
-//        arguments << "-s" << "N";
-//        arguments << "-x" << "N";
-//        arguments << "-r" << "N";
-//        arguments << "-g" << "N";
-//        arguments << "-o" << d->outputDir << d->currentSerieDir.absolutePath();
-//
-//        d->process = new QProcess(this);
-//        d->process->setStandardOutputFile(d->logsDir.absolutePath() + QDir::separator() + "log" + d->serieId + ".txt");
-//        d->process->start(d->dcm2nii, arguments);
-//        d->process->waitForFinished();
-//        //zeroStr.fill(QChar('0'), 5 - QString::number(i).size());
-//
-//        //this->deleteCurrentSerieDir();
-//        delete d->process;
-//    }
-//    this->displayMessage(tr("Import termine"));
-//}
-
 void
-QtDcmManager::makePreview() {
-    d->seriesToExport.insert ( d->serieId, d->images );
-    d->currentSerieDir = QDir ( d->tempDir.absolutePath() + QDir::separator() + d->serieId );
-
-    QStringList list = d->currentSerieDir.entryList ( QDir::Files, QDir::Name );
-    d->listImages.clear();
-
+QtDcmManager::makePreview(QString filename) {
     DcmRLEDecoderRegistration::registerCodecs ( OFFalse, OFFalse );
     DJDecoderRegistration::registerCodecs ( EDC_photometricInterpretation, EUC_default, EPC_default, OFFalse );
+    DcmFileFormat file;
+    file.loadFile ( filename.toLatin1().data() );
+    DcmDataset * dset = file.getDataset();
+    DicomImage* dcimage = new DicomImage ( dset, file.getDataset()->getOriginalXfer(), CIF_MayDetachPixelData );
 
-    for ( int i = 0; i < list.size(); i++ ) {
-        //        qApp->processEvents();
-        //QImage * current_image_ = NULL;
-        // get pixeldata
-        DcmFileFormat file;
-        file.loadFile ( ( d->currentSerieDir.absolutePath() + QDir::separator() + list.at ( i ) ).toLatin1().data() );
-        DcmDataset * dset = file.getDataset();
-        DicomImage* dcimage = new DicomImage ( dset, file.getDataset()->getOriginalXfer(), CIF_MayDetachPixelData );
+    dcimage->setNoDisplayFunction();
+    dcimage->hideAllOverlays();
+    dcimage->setNoVoiTransformation();
 
-        dcimage->setNoDisplayFunction();
-        dcimage->hideAllOverlays();
-        dcimage->setNoVoiTransformation();
-
-        //        DicomImage * dcimage = new DicomImage((d->currentSerieDir.absolutePath() + QDir::separator() + list.at(i)).toLatin1().data());
-        if ( dcimage != NULL ) {
-            if ( dcimage->getStatus() == EIS_Normal ) {
-                Uint32 *pixelData = ( Uint32 * ) ( dcimage->getOutputData ( 32 /* bits per sample */ ) );
-                if ( pixelData != NULL ) {
-                    Uint8 *colored = new Uint8[dcimage->getWidth() * dcimage->getHeight() * 4]; //4 * dcimage->getWidth() * dcimage->getHeight() matrix
-                    Uint8 *col = colored;
-                    Uint32 *p = pixelData;
-                    //get the highest values for RGBA, then use them to scale the pixel luminosity
-                    Uint32 p_max = 0;
-                    Uint32 p_min = std::numeric_limits<Uint32>::max();
-                    for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
-                        for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
-                            if ( *p > p_max )
-                                p_max = *p;
-                            if ( *p < p_min )
-                                p_min = *p;
-                        }
-                    double a = 4294967295.f / ( ( double ) p_max - ( double ) p_min );
-                    //re-initialize 'col'
-                    p = pixelData;
-                    //copy the pixels in our QImage
-                    for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
-                        for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
-                            *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
-                            ++col;
-                            *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
-                            ++col;
-                            *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
-                            ++col;
-                            *col = 255;
-                            ++col;
-                        }
-                    d->listImages.append ( QImage ( colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 ) );
-                }
-
+    //        DicomImage * dcimage = new DicomImage((d->currentSerieDir.absolutePath() + QDir::separator() + list.at(i)).toLatin1().data());
+    if ( dcimage != NULL ) {
+        if ( dcimage->getStatus() == EIS_Normal ) {
+            Uint32 *pixelData = ( Uint32 * ) ( dcimage->getOutputData ( 32 /* bits per sample */ ) );
+            if ( pixelData != NULL ) {
+                Uint8 *colored = new Uint8[dcimage->getWidth() * dcimage->getHeight() * 4]; //4 * dcimage->getWidth() * dcimage->getHeight() matrix
+                Uint8 *col = colored;
+                Uint32 *p = pixelData;
+                //get the highest values for RGBA, then use them to scale the pixel luminosity
+                Uint32 p_max = 0;
+                Uint32 p_min = std::numeric_limits<Uint32>::max();
+                for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
+                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
+                        if ( *p > p_max )
+                            p_max = *p;
+                        if ( *p < p_min )
+                            p_min = *p;
+                    }
+                double a = 4294967295.f / ( ( double ) p_max - ( double ) p_min );
+                //re-initialize 'col'
+                p = pixelData;
+                //copy the pixels in our QImage
+                for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
+                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
+                        *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
+                        ++col;
+                        *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
+                        ++col;
+                        *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
+                        ++col;
+                        *col = 255;
+                        ++col;
+                    }
+                QImage image(colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 );
+                dynamic_cast<QtDCM*>(d->parent)->getPreviewLabel()->setPixmap(QPixmap::fromImage(image.scaled(130,130), Qt::AutoColor));
             }
         }
     }
-    d->seriesToExport.clear();
 }
-
 // Getters and setters
 QString
 QtDcmManager::getDicomdir() const {
@@ -726,6 +697,11 @@ QtDcmManager::setQuery ( QByteArray query ) {
     d->query = query;
 }
 
+void QtDcmManager::setPreviewImageUID(QString uid)
+{
+    d->previewImageUID = uid;
+}
+
 void
 QtDcmManager::addSerieToImport ( QString uid ) {
     if ( !d->seriesToImport.contains ( uid ) )
@@ -747,4 +723,4 @@ int
 QtDcmManager::seriesToImportSize() {
     return d->seriesToImport.size();
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 0; 

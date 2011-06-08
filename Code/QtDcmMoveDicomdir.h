@@ -16,35 +16,52 @@ class QtDcmMoveDicomdirPrivate;
 class QtDcmMoveDicomdir : public QThread
 {
     Q_OBJECT
-    public:
-        QtDcmMoveDicomdir(QObject * parent);
-        virtual
-        ~QtDcmMoveDicomdir();
+public:
+    QtDcmMoveDicomdir(QObject * parent);
+    virtual
+    ~QtDcmMoveDicomdir();
 
-        void
-        setDcmItem(DcmItem * item);
+    enum mode
+    {
+        IMPORT, PREVIEW
+    };
 
-        void
-        setOutputDir(QString dir);
+    void
+    setMode(mode mode);
 
-        void
-        setImportDir(QString dir);
+    QtDcmMoveDicomdir::mode
+    getMode();
 
-        void
-        setSeries(QList<QString> series);
+    void
+    setDcmItem(DcmItem * item);
 
-        void
-        run();
+    void
+    setOutputDir(QString dir);
 
-    signals:
-        void
-        updateProgress(int i);
+    void
+    setImportDir(QString dir);
 
-    private:
-        QString
-        fixFilename(QString name);
+    void
+    setSeries(QList<QString> series);
 
-        QtDcmMoveDicomdirPrivate * d;
+    void
+    setIndex(int index);
+
+    void
+    run();
+
+signals:
+    void
+    updateProgress(int i);
+    void
+    previewSlice(QString filename);
+
+private:
+    QString
+    fixFilename(QString name);
+
+    QtDcmMoveDicomdirPrivate * d;
 };
 
 #endif /* QTDCMMOVEDICOMDIR_H_ */
+// kate: indent-mode cstyle; space-indent on; indent-width 0; 

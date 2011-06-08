@@ -57,6 +57,9 @@ public:
     QString outputDir;
     QString importDir;
     QString currentSerie;
+
+    QtDcmMoveScu::mode mode;
+    QString imageId;
 };
 
 QtDcmMoveScu::QtDcmMoveScu(QObject * parent) :
@@ -92,10 +95,27 @@ QtDcmMoveScu::QtDcmMoveScu(QObject * parent) :
     useStoreSCP = true;
     overrideKeys = NULL;
     blockMode = DIMSE_BLOCKING;
+
+    d->mode = QtDcmMoveScu::IMPORT;
 }
 
 QtDcmMoveScu::~QtDcmMoveScu()
 {
+}
+
+void QtDcmMoveScu::setMode(QtDcmMoveScu::mode mode)
+{
+    d->mode = mode;
+}
+
+QtDcmMoveScu::mode QtDcmMoveScu::getMode()
+{
+    return d->mode;
+}
+
+void QtDcmMoveScu::setImageId(QString id)
+{
+    d->imageId = id;
 }
 
 void
@@ -127,15 +147,21 @@ QtDcmMoveScu::run()
         if (!serieDir.exists())
             QDir(d->outputDir).mkdir(d->series.at(i));
         outputDirectory = QString(d->outputDir + QDir::separator() + d->currentSerie).toUtf8().constData();
-        cond = this->move(d->series.at(i));
 
-        d->converter->setInputDirectory ( serieDir.absolutePath() );
-        d->converter->setOutputFilename( d->series.at(i) + ".nii" );
-        d->converter->setOutputDirectory ( d->importDir );
-        d->converter->convert();
-        emit updateProgress((int) (100.0 * (i+1) / d->series.size()));
+        if (d->mode == IMPORT)
+        {
+            cond = this->move(d->series.at(i));
+            //Test if files are present (avoir crash of the application)
+            d->converter->setInputDirectory ( serieDir.absolutePath() );
+            d->converter->setOutputFilename( d->series.at(i) + ".nii" );
+            d->converter->setOutputDirectory ( d->importDir );
+            d->converter->convert();
+            emit updateProgress((int) (100.0 * (i+1) / d->series.size()));
 
-        progressTotal += step;
+            progressTotal += step;
+        }
+        else
+            cond = this->move(d->imageId);
     }
     exit();
 }
@@ -158,9 +184,17 @@ QtDcmMoveScu::move(QString uid)
     };
 
     OFCondition cond;
-    this->addOverrideKey(QString("QueryRetrieveLevel=") + QString("" "SERIES" ""));
-    this->addOverrideKey(QString("SeriesInstanceUID=" + uid));
 
+    if (d->mode == IMPORT)
+    {
+        this->addOverrideKey(QString("QueryRetrieveLevel=") + QString("" "SERIES" ""));
+        this->addOverrideKey(QString("SeriesInstanceUID=" + uid));
+    }
+    else
+    {
+        this->addOverrideKey(QString("QueryRetrieveLevel=") + QString("" "IMAGE" ""));
+        this->addOverrideKey(QString("SOPInstanceUID=" + uid));
+    }
     cond = ASC_initializeNetwork(NET_ACCEPTORREQUESTOR, d->manager->getPreferences()->getPort().toInt(), acseTimeout, &net);
 
     if (cond.bad()) {
@@ -654,6 +688,9 @@ QtDcmMoveScu::storeSCPCallback(void *callbackData, T_DIMSE_StoreProgress *progre
                                                     self->paddingType, OFstatic_cast(Uint32, self->filepad), OFstatic_cast(Uint32, self->itempad),
                                                     (self->useMetaheader) ? EWM_fileformat : EWM_dataset);
 
+            if (QFile(ofname.c_str()).exists())
+                emit self->previewSlice(QString(ofname.c_str()));
+
             if ((rsp->DimseStatus == STATUS_Success) && !self->ignore)
             {
                 /* which SOP class and SOP instance ? */
@@ -735,7 +772,7 @@ QtDcmMoveScu::subOpCallback(void * caller, T_ASC_Network *aNet, T_ASC_Associatio
 
     QtDcmMoveScu * self = (QtDcmMoveScu*) caller;
     emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
-    
+
     if (aNet == NULL) return;   /* help no net ! */
 
     if (*subAssoc == NULL) {
@@ -750,7 +787,7 @@ QtDcmMoveScu::subOpCallback(void * caller, T_ASC_Network *aNet, T_ASC_Associatio
 
 void
 QtDcmMoveScu::moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp)
-{   
+{
     if (!caller)
         return;
 
@@ -758,7 +795,7 @@ QtDcmMoveScu::moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCou
 
     self->progressSerie = 0;
     self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
-    
+
     OFCondition cond = EC_Normal;
     OFString temp_str;
     DIMSE_dumpMessage(temp_str, *rsp, DIMSE_INCOMING);
@@ -837,19 +874,9 @@ QtDcmMoveScu::moveSCU(T_ASC_Association * assoc, const char *fname)
 
     OFCondition cond;
     if (useStoreSCP)
-    {
-        cond = DIMSE_moveUser(assoc, presId, &req, file.getDataset(),
-                              moveCallback, (void*) this, blockMode,
-                              dimseTimeout, net, subOpCallback,
-                              (void*) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets);
-    }
+        cond = DIMSE_moveUser(assoc, presId, &req, file.getDataset(), moveCallback, (void*) this, blockMode, dimseTimeout, net, subOpCallback, (void*) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets);
     else
-    {
-        cond = DIMSE_moveUser(assoc, presId, &req, file.getDataset(),
-                              moveCallback, (void*) this, blockMode,
-                              dimseTimeout, net, NULL,
-                              (void*) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets);
-    }
+        cond = DIMSE_moveUser(assoc, presId, &req, file.getDataset(), moveCallback, (void*) this, blockMode, dimseTimeout, net, NULL, (void*) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets);
 
     if (rspIds != NULL) delete rspIds;
 

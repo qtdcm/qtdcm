@@ -150,12 +150,13 @@ void
 QtDCM::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous ) {
     if ( current != 0 ) { // Avoid crash when clearDisplay is called
         if ( d->mode == QtDCM::CD )
-//            d->manager->findImagesScu(current->text(3));
-//        else
             d->manager->findImagesDicomdir ( current->text ( 3 ) );
         elementCountLabel->setText ( current->data ( 4, 0 ).toString() );
         institutionLabel->setText ( current->data ( 5, 0 ).toString() );
         operatorLabel->setText ( current->data ( 6, 0 ).toString() );
+        int elementCount = elementCountLabel->text().toInt();
+        imageLabel->setPixmap(NULL);
+        d->manager->getPreviewFromSelectedSerie(current->text(3), elementCount / 2);
     }
     detailsFrame->show();
 }
@@ -378,7 +379,7 @@ QtDCM::showPreview() {
     if ( d->manager->getMode() == "CD" )
         d->manager->setImagesList ( d->imagesList );
     d->manager->setSerieId ( d->currentSerieId );
-    d->manager->makePreview();
+//     d->manager->makePreview();
     dialog->setImages ( d->manager->getListImages() );
     dialog->updatePreview();
     dialog->exec();
