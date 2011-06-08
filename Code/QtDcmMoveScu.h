@@ -123,11 +123,11 @@ private:
     //For dcmtk stuff
     T_ASC_Network*        net;              /* the global DICOM network */
     T_ASC_Parameters*     params;
+    T_ASC_Association*  assoc;
     T_ASC_PresentationContextID presId;
     
     DcmFileFormat*      file;
     char*               imageFile;
-    T_ASC_Association*  assoc;
 
     QueryModel queryModel;
     T_DIMSE_BlockingMode  blockMode;
@@ -151,11 +151,13 @@ private:
     OFCmdSignedInt cancelAfterNResponses;
     OFBool ignorePendingDatasets;
     OFBool useStoreSCP;
-
     DcmDataset *overrideKeys;
-
-    
     OFString outputDirectory;
+
+    int slicesCount;
+    int progressTotal;
+    int progressSerie;
+    int step;
 };
 
 #endif /* QTDCMMOVESCU_H_ */

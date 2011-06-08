@@ -64,7 +64,10 @@ QtDcmMoveScu::QtDcmMoveScu(QObject * parent) :
 {
     d->manager = dynamic_cast<QtDcmManager *> (parent);
     d->converter = new QtDcmConvert(this);
-    
+    progressTotal = 0;
+    progressSerie = 0;
+    step = 0;
+
     maxPDU = ASC_DEFAULTMAXPDU;
     useMetaheader = OFTrue;
     networkTransferSyntax = EXS_Unknown;
@@ -116,8 +119,8 @@ void
 QtDcmMoveScu::run()
 {
     OFCondition cond;
-//     int step = (int) (100.0 / d->series.size());
-//     int progress = 0;
+    step = (int) (100.0 / d->series.size());
+    progressTotal = 0;
     for (int i = 0; i < d->series.size(); i++) {
         d->currentSerie = d->series.at(i);
         QDir serieDir(d->outputDir + QDir::separator() + d->series.at(i));
@@ -131,6 +134,8 @@ QtDcmMoveScu::run()
         d->converter->setOutputDirectory ( d->importDir );
         d->converter->convert();
         emit updateProgress((int) (100.0 * (i+1) / d->series.size()));
+
+        progressTotal += step;
     }
     exit();
 }
@@ -145,7 +150,7 @@ QtDcmMoveScu::move(QString uid)
 
     QuerySyntax querySyntax[3] =  {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-          UID_MOVEPatientRootQueryRetrieveInformationModel },
+            UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
@@ -153,7 +158,6 @@ QtDcmMoveScu::move(QString uid)
     };
 
     OFCondition cond;
-//     this->addOverrideKey(QString("QueryRetrieveLevel=") + QString("" "SERIES" ""));
     this->addOverrideKey(QString("QueryRetrieveLevel=") + QString("" "SERIES" ""));
     this->addOverrideKey(QString("SeriesInstanceUID=" + uid));
 
@@ -221,7 +225,7 @@ QtDcmMoveScu::move(QString uid)
         } else {
             /* release association */
             qDebug() << "Releasing Association";
-            cond = ASC_releaseAssociation(assoc);
+//             cond = ASC_releaseAssociation(assoc); //Problem with error message Illegal Key
             ASC_dropNetwork(&net);
             if (cond.bad())
             {
@@ -729,6 +733,9 @@ QtDcmMoveScu::subOpCallback(void * caller, T_ASC_Network *aNet, T_ASC_Associatio
     if (!caller)
         return;
 
+    QtDcmMoveScu * self = (QtDcmMoveScu*) caller;
+    emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
+    
     if (aNet == NULL) return;   /* help no net ! */
 
     if (*subAssoc == NULL) {
@@ -738,16 +745,20 @@ QtDcmMoveScu::subOpCallback(void * caller, T_ASC_Network *aNet, T_ASC_Associatio
         /* be a service class provider */
         subOpSCP(subAssoc, caller);
     }
+    self->progressSerie ++;
 }
 
 void
-QtDcmMoveScu::moveCallback(void *callbackData, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp)
-{
-
-    if (!callbackData)
+QtDcmMoveScu::moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp)
+{   
+    if (!caller)
         return;
 
-//     qDebug() << rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
+    QtDcmMoveScu * self = (QtDcmMoveScu*) caller;
+
+    self->progressSerie = 0;
+    self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
+    
     OFCondition cond = EC_Normal;
     OFString temp_str;
     DIMSE_dumpMessage(temp_str, *rsp, DIMSE_INCOMING);
@@ -786,7 +797,7 @@ QtDcmMoveScu::moveSCU(T_ASC_Association * assoc, const char *fname)
 
     QuerySyntax querySyntax[3] =  {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-          UID_MOVEPatientRootQueryRetrieveInformationModel },
+            UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
