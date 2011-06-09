@@ -11,6 +11,7 @@
 #include <QtGui>
 
 class QtDcmSerie;
+
 class QtDcmImagePrivate;
 
 /**
@@ -18,13 +19,15 @@ class QtDcmImagePrivate;
  * There is also a pointer to the parent serie (not used for the moment)
  *
  */
-class QtDcmImage : public QObject
-  {
-  Q_OBJECT
-  private:
-      QtDcmImagePrivate * d;
 
-  public:
+class QtDcmImage : public QObject
+{
+    Q_OBJECT
+
+private:
+    QtDcmImagePrivate * d;
+
+public:
     /**
      * Default constructor
      */
@@ -33,39 +36,34 @@ class QtDcmImage : public QObject
     /**
      * Default destructor
      */
-    virtual
-    ~QtDcmImage() {};
+    virtual ~QtDcmImage() {};
 
     /**
      * Id getter
      *
      * @return _id
      */
-    QString
-    getId();
+    QString getId();
     /**
      * Id setter
      *
      * @param id a QString
      */
-    void
-    setId( QString id );
+    void setId ( QString id );
 
     /**
      * Image filename getter
      *
      * @return _filename
      */
-    QString
-    getFilename();
+    QString getFilename();
 
     /**
      * Image filename setter
      *
      * @param filename a QString containing absolute path
      */
-    void
-    setFilename( QString filename );
+    void setFilename ( QString filename );
 
     /**
      * Parent serie getter
@@ -73,8 +71,7 @@ class QtDcmImage : public QObject
      * @return _p_serie the pointer on the parent serie object
      * @see QtDcmSerie
      */
-    QtDcmSerie *
-    getSerie();
+    QtDcmSerie * getSerie();
 
     /**
      * Parent serie setter
@@ -82,9 +79,7 @@ class QtDcmImage : public QObject
      * @param serie a pointer on the parent serie object
      * @see QtDcmSerie
      */
-    void
-    setSerie( QtDcmSerie * serie );
-
-  };
+    void setSerie ( QtDcmSerie * serie );
+};
 
 #endif /* QTDCMIMAGE_H_ */

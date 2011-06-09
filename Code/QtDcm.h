@@ -5,6 +5,7 @@
 #include <QtGui>
 
 class QtDcmPrivate;
+
 class QtDcmManager;
 
 /**
@@ -12,179 +13,152 @@ class QtDcmManager;
  * the content of a DICOMDIR. It is also possible to query and retrieve data from a PACS.
  * Once read/retrieve, each serie can be reconstructed, using the QtDcmManager.
  */
+
 class QtDCM : public QLabel, public Ui::QtDCM
 {
     Q_OBJECT
-    public:
-        QtDCM(QWidget *parent = 0); /** Classic constructor */
-        ~QtDCM();
-        /**
-         * Get the pointer of the treewidget
-         *
-         * @return the pointer on the QTreeWidget
-         */
-        QTreeView *
-        getPatientsTreeView()
-        {
-            return treeWidgetPatients;
-        }
 
-        QTreeView *
-        getStudiesTreeView()
-        {
-            return treeWidgetStudies;
-        }
+public:
+    QtDCM ( QWidget *parent = 0 ); /** Classic constructor */
+    ~QtDCM();
+    /**
+     * Get the pointer of the treewidget
+     *
+     * @return the pointer on the QTreeWidget
+     */
+    QTreeView * getPatientsTreeView()
+    {
+        return treeWidgetPatients;
+    }
 
-        QTreeView *
-        getSeriesTreeView()
-        {
-            return treeWidgetSeries;
-        }
+    QTreeView * getStudiesTreeView()
+    {
+        return treeWidgetStudies;
+    }
 
-        QLabel *
-        getPreviewLabel()
-        {
-            return imageLabel;
-        }
+    QTreeView * getSeriesTreeView()
+    {
+        return treeWidgetSeries;
+    }
 
-        enum mode
-        {
-            CD, PACS
-        };
+    QLabel * getPreviewLabel()
+    {
+        return imageLabel;
+    }
 
-        /**
-         * Get the pointer of the QtDcm manager
-         *
-         * @return Pointer on QtDcmManager
-         */
-        QtDcmManager *
-        getManager();
+    enum mode
+    {
+        CD, PACS
+    };
 
-        /**
-         * Clear the content of the QTreeWidget
-         */
-        void
-        clearDisplay();
+    /**
+     * Get the pointer of the QtDcm manager
+     *
+     * @return Pointer on QtDcmManager
+     */
+    QtDcmManager * getManager();
 
-        /**
-         * Initialize SIGNAL/SLOTS connections of the different widget
-         *
-         */
-        void
-        initConnections();
+    /**
+     * Clear the content of the QTreeWidget
+     */
+    void clearDisplay();
 
-        void
-        importToDirectory(QString directory);
+    /**
+     * Initialize SIGNAL/SLOTS connections of the different widget
+     *
+     */
+    void initConnections();
 
-    public slots:
-        void
-        findSCU();
+    void importToDirectory ( QString directory );
 
-        /**
-         * Slot that change the modality parameter of the query
-         *
-         */
-        void
-        updateModality(int index);
+public slots:
+    void findSCU();
 
-        void
-        updateSex(int index);
+    /**
+     * Slot that change the modality parameter of the query
+     *
+     */
+    void updateModality ( int index );
 
-        void
-        updatePACS(int index);
+    void updateSex ( int index );
 
-        /**
-         * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
-         *
-         */
-        void
-        startDateChanged(QDate date);
+    void updatePACS ( int index );
 
-        /**
-         * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
-         *
-         */
-        void
-        endDateChanged(QDate date);
+    /**
+     * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
+     *
+     */
+    void startDateChanged ( QDate date );
 
-        void
-        patientItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    /**
+     * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
+     *
+     */
+    void endDateChanged ( QDate date );
 
-        void
-        studyItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    void patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
 
-        void
-        serieItemSelected(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    void studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
 
-        void
-        serieItemClicked(QTreeWidgetItem* current, int);
+    void serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
 
-        /**
-         * Slot that launch a QFileDialog for choosing an output directory
-         * where the current serie will be exported with dcm2nii (This is done by the _manager).
-         *
-         */
-        //        void
-        //        exportList();
+    void serieItemClicked ( QTreeWidgetItem* current, int );
 
-        void
-        importSelectedSeries();
+    /**
+     * Slot that launch a QFileDialog for choosing an output directory
+     * where the current serie will be exported with dcm2nii (This is done by the _manager).
+     *
+     */
+    //        void
+    //        exportList();
 
-        /**
-         * Slot that query the list of server with the user specified parameters
-         */
-        void
-        queryPACS();
+    void importSelectedSeries();
 
-        /**
-         * Slot that launch a QFileDialog for choosing a dicomdir
-         *
-         *
-         */
-        void
-        openDicomdir();
+    /**
+     * Slot that query the list of server with the user specified parameters
+     */
+    void queryPACS();
 
-        void
-        loadPatientsFromDicomdir();
+    /**
+     * Slot that launch a QFileDialog for choosing a dicomdir
+     *
+     *
+     */
+    void openDicomdir();
 
-        /**
-         * Slot that launch the PACS preferences dialog
-         *
-         */
-        void
-        editPreferences();
+    void loadPatientsFromDicomdir();
 
-        /**
-         * Slot called when user modify patient name edit line
-         */
-        void
-        patientNameTextChanged(QString);
+    /**
+     * Slot that launch the PACS preferences dialog
+     *
+     */
+    void editPreferences();
 
-        /**
-         * Slot called when user modify serie description edit line
-         */
-        void
-        serieDescriptionTextChanged(QString);
+    /**
+     * Slot called when user modify patient name edit line
+     */
+    void patientNameTextChanged ( QString );
 
-        /**
-         * Slot called when user modify study description edit line
-         */
-        void
-        studyDescriptionTextChanged(QString);
+    /**
+     * Slot called when user modify serie description edit line
+     */
+    void serieDescriptionTextChanged ( QString );
 
-        void
-        showPreview();
+    /**
+     * Slot called when user modify study description edit line
+     */
+    void studyDescriptionTextChanged ( QString );
 
-    signals:
-        void
-        serieChecked(bool checked);
-        void
-        serieSelected(bool selected);
+    void showPreview();
 
-    private:
-        void
-        updatePacsComboBox();
-        QtDcmPrivate *d;
+signals:
+    void serieChecked ( bool checked );
+    void serieSelected ( bool selected );
+
+private:
+    void updatePacsComboBox();
+
+    QtDcmPrivate *d;
 };
 
 #endif

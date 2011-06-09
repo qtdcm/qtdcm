@@ -38,99 +38,82 @@ class QtDcmMoveScuPrivate;
 
 class QtDcmMoveScu : public QThread
 {
-     Q_OBJECT
-public:
-    QtDcmMoveScu(QObject * parent);
+    Q_OBJECT
 
-    virtual
-    ~QtDcmMoveScu();
+public:
+    QtDcmMoveScu ( QObject * parent );
+
+    virtual ~QtDcmMoveScu();
 
     enum mode
     {
         IMPORT, PREVIEW
     };
 
-    void
-    setMode(mode mode);
+    void setMode ( mode mode );
 
-    QtDcmMoveScu::mode
-    getMode();
+    QtDcmMoveScu::mode getMode();
 
-    void setImageId(QString id);
-    
-    void
-    setOutputDir(QString dir);
+    void setImageId ( QString id );
 
-    void
-    setImportDir(QString dir);
+    void setOutputDir ( QString dir );
 
-    void
-    setSeries(QList<QString> series);
+    void setImportDir ( QString dir );
 
-    void
-    run();
+    void setSeries ( QList<QString> series );
+
+    void run();
 
 signals:
-    void
-    updateProgress(int i);
-    void
-    previewSlice(QString filename);
+    void updateProgress ( int i );
+    void previewSlice ( QString filename );
 
 protected:
-    typedef struct {
+
+    typedef struct
+    {
         T_ASC_Association *assoc;
         T_ASC_PresentationContextID presId;
     } MyCallbackInfo;
 
-        typedef enum {
+    typedef enum
+    {
         QMPatientRoot = 0,
         QMStudyRoot = 1,
         QMPatientStudyOnly = 2
     } QueryModel;
 
-    typedef struct {
+    typedef struct
+    {
         const char *findSyntax;
         const char *moveSyntax;
     } QuerySyntax;
 
-    OFCondition
-    move(QString uid);
+    OFCondition move ( QString uid );
 
-    void
-    addOverrideKey(QString key);
+    void addOverrideKey ( QString key );
 
-    OFCondition
-    addPresentationContext(T_ASC_Parameters *params, T_ASC_PresentationContextID pid, const char* abstractSyntax, E_TransferSyntax preferredTransferSyntax);
+    OFCondition addPresentationContext ( T_ASC_Parameters *params, T_ASC_PresentationContextID pid, const char* abstractSyntax, E_TransferSyntax preferredTransferSyntax );
 
-    OFCondition
-    cmove(T_ASC_Association * assoc, const char *fname);
+    OFCondition cmove ( T_ASC_Association * assoc, const char *fname );
 
-    static OFCondition
-    acceptSubAssoc(T_ASC_Network * aNet, T_ASC_Association ** assoc);
+    static OFCondition acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Association ** assoc );
 
-    static OFCondition
-    echoSCP(T_ASC_Association * assoc, T_DIMSE_Message * msg, T_ASC_PresentationContextID presID);
+    static OFCondition echoSCP ( T_ASC_Association * assoc, T_DIMSE_Message * msg, T_ASC_PresentationContextID presID );
 
-    static OFCondition
-    storeSCP(T_ASC_Association *assoc, T_DIMSE_Message *msg, T_ASC_PresentationContextID presID, void* subOpCallbackData);
+    static OFCondition storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *msg, T_ASC_PresentationContextID presID, void* subOpCallbackData );
 
-    static void
-    storeSCPCallback(void* caller, T_DIMSE_StoreProgress* progress, T_DIMSE_C_StoreRQ* req, char* imageFile, DcmDataset** imageDataSet, T_DIMSE_C_StoreRSP* rsp, DcmDataset** statusDetail);
+    static void storeSCPCallback ( void* caller, T_DIMSE_StoreProgress* progress, T_DIMSE_C_StoreRQ* req, char* imageFile, DcmDataset** imageDataSet, T_DIMSE_C_StoreRSP* rsp, DcmDataset** statusDetail );
 
-    static OFCondition
-    subOpSCP(T_ASC_Association **subAssoc, void * subOpCallbackData);
+    static OFCondition subOpSCP ( T_ASC_Association **subAssoc, void * subOpCallbackData );
 
-    static void
-    subOpCallback(void * /*subOpCallbackData*/, T_ASC_Network *aNet, T_ASC_Association **subAssoc);
+    static void subOpCallback ( void * /*subOpCallbackData*/, T_ASC_Network *aNet, T_ASC_Association **subAssoc );
 
-    static void
-    moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp);
+    static void moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp );
 
-    void
-    substituteOverrideKeys(DcmDataset *dset);
+    void substituteOverrideKeys ( DcmDataset *dset );
 
-    OFCondition
-    moveSCU(T_ASC_Association * assoc, const char *fname);
+    OFCondition moveSCU ( T_ASC_Association * assoc, const char *fname );
 
 private:
     QtDcmMoveScuPrivate * d;
@@ -140,7 +123,7 @@ private:
     T_ASC_Parameters*     params;
     T_ASC_Association*  assoc;
     T_ASC_PresentationContextID presId;
-    
+
     DcmFileFormat*      file;
     char*               imageFile;
 
@@ -176,4 +159,4 @@ private:
 };
 
 #endif /* QTDCMMOVESCU_H_ */
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 
+// kate: indent-mode cstyle; space-indent on; indent-width 0;

@@ -12,34 +12,35 @@
 #include "dcmtk/dcmnet/dfindscu.h"
 
 struct T_DIMSE_C_FindRQ;
+
 struct T_DIMSE_C_FindRSP;
+
 class DcmDataset;
+
 class QtDcmManager;
 
 class QtDcmFindCallbackPrivate;
 
 class QtDcmFindCallback : public DcmFindSCUCallback
 {
-    public:
-        QtDcmFindCallback();
-        QtDcmFindCallback(int type);
 
-        virtual
-        ~QtDcmFindCallback() {};
+public:
+    QtDcmFindCallback();
+    QtDcmFindCallback ( int type );
 
-        enum cbType
-        {
-            PATIENT, STUDY, SERIE, IMAGE
-        };
+    virtual ~QtDcmFindCallback() {};
 
-        void
-        setManager(QtDcmManager * manager);
+    enum cbType
+    {
+        PATIENT, STUDY, SERIE, IMAGE
+    };
 
-        virtual void
-        callback(T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers);
+    void setManager ( QtDcmManager * manager );
 
-    private:
-        QtDcmFindCallbackPrivate * d;
+    virtual void callback ( T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers );
+
+private:
+    QtDcmFindCallbackPrivate * d;
 };
 
 #endif /* QTDCMFINDCALLBACK_H_ */

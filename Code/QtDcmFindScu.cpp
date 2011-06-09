@@ -52,199 +52,187 @@
 
 class QtDcmFindScuPrivate
 {
-    public:
-        QtDcmManager * manager;
+
+public:
+    QtDcmManager * manager;
 };
 
-QtDcmFindScu::QtDcmFindScu(QObject * parent) :
-    d(new QtDcmFindScuPrivate)
+QtDcmFindScu::QtDcmFindScu ( QObject * parent ) : d ( new QtDcmFindScuPrivate )
 {
-    d->manager = dynamic_cast<QtDcmManager *> (parent);
+    d->manager = dynamic_cast<QtDcmManager *> ( parent );
 }
 
-QtDcmFindScu::~QtDcmFindScu()
+QtDcmFindScu::~QtDcmFindScu() {}
+
+void QtDcmFindScu::findPatientsScu ( QString patientName )
 {
+    this->findPatientsScu ( patientName, "*" );
 }
 
-void
-QtDcmFindScu::findPatientsScu(QString patientName)
-{
-    this->findPatientsScu(patientName, "*");
-}
-
-void
-QtDcmFindScu::findPatientsScu(QString patientName, QString patientSex)
+void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "PATIENT" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    
+    overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "PATIENT" "" ) ).toUtf8().data() );
+    overrideKeys.push_back ( ( QString ( "PatientName=" ) + patientName ).toUtf8().data() );
+
     //Patient leqvel
-    overrideKeys.push_back(QString("PatientID").toUtf8().data());
-    overrideKeys.push_back(QString("PatientSex=" + patientSex).toUtf8().data());
-    overrideKeys.push_back(QString("PatientBirthDate").toUtf8().data());
+    overrideKeys.push_back ( QString ( "PatientID" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "PatientSex=" + patientSex ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "PatientBirthDate" ).toUtf8().data() );
 
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback();
-    callback->setManager(d->manager);
+    callback->setManager ( d->manager );
 
-    if (findscu.initializeNetwork(30).bad())
-        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+    if ( findscu.initializeNetwork ( 30 ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
-    if (findscu.dropNetwork().bad())
-        d->manager->displayErrorMessage(tr("Cannot drop network"));
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void
-QtDcmFindScu::findStudiesScu(QString patientName)
+void QtDcmFindScu::findStudiesScu ( QString patientName )
 {
-    this->findStudiesScu(patientName, "*", QDate(1900,01,01).toString("yyyyMMdd"),QDate::currentDate().toString("yyyyMMdd"));
+    this->findStudiesScu ( patientName, "*", QDate ( 1900,01,01 ).toString ( "yyyyMMdd" ),QDate::currentDate().toString ( "yyyyMMdd" ) );
 }
 
-void
-QtDcmFindScu::findStudiesScu(QString patientName, QString studyDescription)
+void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescription )
 {
-    this->findStudiesScu(patientName, studyDescription, QDate(1900,01,01).toString("yyyyMMdd"),QDate::currentDate().toString("yyyyMMdd"));
+    this->findStudiesScu ( patientName, studyDescription, QDate ( 1900,01,01 ).toString ( "yyyyMMdd" ),QDate::currentDate().toString ( "yyyyMMdd" ) );
 }
 
-void
-QtDcmFindScu::findStudiesScu(QString patientName, QString studyDescription, QString startDate, QString endDate)
+void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescription, QString startDate, QString endDate )
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "STUDY" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back((QString("StudyDescription=") + studyDescription).toUtf8().data());
-    overrideKeys.push_back(QString("StudyDate=" + startDate + "-" + endDate).toUtf8().data());
+    overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "STUDY" "" ) ).toUtf8().data() );
+    overrideKeys.push_back ( ( QString ( "PatientName=" ) + patientName ).toUtf8().data() );
+    overrideKeys.push_back ( ( QString ( "StudyDescription=" ) + studyDescription ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "StudyDate=" + startDate + "-" + endDate ).toUtf8().data() );
 
     //Study level
-    overrideKeys.push_back(QString("StudyInstanceUID").toUtf8().data());
+    overrideKeys.push_back ( QString ( "StudyInstanceUID" ).toUtf8().data() );
 
     //Image level
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::STUDY);
-    callback->setManager(d->manager);
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::STUDY );
+    callback->setManager ( d->manager );
 
-    if (findscu.initializeNetwork(30).bad())
-        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+    if ( findscu.initializeNetwork ( 30 ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
-    if (findscu.dropNetwork().bad())
-        d->manager->displayErrorMessage(tr("Cannot drop network"));
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void
-QtDcmFindScu::findSeriesScu(QString patientName, QString studyDescription)
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription )
 {
-    this->findSeriesScu(patientName, studyDescription, "*", "*");
+    this->findSeriesScu ( patientName, studyDescription, "*", "*" );
 }
 
-void
-QtDcmFindScu::findSeriesScu(QString patientName, QString studyDescription, QString modality)
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription, QString modality )
 {
-    this->findSeriesScu(patientName, studyDescription, "*", modality);
+    this->findSeriesScu ( patientName, studyDescription, "*", modality );
 }
 
-void
-QtDcmFindScu::findSeriesScu(QString patientName, QString studyDescription, QString serieDescription, QString modality)
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription, QString serieDescription, QString modality )
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "SERIES" "")).toUtf8().data());
-    overrideKeys.push_back((QString("PatientName=") + patientName).toUtf8().data());
-    overrideKeys.push_back(QString("StudyDescription=" + studyDescription).toUtf8().data());
-    overrideKeys.push_back((QString("SeriesDescription=") + serieDescription).toUtf8().data());
-    overrideKeys.push_back(QString("Modality=" + modality).toUtf8().data());
+    overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) ).toUtf8().data() );
+    overrideKeys.push_back ( ( QString ( "PatientName=" ) + patientName ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "StudyDescription=" + studyDescription ).toUtf8().data() );
+    overrideKeys.push_back ( ( QString ( "SeriesDescription=" ) + serieDescription ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "Modality=" + modality ).toUtf8().data() );
 
     //Study level
-    overrideKeys.push_back(QString("StudyDate").toUtf8().data());
+    overrideKeys.push_back ( QString ( "StudyDate" ).toUtf8().data() );
 
     //Serie level
-    overrideKeys.push_back(QString("SeriesInstanceUID").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionName").toUtf8().data());
-    overrideKeys.push_back(QString("InstitutionAddress").toUtf8().data());
-    overrideKeys.push_back(QString("PerformingPhysicianName").toUtf8().data());
-    overrideKeys.push_back(QString("AcquisitionNumber").toUtf8().data());
-    overrideKeys.push_back(QString("NumberOfSeriesRelatedInstances").toUtf8().data());
+    overrideKeys.push_back ( QString ( "SeriesInstanceUID" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "InstitutionName" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "InstitutionAddress" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "PerformingPhysicianName" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "AcquisitionNumber" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "NumberOfSeriesRelatedInstances" ).toUtf8().data() );
 
     //Image level
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::SERIE);
-    callback->setManager(d->manager);
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::SERIE );
+    callback->setManager ( d->manager );
 
-    if (findscu.initializeNetwork(30).bad())
-        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+    if ( findscu.initializeNetwork ( 30 ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
-    if (findscu.dropNetwork().bad())
-        d->manager->displayErrorMessage(tr("Cannot drop network"));
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void
-QtDcmFindScu::findImagesScu(QString seriesUID)
+void QtDcmFindScu::findImagesScu ( QString seriesUID )
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGE" "")).toUtf8().data());
-    overrideKeys.push_back(QString("SeriesInstanceUID=" + seriesUID).toUtf8().data());
+    overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
 
     //Image level
-    overrideKeys.push_back(QString("InstanceNumber").toUtf8().data());
+    overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
 
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::IMAGE);
-    callback->setManager(d->manager);
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
+    callback->setManager ( d->manager );
 
-    if (findscu.initializeNetwork(30).bad())
-        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+    if ( findscu.initializeNetwork ( 30 ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
-    if (findscu.dropNetwork().bad())
-        d->manager->displayErrorMessage(tr("Cannot drop network"));
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void
-QtDcmFindScu::findImageScu(QString seriesUID, QString instanceNumber)
+void QtDcmFindScu::findImageScu ( QString seriesUID, QString instanceNumber )
 {
     OFList<OFString> overrideKeys;
-    overrideKeys.push_back((QString("QueryRetrieveLevel=") + QString("" "IMAGE" "")).toUtf8().data());
-    overrideKeys.push_back(QString("SeriesInstanceUID=" + seriesUID).toUtf8().data());
-    overrideKeys.push_back(QString("InstanceNumber=" + instanceNumber).toUtf8().data());
+    overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "InstanceNumber=" + instanceNumber ).toUtf8().data() );
 
     //Image level
-    overrideKeys.push_back(QString("SOPInstanceUID").toUtf8().data());
+    overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
 
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback(QtDcmFindCallback::IMAGE);
-    callback->setManager(d->manager);
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
+    callback->setManager ( d->manager );
 
-    if (findscu.initializeNetwork(30).bad())
-        d->manager->displayErrorMessage(tr("Cannot establish network connection"));
+    if ( findscu.initializeNetwork ( 30 ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if (findscu.performQuery(d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList).bad())
-        d->manager->displayErrorMessage(tr("Cannot perform query C-FIND"));
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
-    if (findscu.dropNetwork().bad())
-        d->manager->displayErrorMessage(tr("Cannot drop network"));
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }

@@ -24,7 +24,8 @@
 #include "itkImageSeriesReader.h"
 #include "itkImageFileWriter.h"
 
-class QtDcmConvertPrivate {
+class QtDcmConvertPrivate
+{
 
 public:
     QString inputDirectory;
@@ -32,13 +33,15 @@ public:
     QString outputFilename;
 };
 
-QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate ) {
+QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
+{
     d->inputDirectory = "";
     d->outputFilename = "";
 }
 
-void QtDcmConvert::convert() {
-    typedef signed short                                       PixelType;
+void QtDcmConvert::convert()
+{
+    typedef signed short                                PixelType;
     const unsigned int Dimension = 4;
     typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
     typedef itk::ImageSeriesReader< ImageType >         ReaderType;
@@ -56,7 +59,8 @@ void QtDcmConvert::convert() {
     inputNames->AddSeriesRestriction ( "0020,0037" );
     inputNames->SetDirectory ( d->inputDirectory.toStdString() );
 
-    try {
+    try
+    {
         const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
         std::string seriesIdentifier = seriesUID.begin()->c_str();
         FileNamesContainer filenames = inputNames->GetFileNames ( seriesIdentifier );
@@ -64,39 +68,51 @@ void QtDcmConvert::convert() {
         reader->SetImageIO ( dicomIO );
         reader->SetFileNames ( filenames );
 
-        try {
+        try
+        {
             reader->Update();
-        } catch ( itk::ExceptionObject &excp ) {
+        }
+        catch ( itk::ExceptionObject &excp )
+        {
             std::cerr << excp << std::endl;
             return;
         }
 
         WriterType::Pointer writer = WriterType::New();
+
         QString completeFilename = d->outputDirectory + QDir::separator() + d->outputFilename;
-        
+
         writer->SetFileName ( completeFilename.toStdString() );
         writer->SetInput ( reader->GetOutput() );
-        try {
+
+        try
+        {
             writer->Update();
-        } catch ( itk::ExceptionObject &ex ) {
+        }
+        catch ( itk::ExceptionObject &ex )
+        {
             std::cout << ex << std::endl;
             return;
         }
-    } catch ( itk::ExceptionObject &ex ) {
+    }
+    catch ( itk::ExceptionObject &ex )
+    {
         std::cout << ex << std::endl;
         return;
     }
 }
 
-void QtDcmConvert::setInputDirectory ( QString dir ) {
+void QtDcmConvert::setInputDirectory ( QString dir )
+{
     d->inputDirectory = dir;
 }
 
-void QtDcmConvert::setOutputDirectory ( QString dir ) {
+void QtDcmConvert::setOutputDirectory ( QString dir )
+{
     d->outputDirectory = dir;
 }
 
-void QtDcmConvert::setOutputFilename ( QString fname ) {
+void QtDcmConvert::setOutputFilename ( QString fname )
+{
     d->outputFilename = fname;
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 0; 

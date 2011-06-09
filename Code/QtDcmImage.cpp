@@ -16,41 +16,34 @@ class QtDcmImagePrivate
         QtDcmSerie * p_serie; /** Parent serie */
 };
 
-QtDcmImage::QtDcmImage() : d(new QtDcmImagePrivate)
-{}
+QtDcmImage::QtDcmImage() : d(new QtDcmImagePrivate) {}
 
-QString
-QtDcmImage::getId()
+QString QtDcmImage::getId()
   {
     return d->id;
   }
 
-void
-QtDcmImage::setId( QString id )
+void QtDcmImage::setId( QString id )
   {
     d->id = id;
   }
 
-QString
-QtDcmImage::getFilename()
+QString QtDcmImage::getFilename()
   {
     return d->filename;
   }
 
-void
-QtDcmImage::setFilename( QString filename )
+void QtDcmImage::setFilename( QString filename )
   {
     d->filename = filename;
   }
 
-QtDcmSerie *
-QtDcmImage::getSerie()
+QtDcmSerie * QtDcmImage::getSerie()
   {
     return d->p_serie;
   }
 
-void
-QtDcmImage::setSerie( QtDcmSerie * serie )
+void QtDcmImage::setSerie( QtDcmSerie * serie )
   {
     d->p_serie = serie;
   }

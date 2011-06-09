@@ -28,14 +28,14 @@ class QtDcmConvertPrivate;
 class QtDcmConvert : public QObject
 {
     Q_OBJECT
+
 public:
-    QtDcmConvert(QObject * parent);
+    QtDcmConvert ( QObject * parent );
 
     void convert();
-
-    void setInputDirectory(QString dir);
-    void setOutputDirectory(QString dir);
-    void setOutputFilename(QString fname);
+    void setInputDirectory ( QString dir );
+    void setOutputDirectory ( QString dir );
+    void setOutputFilename ( QString fname );
 
 private:
     QtDcmConvertPrivate * d;

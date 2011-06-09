@@ -12,144 +12,132 @@
 #include <QList>
 
 class QtDcmStudyPrivate;
+
 class QtDcmPatient;
+
 class QtDcmSerie;
 
 /**
  * This class is representation of a Dicom study.
  */
+
 class QtDcmStudy : public QObject
 {
     Q_OBJECT
-    private:
-        QtDcmStudyPrivate * d;
 
-    public:
-        /**
-         * Default constructor
-         */
-        QtDcmStudy();
+private:
+    QtDcmStudyPrivate * d;
 
-        /**
-         * Default destructor
-         */
-        virtual
-        ~QtDcmStudy()
-        {
-        }
-        ;
+public:
+    /**
+     * Default constructor
+     */
+    QtDcmStudy();
 
-        /**
-         * Study Id getter
-         *
-         * @return _id as a QString
-         */
-        QString
-        getId();
+    /**
+     * Default destructor
+     */
+    virtual ~QtDcmStudy() {}
 
-        /**
-         * Study Id setter
-         *
-         * @param id as a QString
-         */
-        void
-        setId(QString id);
+    ;
 
-        /**
-         * Study description getter
-         *
-         * @return _description as a QString
-         */
-        QString
-        getDescription();
+    /**
+     * Study Id getter
+     *
+     * @return _id as a QString
+     */
+    QString getId();
 
-        /**
-         * Study description setter
-         *
-         * @param description as a QString
-         */
-        void
-        setDescription(QString description);
+    /**
+     * Study Id setter
+     *
+     * @param id as a QString
+     */
+    void setId ( QString id );
 
-        /**
-         * Study date getter
-         *
-         * @return _date as a QString
-         */
-        QDate
-        getDate();
+    /**
+     * Study description getter
+     *
+     * @return _description as a QString
+     */
+    QString getDescription();
 
-        /**
-         * Study date setter
-         *
-         * @param date as a QString
-         */
-        void
-        setDate(QDate date);
+    /**
+     * Study description setter
+     *
+     * @param description as a QString
+     */
+    void setDescription ( QString description );
 
-        /**
-         * Study time getter
-         *
-         * @return _time as a QString
-         */
-        QString
-        getTime();
+    /**
+     * Study date getter
+     *
+     * @return _date as a QString
+     */
+    QDate getDate();
 
-        /**
-         * Study time setter
-         *
-         * @param time as a QString
-         */
-        void
-        setTime(QString time);
+    /**
+     * Study date setter
+     *
+     * @param date as a QString
+     */
+    void setDate ( QDate date );
 
-        /**
-         * List of series in the study getter
-         *
-         * @return _series as a QList of series
-         * @see QtDcmSerie
-         */
-        QList<QtDcmSerie *>
-        getSeries();
+    /**
+     * Study time getter
+     *
+     * @return _time as a QString
+     */
+    QString getTime();
 
-        /**
-         * List of series in the study setter
-         *
-         * @param series as a QList of series
-         * @see QtDcmSerie
-         */
-        void
-        setSeries(QList<QtDcmSerie *> series);
+    /**
+     * Study time setter
+     *
+     * @param time as a QString
+     */
+    void setTime ( QString time );
 
-        /**
-         * Patient getter
-         *
-         * @return _p_patient as a patient
-         * @see QtDcmPatient
-         */
-        QtDcmPatient *
-        getPatient();
+    /**
+     * List of series in the study getter
+     *
+     * @return _series as a QList of series
+     * @see QtDcmSerie
+     */
+    QList<QtDcmSerie *> getSeries();
 
-        /**
-         * Patient setter
-         *
-         * @param patient
-         * @see QtDcmPatient
-         */
-        void
-        setPatient(QtDcmPatient * patient);
+    /**
+     * List of series in the study setter
+     *
+     * @param series as a QList of series
+     * @see QtDcmSerie
+     */
+    void setSeries ( QList<QtDcmSerie *> series );
 
-        /**
-         * Add serie in the list
-         */
-        void
-        addSerie(QtDcmSerie * serie);
+    /**
+     * Patient getter
+     *
+     * @return _p_patient as a patient
+     * @see QtDcmPatient
+     */
+    QtDcmPatient * getPatient();
 
-        /**
-         * Remove serie at position index
-         */
-        void
-        removeSerie(int index);
+    /**
+     * Patient setter
+     *
+     * @param patient
+     * @see QtDcmPatient
+     */
+    void setPatient ( QtDcmPatient * patient );
+
+    /**
+     * Add serie in the list
+     */
+    void addSerie ( QtDcmSerie * serie );
+
+    /**
+     * Remove serie at position index
+     */
+    void removeSerie ( int index );
 };
 
 #endif /* QTDCMSTUDY_H_ */

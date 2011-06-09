@@ -11,40 +11,31 @@
 #include <QtGui>
 
 class QtDcmManager;
+
 class QtDcmQueryThreadPrivate;
 /*
  *
  */
+
 class QtDcmQueryThread : public QThread
-  {
-  Q_OBJECT
-  private:
+{
+    Q_OBJECT
+
+private:
     QtDcmQueryThreadPrivate * d;
 
-  public:
-    QtDcmQueryThread()
-      {
-      }
+public:
+    QtDcmQueryThread() {}
 
-    virtual
-    ~QtDcmQueryThread()
-      {
-      }
+    virtual ~QtDcmQueryThread() {}
 
-    void
-    run();
+    void run();
 
-    QProcess *
-    getProcess();
+    QProcess * getProcess();
 
-    void
-    setCommand( QString command );
-
-    void
-    setParameters( QStringList parameters );
-
-    void
-    setManager( QtDcmManager * manager );
-  };
+    void setCommand ( QString command );
+    void setParameters ( QStringList parameters );
+    void setManager ( QtDcmManager * manager );
+};
 
 #endif /* QTDCMQUERYTHREAD_H_ */

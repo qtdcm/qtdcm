@@ -10,52 +10,49 @@
 
 class QtDcmQueryThreadPrivate
 {
-    public:
-        QString command;
-        QStringList parameters;
-        QtDcmManager * manager;
-        QProcess * process;
+
+public:
+    QString command;
+    QStringList parameters;
+    QtDcmManager * manager;
+    QProcess * process;
 };
 
-void
-QtDcmQueryThread::run()
-  {
+void QtDcmQueryThread::run()
+{
     // Use dcmqr
     d->process = new QProcess();
-    d->process->start(d->command, d->parameters);
+    d->process->start ( d->command, d->parameters );
 
     QByteArray query;
-    while (d->process->waitForReadyRead())
-      query += d->process->readAll();
+
+    while ( d->process->waitForReadyRead() )
+        query += d->process->readAll();
 
 //    qDebug() << query;
-    d->manager->setQuery(query);
+    d->manager->setQuery ( query );
 
     delete d->process;
 
     exit();
-  }
+}
 
-QProcess *
-QtDcmQueryThread::getProcess()
-  {
+QProcess * QtDcmQueryThread::getProcess()
+{
     return d->process;
-  }
+}
 
-void
-QtDcmQueryThread::setCommand( QString command )
-  {
+void QtDcmQueryThread::setCommand ( QString command )
+{
     d->command = command;
-  }
+}
 
-void
-QtDcmQueryThread::setParameters( QStringList parameters )
-  {
+void QtDcmQueryThread::setParameters ( QStringList parameters )
+{
     d->parameters = parameters;
-  }
+}
 
-void
-QtDcmQueryThread::setManager( QtDcmManager * manager )
-  {
+void QtDcmQueryThread::setManager ( QtDcmManager * manager )
+{
     d->manager = manager;
-  }
+}

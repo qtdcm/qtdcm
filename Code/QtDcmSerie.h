@@ -11,19 +11,23 @@
 #include <QtGui>
 
 class QtDcmSeriePrivate;
+
 class QtDcmStudy;
+
 class QtDcmImage;
 
 /**
  * This class is a representation of a dicom serie
  */
-class QtDcmSerie : public QObject
-  {
-  Q_OBJECT
-  private:
-   QtDcmSeriePrivate * d;
 
-  public:
+class QtDcmSerie : public QObject
+{
+    Q_OBJECT
+
+private:
+    QtDcmSeriePrivate * d;
+
+public:
     /**
      * Default constructor
      */
@@ -32,56 +36,49 @@ class QtDcmSerie : public QObject
     /**
      * Default destructor
      */
-    virtual
-    ~QtDcmSerie() {};
+    virtual ~QtDcmSerie() {};
 
     /**
      * Serie Id getter
      *
      * @return _id a QString
      */
-    QString
-    getId();
+    QString getId();
 
     /**
      * Serie Id setter
      *
      * @param id is a QString
      */
-    void
-    setId( QString id );
+    void setId ( QString id );
 
     /**
      * Serie date getter
      *
      * @return _date a QString
      */
-    QString
-    getDate();
+    QString getDate();
 
     /**
      * Serie date setter
      *
      * @param date is a QString
      */
-    void
-    setDate( QString date );
+    void setDate ( QString date );
 
     /**
      * Serie description getter
      *
      * @return _description a QString
      */
-    QString
-    getDescription();
+    QString getDescription();
 
     /**
      * Serie description setter
      *
      * @param description a QString
      */
-    void
-    setDescription( QString description );
+    void setDescription ( QString description );
 
     /**
      * Image list getter
@@ -89,8 +86,7 @@ class QtDcmSerie : public QObject
      * @return _images a QList of images
      * @see QtDcmImage
      */
-    QList<QtDcmImage *>
-    getImages();
+    QList<QtDcmImage *> getImages();
 
     /**
      * Image list setter
@@ -98,8 +94,7 @@ class QtDcmSerie : public QObject
      * @param images a QList of images
      * @see QtDcmImage
      */
-    void
-    setImages( QList<QtDcmImage *> images );
+    void setImages ( QList<QtDcmImage *> images );
 
     /**
      * Parent study getter
@@ -107,8 +102,7 @@ class QtDcmSerie : public QObject
      * @return _p_study a pointer on the parent study
      * @see QtDcmStudy
      */
-    QtDcmStudy *
-    getStudy();
+    QtDcmStudy * getStudy();
 
     /**
      * Parent study setter
@@ -116,8 +110,7 @@ class QtDcmSerie : public QObject
      * @param study a pointer on the parent study
      * @see QtDcmStudy
      */
-    void
-    setStudy( QtDcmStudy * study );
-  };
+    void setStudy ( QtDcmStudy * study );
+};
 
 #endif /* QTDCMSERIE_H_ */

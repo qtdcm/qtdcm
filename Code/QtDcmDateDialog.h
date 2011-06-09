@@ -15,38 +15,34 @@ class QtDcmDateDialogPrivate;
 /*
  *
  */
+
 class QtDcmDateDialog : public QDialog, public Ui::DateDialog
-  {
-  Q_OBJECT
-  private:
-  QtDcmDateDialogPrivate * d;
-  public:
-    QtDcmDateDialog( QWidget * parent );
+{
+    Q_OBJECT
+
+private:
+    QtDcmDateDialogPrivate * d;
+
+public:
+    QtDcmDateDialog ( QWidget * parent );
     virtual
-    ~QtDcmDateDialog()
-      {
-      }
-    ;
-    QCalendarWidget *
-    getCalendarWidget()
-      {
+    ~QtDcmDateDialog() {};
+
+    QCalendarWidget * getCalendarWidget()
+    {
         return calendarWidget;
-      }
+    }
 
     /**
      * Call this method to get the selected date in the calendar widget
      */
-    QDate
-    getDate();
+    QDate getDate();
 
-    void
-    initConnections();
+    void initConnections();
 
-  public slots:
-    void
-    setDate( const QDate & date );
-    void
-    yearMonthChanged( int year , int month );
-  };
+public slots:
+    void setDate ( const QDate & date );
+    void yearMonthChanged ( int year , int month );
+};
 
 #endif /* QTDCMDATEDIALOG_H_ */

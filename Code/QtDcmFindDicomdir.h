@@ -11,33 +11,29 @@
 #include <QtGui>
 
 class DcmItem;
+
 class QtDcmFindDicomdirPrivate;
 
 class QtDcmFindDicomdir : public QObject
 {
     Q_OBJECT
-    public:
-        QtDcmFindDicomdir(QObject * parent);
-        virtual
-        ~QtDcmFindDicomdir();
-        
-        void
-        setDcmItem(DcmItem * item);
 
-        void
-        findPatients();
+public:
+    QtDcmFindDicomdir ( QObject * parent );
+    virtual ~QtDcmFindDicomdir();
 
-        void
-        findStudies(QString patientName);
+    void setDcmItem ( DcmItem * item );
 
-        void
-        findSeries(QString patientName, QString studyDescription);
+    void findPatients();
 
-        void
-        findImages(QString seriesUID);
+    void findStudies ( QString patientName );
 
-    private:
-        QtDcmFindDicomdirPrivate * d;
+    void findSeries ( QString patientName, QString studyDescription );
+
+    void findImages ( QString seriesUID );
+
+private:
+    QtDcmFindDicomdirPrivate * d;
 };
 
 #endif /* QTDCMFINDDICOMDIR_H_ */

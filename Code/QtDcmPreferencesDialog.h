@@ -13,59 +13,45 @@
 #include <ui_qtdcmpreferencesdialog.h>
 
 class QtDcmPreferences;
+
 class QtDcmPreferencesDialogPrivate;
 
 /*
  *
  */
+
 class QtDcmPreferencesDialog : public QDialog, public Ui::PreferencesDialog
-  {
-  Q_OBJECT
-  public:
-    QtDcmPreferencesDialog( QWidget * parent );
-    virtual
-    ~QtDcmPreferencesDialog() {};;
+{
+    Q_OBJECT
 
-    QtDcmPreferences *
-    getPreferences();
+public:
+    QtDcmPreferencesDialog ( QWidget * parent );
+    virtual ~QtDcmPreferencesDialog() {};
 
-    void
-    setPreferences( QtDcmPreferences * prefs );
+    QtDcmPreferences * getPreferences();
 
-    void
-    updatePreferences();
+    void setPreferences ( QtDcmPreferences * prefs );
+    void updatePreferences();
 
-  public slots:
-    void
-    itemSelected( QTreeWidgetItem* current , QTreeWidgetItem* previous );
-    void
-    serverHostnameChanged( QString text );
-    void
-    serverNameChanged( QString text );
-    void
-    serverAetitleChanged( QString text );
-    void
-    serverPortChanged( QString text );
-    void
-    removeServer();
-    void
-    addServer();
-    void
-    setDcm2nii();
-    void
-    setDcm4che();
-    void
-    sendEcho();
+public slots:
+    void itemSelected ( QTreeWidgetItem* current , QTreeWidgetItem* previous );
+    void serverHostnameChanged ( QString text );
+    void serverNameChanged ( QString text );
+    void serverAetitleChanged ( QString text );
+    void serverPortChanged ( QString text );
+    void removeServer();
+    void addServer();
+    void setDcm2nii();
+    void setDcm4che();
+    void sendEcho();
 
-    signals:
-    void
-    sendEchoToPacs(int index);
+signals:
+    void sendEchoToPacs ( int index );
 
-  private:
+private:
     QtDcmPreferencesDialogPrivate * d;
 
-    void
-    initConnections();
-  };
+    void initConnections();
+};
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */
