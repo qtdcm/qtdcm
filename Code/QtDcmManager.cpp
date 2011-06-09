@@ -28,8 +28,6 @@
 #include <QtDcmImage.h>
 #include <QtDcmServer.h>
 #include <QtDcmPreferences.h>
-#include <QtDcmExportThread.h>
-#include <QtDcmQueryThread.h>
 #include <QtDcmFindCallback.h>
 
 #define INCLUDE_CSTDLIB
@@ -102,8 +100,6 @@ public:
     QString mode; /** Mode that determine the type of media (CD or PACS) */
     QString dcm2nii; /** Absolute filename of the dcm2nii program */
     QString dcm4che; /** Absolute filename of the dcm4che program */
-    QtDcmExportThread * exportThread;
-    QtDcmQueryThread * queryThread;
     QByteArray query;
     QString previewImageUID;
 
@@ -136,8 +132,6 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->progress = NULL;
 
     d->preferences = new QtDcmPreferences();
-    d->exportThread = new QtDcmExportThread();
-    d->queryThread = new QtDcmQueryThread();
 
     d->currentPacs = d->preferences->getServers().at ( 0 );
 
@@ -167,9 +161,6 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->seriesTreeWidget = NULL;
     d->progress = NULL;
 
-    d->exportThread = new QtDcmExportThread();
-    d->queryThread = new QtDcmQueryThread();
-
     d->currentPacs = d->preferences->getServers().at ( 0 );
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
@@ -179,8 +170,6 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
 QtDcmManager::~QtDcmManager()
 {
     this->deleteTemporaryDirs();
-    delete d->exportThread;
-    delete d->queryThread;
     delete d->preferences;
 }
 
@@ -300,7 +289,6 @@ void QtDcmManager::foundSerie ( QMap<QString, QString> infosMap )
 
 void QtDcmManager::foundImage ( QMap<QString, QString> infosMap )
 {
-//     QtDcmManager::foundImage ( QString uid) {
     if ( d->seriesTreeWidget )
     {
         if ( infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data ( 4, 0 ).toInt() )
@@ -410,7 +398,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
     }
-    else
+    else // mode PACS
     {
         QtDcmFindScu * find = new QtDcmFindScu ( this );
         find->findImageScu ( uid, QString::number ( elementIndex ) );
@@ -535,8 +523,6 @@ void QtDcmManager::makePreview ( QString filename )
     dcimage->setNoDisplayFunction();
     dcimage->hideAllOverlays();
     dcimage->setNoVoiTransformation();
-
-    //        DicomImage * dcimage = new DicomImage((d->currentSerieDir.absolutePath() + QDir::separator() + list.at(i)).toLatin1().data());
 
     if ( dcimage != NULL )
     {

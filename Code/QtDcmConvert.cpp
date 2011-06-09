@@ -42,7 +42,7 @@ QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
 void QtDcmConvert::convert()
 {
     typedef signed short                                PixelType;
-    const unsigned int Dimension = 4;
+    const unsigned int Dimension = 3;
     typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
     typedef itk::ImageSeriesReader< ImageType >         ReaderType;
     typedef itk::ImageFileWriter<ImageType>             WriterType;

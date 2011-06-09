@@ -4,10 +4,8 @@
 #include <QtDcmSerie.h>
 #include <QtDcmServer.h>
 #include <QtDcmImage.h>
-#include <QtDcmDateDialog.h>
 #include <QtDcmPreferences.h>
 #include <QtDcmPreferencesDialog.h>
-#include <QtDcmPreviewDialog.h>
 #include <QtDcmManager.h>
 
 class QtDcmPrivate
@@ -105,14 +103,14 @@ void QtDCM::initConnections()
 
 void QtDCM::updatePacsComboBox()
 {
-    pacsComboBox->blockSignals(true);
+    pacsComboBox->blockSignals ( true );
     pacsComboBox->clear();
 
-   for ( int i = 0; i < d->manager->getPreferences()->getServers().size(); i++ )
+    for ( int i = 0; i < d->manager->getPreferences()->getServers().size(); i++ )
     {
         pacsComboBox->addItem ( d->manager->getPreferences()->getServers().at ( i )->getName() );
     }
-    pacsComboBox->blockSignals(false);
+    pacsComboBox->blockSignals ( false );
 }
 
 void QtDCM::findSCU()
@@ -167,15 +165,12 @@ void QtDCM::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
             d->manager->findImagesDicomdir ( current->text ( 3 ) );
 
         elementCountLabel->setText ( current->data ( 4, 0 ).toString() );
-
         institutionLabel->setText ( current->data ( 5, 0 ).toString() );
-
         operatorLabel->setText ( current->data ( 6, 0 ).toString() );
 
         int elementCount = elementCountLabel->text().toInt();
-
         imageLabel->setPixmap ( NULL );
-
+        
         d->manager->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
     }
 
@@ -395,9 +390,6 @@ void QtDCM::patientNameTextChanged ( QString name )
 
     if ( d->mode == QtDCM::PACS )
         this->findSCU();
-
-    //    else
-    //        this->loadPatientsFromDicomdir();
 }
 
 void QtDCM::studyDescriptionTextChanged ( QString desc )
@@ -407,17 +399,15 @@ void QtDCM::studyDescriptionTextChanged ( QString desc )
     else
         d->manager->setStudyDescription ( "*" + desc + "*" );
 
-    treeWidgetStudies->clear();
-
-    treeWidgetSeries->clear();
-
+    if ( d->mode == QtDCM::PACS )
+    {
+        treeWidgetStudies->clear();
+        treeWidgetSeries->clear();
+    }
     if ( treeWidgetPatients->currentItem() )
     {
         if ( d->mode == QtDCM::PACS )
             d->manager->findStudiesScu ( treeWidgetPatients->currentItem()->text ( 0 ) );
-
-        //        else
-        //            d->manager->findStudiesDicomdir(treeWidgetPatients->currentItem()->text(0));
     }
 }
 
@@ -430,35 +420,12 @@ void QtDCM::serieDescriptionTextChanged ( QString desc )
     else
         d->manager->setSerieDescription ( "*" + desc + "*" );
 
-    treeWidgetSeries->clear();
+    if ( d->mode == QtDCM::PACS )
+        treeWidgetSeries->clear();
 
     if ( treeWidgetPatients->currentItem() && treeWidgetStudies->currentItem() )
     {
         if ( d->mode == QtDCM::PACS )
             d->manager->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->text ( 0 ) );
-
-        //        else
-        //            d->manager->findSeriesDicomdir(treeWidgetPatients->currentItem()->text(0), treeWidgetStudies->currentItem()->text(0));
     }
-}
-
-void QtDCM::showPreview()
-{
-    QtDcmPreviewDialog * dialog = new QtDcmPreviewDialog ( this );
-
-    if ( d->manager->getMode() == "CD" )
-        d->manager->setImagesList ( d->imagesList );
-
-    d->manager->setSerieId ( d->currentSerieId );
-
-//     d->manager->makePreview();
-    dialog->setImages ( d->manager->getListImages() );
-
-    dialog->updatePreview();
-
-    dialog->exec();
-
-    dialog->close();
-
-    delete dialog;
 }

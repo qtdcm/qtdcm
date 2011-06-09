@@ -81,14 +81,14 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.cpp
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.cpp
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.cpp
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.cpp
 )
 
 set(SAMPLE_HDRS
@@ -103,22 +103,22 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.h
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.h
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.h
+#   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.h
 )
 
 set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
-  ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
+#   ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
-  ${QTDCM_SOURCE_DIR}/Code/qtdcmpreviewdialog.ui
+#   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreviewdialog.ui
 )
 
 set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})

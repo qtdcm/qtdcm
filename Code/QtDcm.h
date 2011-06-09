@@ -149,8 +149,6 @@ public slots:
      */
     void studyDescriptionTextChanged ( QString );
 
-    void showPreview();
-
 signals:
     void serieChecked ( bool checked );
     void serieSelected ( bool selected );
