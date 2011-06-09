@@ -83,6 +83,7 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
@@ -104,6 +105,7 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
@@ -115,6 +117,7 @@ set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreviewdialog.ui
 )
 

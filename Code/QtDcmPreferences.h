@@ -70,13 +70,6 @@ public:
     QString getAetitle() const;
 
     /**
-     * QtDcm local encoding getter
-     *
-     * @return _encoding as a QString
-     */
-    QString getEncoding() const;
-
-    /**
      * QtDcm local application TCP port getter
      *
      * @return _port as a QString
@@ -90,34 +83,6 @@ public:
      * @see QtDcmServer
      */
     QList<QtDcmServer *> getServers();
-
-    /**
-     * Dcm2nii  getter
-     *
-     * @return _dcm2nii as a QString
-     */
-    QString getDcm2nii();
-
-    /**
-     * Dcm4che getter
-     *
-     * @return _dcm4che as a QString
-     */
-    QString getDcm4che();
-
-    /**
-     * Dcm2nii path setter
-     *
-     * @param as a QString
-     */
-    void setDcm2nii ( QString path );
-
-    /**
-     * Dcm4che setter
-     *
-     * @param as a QString
-     */
-    void setDcm4che ( QString path );
 
     /**
      * QtDcm local AETitle setter
@@ -134,13 +99,6 @@ public:
      * @param _aetitle as a QString
      */
     void setAetitle ( QString aetitle );
-
-    /**
-     * QtDcm local encoding setter
-     *
-     * @param encoding as a QString
-     */
-    void setEncoding ( QString encoding );
 
     /**
      * QtDcm local application TCP port setter
@@ -168,9 +126,6 @@ public:
      * @see QtDcmServer
      */
     void setServers ( QList<QtDcmServer *> servers );
-
-public slots:
-    void sendEcho ( int index );
 
 private:
     /**

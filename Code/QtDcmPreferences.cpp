@@ -5,43 +5,6 @@
  *      Author: aabadie
  */
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-//#define INCLUDEd->CSTDLIB
-//#define INCLUDEd->CSTRING
-#include "dcmtk/ofstd/ofstdinc.h"
-
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
-
-#ifdef WITH_OPENSSL
-#include "dcmtk/dcmtls/tlstrans.h"
-#include "dcmtk/dcmtls/tlslayer.h"
-#endif
-
 #include <QtDcmServer.h>
 #include <QtDcmPreferences.h>
 
@@ -53,10 +16,6 @@ public:
     QString aetitle; /** Local aetitle of QtDcm */
     QString port; /** Local port of qtdcm */
     QString hostname;
-    QString encoding; /** Local character encoding */
-
-    QString dcm2nii; /** Absolute filename of the dcm2nii binary on the system */
-    QString dcm4che; /** Absolute filename of the dcm4che binary on the system */
 
     QList<QtDcmServer *> servers; /** List of server that QtDcm can query */
 };
@@ -78,76 +37,6 @@ QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
         this->readSettings(); // else load the parameters
 }
 
-void QtDcmPreferences::sendEcho ( int index )
-{
-    if ( index > d->servers.size() )
-        return;
-
-    T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
-
-    ASC_initializeNetwork ( NET_REQUESTOR, 0, 1000 /* timeout */, &net );
-
-    T_ASC_Parameters *params; // parameters of association request
-
-    ASC_createAssociationParameters ( &params, ASC_DEFAULTMAXPDU );
-
-    // set calling and called AE titles
-    ASC_setAPTitles ( params, d->aetitle.toUtf8().data(), d->servers.at ( index )->getAetitle().toUtf8().data(), NULL );
-
-    // the DICOM server accepts connections at server.nowhere.com port 104
-    ASC_setPresentationAddresses ( params, d->hostname.toUtf8().data(), QString ( d->servers.at ( index )->getServer() + ":" + d->servers.at ( index )->getPort() ).toAscii().data() );
-
-    // list of transfer syntaxes, only a single entry here
-    const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
-
-    // add presentation context to association request
-    ASC_addPresentationContext ( params, 1, UID_VerificationSOPClass, ts, 1 );
-
-    // request DICOM association
-    T_ASC_Association *assoc;
-
-    if ( ASC_requestAssociation ( net, params, &assoc ).good() )
-    {
-        if ( ASC_countAcceptedPresentationContexts ( params ) == 1 )
-        {
-            // the remote SCP has accepted the Verification Service Class
-            DIC_US id = assoc->nextMsgID++; // generate next message ID
-            DIC_US status; // DIMSE status of C-ECHO-RSP will be stored here
-            DcmDataset *sd = NULL; // status detail will be stored here
-            // send C-ECHO-RQ and handle response
-            DIMSE_echoUser ( assoc, id, DIMSE_BLOCKING, 0, &status, &sd );
-
-            delete sd; // we don't care about status detail
-            QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-            msgBox->setIcon ( QMessageBox::Information );
-            msgBox->setText ( "Echo request successful !" );
-            msgBox->exec();
-            delete msgBox;
-        }
-        else
-        {
-            QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-            msgBox->setIcon ( QMessageBox::Critical );
-            msgBox->setText ( "Wrong presentation context, echo request failed" );
-            msgBox->exec();
-            delete msgBox;
-        }
-    }
-    else
-    {
-        QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-        msgBox->setIcon ( QMessageBox::Critical );
-        msgBox->setText ( "Wrong dicom association, echo request failed" );
-        msgBox->exec();
-        delete msgBox;
-    }
-
-    ASC_releaseAssociation ( assoc ); // release association
-
-    ASC_destroyAssociation ( &assoc ); // delete assoc structure
-    ASC_dropNetwork ( &net ); // delete net structure
-}
-
 void QtDcmPreferences::addServer()
 {
     d->servers.append ( new QtDcmServer );
@@ -164,12 +53,9 @@ void QtDcmPreferences::readSettings()
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
     //Load local settings
     prefs.beginGroup ( "LocalSettings" );
-    d->dcm2nii = prefs.value ( "Dcm2nii" ).toString();
-    d->dcm4che = prefs.value ( "Dcm4che" ).toString();
     d->aetitle = prefs.value ( "AETitle" ).toString();
     d->port = prefs.value ( "Port" ).toString();
     d->hostname = prefs.value ( "Hostname" ).toString();
-    d->encoding = prefs.value ( "Encoding" ).toString();
     prefs.endGroup();
     //For each server load corresponding settings
     prefs.beginGroup ( "Servers" );
@@ -195,12 +81,9 @@ void QtDcmPreferences::writeSettings()
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
     //Write local settings from the private attributes
     prefs.beginGroup ( "LocalSettings" );
-    prefs.setValue ( "Dcm2nii", d->dcm2nii );
-    prefs.setValue ( "Dcm4che", d->dcm4che );
     prefs.setValue ( "AETitle", d->aetitle );
     prefs.setValue ( "Port", d->port );
     prefs.setValue ( "Hostname", d->hostname );
-    prefs.setValue ( "Encoding", d->encoding );
     prefs.endGroup();
     //Do the job for each server
     prefs.beginGroup ( "Servers" );
@@ -221,12 +104,9 @@ void QtDcmPreferences::writeSettings()
 void QtDcmPreferences::setDefaultIniFile()
 {
     //Create an ini file with default parameters
-    d->dcm2nii = "";
-    d->dcm4che = "";
     d->aetitle = "QTDCM";
     d->port = "2010";
     d->hostname = "localhost";
-    d->encoding = "ISOd->IR 100";
 
     QtDcmServer * server = new QtDcmServer();
     server->setAetitle ( "SERVER" );
@@ -242,11 +122,6 @@ QString QtDcmPreferences::getAetitle() const
     return d->aetitle;
 }
 
-QString QtDcmPreferences::getEncoding() const
-{
-    return d->encoding;
-}
-
 QString QtDcmPreferences::getPort() const
 {
     return d->port;
@@ -255,26 +130,6 @@ QString QtDcmPreferences::getPort() const
 QList<QtDcmServer *> QtDcmPreferences::getServers()
 {
     return d->servers;
-}
-
-QString QtDcmPreferences::getDcm2nii()
-{
-    return d->dcm2nii;
-}
-
-QString QtDcmPreferences::getDcm4che()
-{
-    return d->dcm4che;
-}
-
-void QtDcmPreferences::setDcm2nii ( QString path )
-{
-    d->dcm2nii = path;
-}
-
-void QtDcmPreferences::setDcm4che ( QString path )
-{
-    d->dcm4che = path;
 }
 
 void QtDcmPreferences::setHostname ( QString hostname )
@@ -290,11 +145,6 @@ QString QtDcmPreferences::getHostname()
 void QtDcmPreferences::setAetitle ( QString aetitle )
 {
     d->aetitle = aetitle;
-}
-
-void QtDcmPreferences::setEncoding ( QString encoding )
-{
-    d->encoding = encoding;
 }
 
 void QtDcmPreferences::setPort ( QString port )

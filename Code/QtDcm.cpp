@@ -105,10 +105,14 @@ void QtDCM::initConnections()
 
 void QtDCM::updatePacsComboBox()
 {
+    pacsComboBox->blockSignals(true);
     pacsComboBox->clear();
 
-    for ( int i = 0; i < d->manager->getPreferences()->getServers().size(); i++ )
+   for ( int i = 0; i < d->manager->getPreferences()->getServers().size(); i++ )
+    {
         pacsComboBox->addItem ( d->manager->getPreferences()->getServers().at ( i )->getName() );
+    }
+    pacsComboBox->blockSignals(false);
 }
 
 void QtDCM::findSCU()
@@ -371,16 +375,14 @@ void QtDCM::editPreferences()
 {
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog ( this );
-    dialog->setPreferences ( d->manager->getPreferences() );
+    dialog->getWidget()->setPreferences ( d->manager->getPreferences() );
 
     if ( dialog->exec() )
     {
-        dialog->updatePreferences();
+        dialog->getWidget()->updatePreferences();;
         this->updatePacsComboBox();
     }
-
     dialog->close();
-
     delete dialog;
 }
 

@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>Images/echo.png</file>
     <file>Images/add.svg</file>
     <file>Images/calendar.svg</file>
     <file>Images/cancel.svg</file>

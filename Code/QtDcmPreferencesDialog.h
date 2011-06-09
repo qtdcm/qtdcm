@@ -12,8 +12,7 @@
 
 #include <ui_qtdcmpreferencesdialog.h>
 
-class QtDcmPreferences;
-
+class QtDcmPreferencesWidget;
 class QtDcmPreferencesDialogPrivate;
 
 /*
@@ -28,30 +27,10 @@ public:
     QtDcmPreferencesDialog ( QWidget * parent );
     virtual ~QtDcmPreferencesDialog() {};
 
-    QtDcmPreferences * getPreferences();
-
-    void setPreferences ( QtDcmPreferences * prefs );
-    void updatePreferences();
-
-public slots:
-    void itemSelected ( QTreeWidgetItem* current , QTreeWidgetItem* previous );
-    void serverHostnameChanged ( QString text );
-    void serverNameChanged ( QString text );
-    void serverAetitleChanged ( QString text );
-    void serverPortChanged ( QString text );
-    void removeServer();
-    void addServer();
-    void setDcm2nii();
-    void setDcm4che();
-    void sendEcho();
-
-signals:
-    void sendEchoToPacs ( int index );
-
-private:
-    QtDcmPreferencesDialogPrivate * d;
-
-    void initConnections();
+    QtDcmPreferencesWidget * getWidget();
+    
+//     void setPreferences ( QtDcmPreferences * prefs );
+//     void updatePreferences();
 };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */
