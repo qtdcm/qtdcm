@@ -161,7 +161,10 @@ QtDcmMoveScu::run()
             progressTotal += step;
         }
         else
+        {
+            qDebug() << "Get image id: " << d->imageId;
             cond = this->move(d->imageId);
+        }
     }
     exit();
 }
@@ -771,7 +774,8 @@ QtDcmMoveScu::subOpCallback(void * caller, T_ASC_Network *aNet, T_ASC_Associatio
         return;
 
     QtDcmMoveScu * self = (QtDcmMoveScu*) caller;
-    emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
+    if (self->getMode() == QtDcmMoveScu::IMPORT)
+        emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
 
     if (aNet == NULL) return;   /* help no net ! */
 
@@ -792,7 +796,6 @@ QtDcmMoveScu::moveCallback(void *caller, T_DIMSE_C_MoveRQ * req, int responseCou
         return;
 
     QtDcmMoveScu * self = (QtDcmMoveScu*) caller;
-
     self->progressSerie = 0;
     self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
 
