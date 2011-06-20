@@ -69,8 +69,10 @@ set(QTDCM_RCCS
     ${QTDCM_SOURCE_DIR}/Resources/qtdcm.qrc
 )
 
-set(SAMPLE_SRCS
+set(SAMPLE_SRCS  
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcm2.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.cpp
@@ -93,6 +95,8 @@ set(SAMPLE_SRCS
 
 set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcm2.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.h
@@ -108,17 +112,12 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.h
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.h
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.h
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.h
 )
 
 set(SAMPLE_UIS
-  ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
-#   ${QTDCM_SOURCE_DIR}/Code/qtdcmdatedialog.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmwidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
-#   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreviewdialog.ui
 )
 
 set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})

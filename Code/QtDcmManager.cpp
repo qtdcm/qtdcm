@@ -73,7 +73,7 @@ class QtDcmManagerPrivate
 {
 
 public:
-    QWidget * parent; /** Here the parent is corresponding to the QtDCM object */
+    QWidget * parent; /** Here the parent is corresponding to the QtDcm object */
     //        QProgressDialog * progress; /** Dialog window showing file copy in progress */
     QString dicomdir; /** Dicomdir absolute file path */
     QString outputDir; /** Output directory for reconstructed serie absolute path */
@@ -154,7 +154,7 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->serieDescription = "*";
     d->studyDescription = "*";
     d->preferences = new QtDcmPreferences();
-    d->parent = dynamic_cast<QtDCM *> ( parent );
+    d->parent = dynamic_cast<QtDcm *> ( parent );
 
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
@@ -570,7 +570,7 @@ void QtDcmManager::makePreview ( QString filename )
 
                 QImage image ( colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 );
 
-                dynamic_cast<QtDCM*> ( d->parent )->getPreviewLabel()->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
+                dynamic_cast<QtDcm*> ( d->parent )->getPreviewLabel()->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
             }
         }
     }

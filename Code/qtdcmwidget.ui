@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QtDcm</class>
- <widget class="QWidget" name="QtDcm">
+ <class>QtDcmWidget</class>
+ <widget class="QWidget" name="QtDcmWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

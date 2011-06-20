@@ -14,13 +14,13 @@ class QtDcmManager;
  * Once read/retrieve, each serie can be reconstructed, using the QtDcmManager.
  */
 
-class QtDCM : public QLabel, public Ui::QtDCM
+class QtDcm : public QWidget, public Ui::QtDcm
 {
     Q_OBJECT
 
 public:
-    QtDCM ( QWidget *parent = 0 ); /** Classic constructor */
-    ~QtDCM();
+    QtDcm ( QWidget *parent = 0 ); /** Classic constructor */
+    ~QtDcm();
     /**
      * Get the pointer of the treewidget
      *

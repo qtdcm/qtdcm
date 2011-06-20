@@ -156,12 +156,10 @@ void QtDcmMoveScu::run()
             d->converter->setOutputDirectory ( d->importDir );
             d->converter->convert();
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
-
             progressTotal += step;
         }
         else
         {
-            qDebug() << "Get image id: " << d->imageId;
             cond = this->move ( d->imageId );
         }
     }
@@ -179,7 +177,7 @@ OFCondition QtDcmMoveScu::move ( QString uid )
     QuerySyntax querySyntax[3] =
     {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-            UID_MOVEPatientRootQueryRetrieveInformationModel },
+          UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
@@ -878,7 +876,8 @@ void QtDcmMoveScu::subOpCallback ( void * caller, T_ASC_Network *aNet, T_ASC_Ass
 
     QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
 
-    if ( self->getMode() == QtDcmMoveScu::IMPORT )
+//     if ( self->getMode() == QtDcmMoveScu::IMPORT )
+    if (self->slicesCount)
         emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
 
     if ( aNet == NULL ) return; /* help no net ! */

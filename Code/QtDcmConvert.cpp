@@ -18,11 +18,14 @@
 */
 #include "QtDcmConvert.h"
 
-#include "itkOrientedImage.h"
-#include "itkGDCMImageIO.h"
-#include "itkGDCMSeriesFileNames.h"
-#include "itkImageSeriesReader.h"
-#include "itkImageFileWriter.h"
+#include <itkOrientedImage.h>
+#include <itkGDCMImageIO.h>
+#include <itkGDCMSeriesFileNames.h>
+#include <itkImageSeriesReader.h>
+#include <itkMetaDataDictionary.h>
+#include <itkObjectFactoryBase.h>
+#include <itkMetaDataObject.h>
+#include <itkImageFileWriter.h>
 
 class QtDcmConvertPrivate
 {
@@ -40,16 +43,25 @@ QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
 }
 
 void QtDcmConvert::convert()
-{   
+{
     typedef signed short                                PixelType;
     const unsigned int Dimension = 3;
     typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
     typedef itk::ImageSeriesReader< ImageType >         ReaderType;
+    typedef ImageType::RegionType                       RegionType;
+    typedef ImageType::SpacingType                      SpacingType;
+    typedef ImageType::PointType                        PointType;
+    typedef ImageType::DirectionType                    DirectionType;
+    typedef itk::ImageRegionIterator<ImageType>         IteratorType;
+    typedef IteratorType::IndexType                     IndexType;
     typedef itk::ImageFileWriter<ImageType>             WriterType;
     typedef itk::GDCMImageIO                            ImageIOType;
     typedef itk::GDCMSeriesFileNames                    NamesGeneratorType;
     typedef std::vector< std::string >                  FileNamesContainer;
     typedef std::vector< std::string >                  SeriesIdContainer;
+
+//     ImageType::Pointer image = 0;
+
     ReaderType::Pointer reader = ReaderType::New();
     ImageIOType::Pointer dicomIO = ImageIOType::New();
 
@@ -57,16 +69,29 @@ void QtDcmConvert::convert()
     inputNames->SetUseSeriesDetails ( true );
     inputNames->AddSeriesRestriction ( "0008|0021" );
     inputNames->AddSeriesRestriction ( "0020,0037" );
-    inputNames->SetDirectory ( d->inputDirectory.toStdString() );
-
+    inputNames->LoadSequencesOn();
+    inputNames->LoadPrivateTagsOn();
+    inputNames->SetInputDirectory ( d->inputDirectory.toStdString() );
     try
     {
         const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
         std::string seriesIdentifier = seriesUID.begin()->c_str();
         FileNamesContainer filenames = inputNames->GetFileNames ( seriesIdentifier );
 
-        reader->SetImageIO ( dicomIO );
+        dicomIO->SetFileName ( filenames.begin()->c_str() );
+        try
+        {
+            dicomIO->ReadImageInformation();
+        }
+        catch ( itk::ExceptionObject &e )
+        {
+            qDebug() << e.GetDescription();
+            return;
+        }
+
+        reader->UseStreamingOn();
         reader->SetFileNames ( filenames );
+        reader->SetImageIO ( dicomIO );
 
         try
         {
@@ -78,12 +103,74 @@ void QtDcmConvert::convert()
             return;
         }
 
+//         IteratorType itOut;
+//
+//         image = reader->GetOutput();
+//
+//         RegionType region;
+//         region.SetSize ( 0, image->GetLargestPossibleRegion().GetSize() [0] );
+//         region.SetSize ( 1, image->GetLargestPossibleRegion().GetSize() [1] );
+//         region.SetSize ( 2, image->GetLargestPossibleRegion().GetSize() [2] );
+//         image->SetRegions ( region );
+//         image->Allocate();
+//         SpacingType spacing;
+//         spacing[0] = image->GetSpacing() [0];
+//         spacing[1] = image->GetSpacing() [1];
+//         spacing[2] = image->GetSpacing() [2];
+//         spacing[3] = 1;
+//         image->SetSpacing ( spacing );
+//         PointType origin;
+//         origin[0] = image->GetOrigin() [0];
+//         origin[1] = image->GetOrigin() [1];
+//         origin[2] = image->GetOrigin() [2];
+//         origin[3] = 0;
+//         image->SetOrigin ( origin );
+//         DirectionType direction;
+//         for ( unsigned int i=0; i<4; i++ )
+//             for ( unsigned int j=0; j<4; j++ )
+//             {
+//                 if ( ( i < 3 ) && ( j < 3 ) )
+//                     direction[i][j] = image->GetDirection() [i][j];
+//                 else
+//                     direction[i][j] = ( i == j ) ? 1 : 0;
+//             }
+//         image->SetDirection ( direction );
+//         itOut = IteratorType ( image, region );
+//
+//         image->SetMetaDataDictionary ( dicomIO->GetMetaDataDictionary() );
+//
+//
+//         itk::ImageRegionIterator<ImageType> itIn ( image, image->GetLargestPossibleRegion() );
+//         while ( !itIn.IsAtEnd() )
+//         {
+//             itOut.Set ( itIn.Get() );
+//             ++itIn;
+//             ++itOut;
+//         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         WriterType::Pointer writer = WriterType::New();
 
         QString completeFilename = d->outputDirectory + QDir::separator() + d->outputFilename;
 
         writer->SetFileName ( completeFilename.toStdString() );
         writer->SetInput ( reader->GetOutput() );
+//         writer->SetInput ( image );
 
         try
         {
