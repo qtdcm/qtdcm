@@ -64,56 +64,56 @@ public:
     }
 
 public slots:
-    void patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
-
-    void studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
-
-    void serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
-
-    void serieItemClicked ( QTreeWidgetItem* current, int );
-
-    /**
-     * Slot called when user modify patient name edit line
-     */
-    void patientNameTextChanged ( QString );
-
-    /**
-     * Slot called when user modify serie description edit line
-     */
-    void serieDescriptionTextChanged ( QString );
-
-    /**
-     * Slot called when user modify study description edit line
-     */
-    void studyDescriptionTextChanged ( QString );
-
-    /**
-     * Slot that change the modality parameter of the query
-     *
-     */
-    void modalityChanged ( int index );
-
-    /**
-     * Slot called when user modify sex combo box
-     */
-    void sexChanged ( int index );
-
-    /**
-     * Slot called when user modify sex combo box
-     */
-    void pacsChanged ( int index );
-
-    /**
-     * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
-     *
-     */
-    void startDateChanged ( QDate date );
-
-    /**
-     * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
-     *
-     */
-    void endDateChanged ( QDate date );
+//     void patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
+// 
+//     void studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
+// 
+//     void serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
+// 
+//     void serieItemClicked ( QTreeWidgetItem* current, int );
+// 
+//     /**
+//      * Slot called when user modify patient name edit line
+//      */
+//     void patientNameTextChanged ( QString );
+// 
+//     /**
+//      * Slot called when user modify serie description edit line
+//      */
+//     void serieDescriptionTextChanged ( QString );
+// 
+//     /**
+//      * Slot called when user modify study description edit line
+//      */
+//     void studyDescriptionTextChanged ( QString );
+// 
+//     /**
+//      * Slot that change the modality parameter of the query
+//      *
+//      */
+//     void modalityChanged ( int index );
+// 
+//     /**
+//      * Slot called when user modify sex combo box
+//      */
+//     void sexChanged ( int index );
+// 
+//     /**
+//      * Slot called when user modify sex combo box
+//      */
+//     void pacsChanged ( int index );
+// 
+//     /**
+//      * Slot that launch the Date selection dialog. This change the begin date (or current date) for the Dicom query
+//      *
+//      */
+//     void startDateChanged ( QDate date );
+// 
+//     /**
+//      * Slot that launch the Date selection dialog. This change the end date for the Dicom query (Use only in range mode)
+//      *
+//      */
+//     void endDateChanged ( QDate date );
 
 
 signals:

@@ -143,11 +143,12 @@ qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 #  qt4_create_translation(qm_files ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_HDRS} ${SAMPLE_UI_HDRS} ${SAMPLE_MOC_SRCS} ${LANGUAGE_TS_FILES})
 #ENDIF(LANGUAGE_TS_FILES)
 
-message(STATUS ${ITK_LIBRARIES})
+message(STATUS ${DCMTK_LIBRARIES})
+link_directories(${DCMTK_DIR}/lib/)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})# ${qm_files})
-target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage tiff jpeg ijg12 ijg16 ijg8 /lib/libwrap.so.0)
+target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage tiff jpeg ijg12 ijg16 ijg8)# /lib/libwrap.so.0)
 
 
 # External inclusion stuff :
