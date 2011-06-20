@@ -115,6 +115,7 @@ set(SAMPLE_HDRS
 )
 
 set(SAMPLE_UIS
+  ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmwidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
