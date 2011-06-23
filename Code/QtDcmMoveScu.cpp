@@ -151,12 +151,14 @@ void QtDcmMoveScu::run()
         {
             cond = this->move ( d->series.at ( i ) );
             //Test if files are present (avoir crash of the application)
-            d->converter->setInputDirectory ( serieDir.absolutePath() );
-            d->converter->setOutputFilename ( d->series.at ( i ) + ".nii" );
-            d->converter->setOutputDirectory ( d->importDir );
-            d->converter->convert();
-
-            emit serieMoved(serieDir.absolutePath());
+            if ( d->manager->useConverter() )
+            {
+                d->converter->setInputDirectory ( serieDir.absolutePath() );
+                d->converter->setOutputFilename ( d->series.at ( i ) + ".nii" );
+                d->converter->setOutputDirectory ( d->importDir );
+                d->converter->convert();
+            }
+            emit serieMoved ( serieDir.absolutePath() );
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             progressTotal += step;
         }
@@ -179,7 +181,7 @@ OFCondition QtDcmMoveScu::move ( QString uid )
     QuerySyntax querySyntax[3] =
     {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-          UID_MOVEPatientRootQueryRetrieveInformationModel },
+            UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
@@ -879,7 +881,7 @@ void QtDcmMoveScu::subOpCallback ( void * caller, T_ASC_Network *aNet, T_ASC_Ass
     QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
 
 //     if ( self->getMode() == QtDcmMoveScu::IMPORT )
-    if (self->slicesCount)
+    if ( self->slicesCount )
         emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
 
     if ( aNet == NULL ) return; /* help no net ! */

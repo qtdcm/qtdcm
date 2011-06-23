@@ -251,12 +251,14 @@ void QtDcmMoveDicomdir::run()
                     emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
                 }
             }
-            d->converter->setInputDirectory ( serieDir.absolutePath() );
-            d->converter->setOutputFilename ( QString ( strDate.c_str() ).replace ( " ", "_" ) + "_" + QString ( strName.c_str() ).replace ( " ", "_" ).replace ( "^", "_" ) + "_" + QString ( strDesc.c_str() ).replace ( " ", "_" ) + ".nii" );
-            d->converter->setOutputDirectory ( d->importDir );
-            d->converter->convert();
-
-            emit serieMoved(serieDir.absolutePath());
+            if ( d->manager->useConverter() )
+            {
+                d->converter->setInputDirectory ( serieDir.absolutePath() );
+                d->converter->setOutputFilename ( QString ( strDate.c_str() ).replace ( " ", "_" ) + "_" + QString ( strName.c_str() ).replace ( " ", "_" ).replace ( "^", "_" ) + "_" + QString ( strDesc.c_str() ).replace ( " ", "_" ) + ".nii" );
+                d->converter->setOutputDirectory ( d->importDir );
+                d->converter->convert();
+            }
+            emit serieMoved ( serieDir.absolutePath() );
             progress += step;
         }
         else

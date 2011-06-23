@@ -170,7 +170,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
 
         int elementCount = elementCountLabel->text().toInt();
         imageLabel->setPixmap ( NULL );
-        
+
         d->manager->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
     }
 
@@ -219,30 +219,38 @@ void QtDcm::loadPatientsFromDicomdir()
 
 void QtDcm::importSelectedSeries()
 {
-    if ( d->manager->seriesToImportSize() != 0 )
+    if ( d->manager->useConverter() )
     {
-        QFileDialog * dialog = new QFileDialog ( this );
-        dialog->setFileMode ( QFileDialog::Directory );
-        dialog->setOption ( QFileDialog::ShowDirsOnly, true );
-        dialog->setDirectory ( QDir::home().dirName() );
-        dialog->setWindowTitle ( tr ( "Export directory" ) );
-        QString directory;
-
-        if ( dialog->exec() )
+        if ( d->manager->seriesToImportSize() != 0 )
         {
-            directory = dialog->selectedFiles() [0];
+            QFileDialog * dialog = new QFileDialog ( this );
+            dialog->setFileMode ( QFileDialog::Directory );
+            dialog->setOption ( QFileDialog::ShowDirsOnly, true );
+            dialog->setDirectory ( QDir::home().dirName() );
+            dialog->setWindowTitle ( tr ( "Export directory" ) );
+            QString directory;
+
+            if ( dialog->exec() )
+            {
+                directory = dialog->selectedFiles() [0];
+            }
+
+            dialog->close();
+
+            if ( !directory.isEmpty() )   // A file has been chosen
+            {
+                // Set the output directory to the manager and launch the conversion process
+                d->manager->setOutputDirectory ( directory );
+                d->manager->moveSelectedSeries();
+            }
+
+            delete dialog;
         }
-
-        dialog->close();
-
-        if ( !directory.isEmpty() )   // A file has been chosen
-        {
-            // Set the output directory to the manager and launch the conversion process
-            d->manager->setOutputDirectory ( directory );
-            d->manager->moveSelectedSeries();
-        }
-
-        delete dialog;
+    }
+    else
+    {
+        d->manager->setOutputDirectory ( "" );
+        d->manager->moveSelectedSeries();
     }
 }
 

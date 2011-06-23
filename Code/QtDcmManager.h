@@ -317,6 +317,10 @@ public:
 
     void setPreviewImageUID ( QString uid );
 
+    bool useConverter();
+
+    void useConverter(bool use);
+
 public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();

@@ -109,11 +109,14 @@ public:
     QTreeWidget * studiesTreeWidget;
     QTreeWidget * seriesTreeWidget;
     QProgressBar * progress;
+
+    bool useConverter;
 };
 
 QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 {
     //Initialization of the private attributes
+    d->useConverter = true;
     d->mode = "PACS";
     d->dicomdir = "";
     d->outputDir = "";
@@ -774,3 +777,15 @@ int QtDcmManager::seriesToImportSize()
 {
     return d->seriesToImport.size();
 }
+
+bool QtDcmManager::useConverter()
+{
+    return d->useConverter;
+}
+
+void QtDcmManager::useConverter ( bool use )
+{
+    d->useConverter = use;
+}
+
+
