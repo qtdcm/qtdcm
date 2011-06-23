@@ -368,6 +368,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setSeries ( d->seriesToImport );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
+        QObject::connect (mover, SIGNAL (serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
         mover->start();
     }
     else
@@ -378,6 +379,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setImportDir ( d->outputDir );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
+        QObject::connect (mover, SIGNAL (serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
         mover->start();
     }
 }
@@ -413,6 +415,12 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     }
 
     return;
+}
+
+void QtDcmManager::onSerieMoved ( QString directory )
+{
+    qDebug() << directory << " QtDcmManager";
+    emit serieMoved(directory);
 }
 
 void QtDcmManager::moveSeriesFinished()

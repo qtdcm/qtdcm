@@ -155,6 +155,8 @@ void QtDcmMoveScu::run()
             d->converter->setOutputFilename ( d->series.at ( i ) + ".nii" );
             d->converter->setOutputDirectory ( d->importDir );
             d->converter->convert();
+
+            emit serieMoved(serieDir.absolutePath());
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             progressTotal += step;
         }

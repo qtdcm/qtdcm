@@ -67,6 +67,7 @@ public:
 signals:
     void updateProgress ( int i );
     void previewSlice ( QString filename );
+    void serieMoved(QString directory);
 
 protected:
 

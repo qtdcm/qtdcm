@@ -321,6 +321,10 @@ public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
     void makePreview ( QString filename );
+    void onSerieMoved(QString directory);
+
+signals:
+    void serieMoved(QString directory);
 
 private:
     QtDcmManagerPrivate *d;
