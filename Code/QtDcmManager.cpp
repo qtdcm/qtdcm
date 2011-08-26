@@ -66,6 +66,8 @@
 #include <QtDcmMoveScu.h>
 #include <QtDcmMoveDicomdir.h>
 #include <QtDcmConvert.h>
+#include <QtDcmPreviewWidget.h>
+#include <QtDcmImportWidget.h>
 
 #include <QtDcmManager.h>
 
@@ -108,6 +110,10 @@ public:
     QTreeWidget * patientsTreeWidget;
     QTreeWidget * studiesTreeWidget;
     QTreeWidget * seriesTreeWidget;
+
+    QtDcmPreviewWidget * previewWidget;
+    QtDcmImportWidget * importWidget;
+    
     QProgressBar * progress;
 
     bool useConverter;
@@ -132,6 +138,10 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;
+
+    d->importWidget = NULL;
+    d->previewWidget = NULL;
+    
     d->progress = NULL;
 
     d->preferences = new QtDcmPreferences();
@@ -164,6 +174,9 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->seriesTreeWidget = NULL;
     d->progress = NULL;
 
+    d->importWidget = NULL;
+    d->previewWidget = NULL;
+
     d->currentPacs = d->preferences->getServers().at ( 0 );
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
@@ -194,6 +207,16 @@ void QtDcmManager::setSeriesTreeWidget ( QTreeWidget * widget )
 void QtDcmManager::setProgressBar ( QProgressBar * progress )
 {
     d->progress = progress;
+}
+
+void QtDcmManager::setImportWidget(QtDcmImportWidget* widget)
+{
+  d->importWidget = widget;
+}
+
+void QtDcmManager::setPreviewWidget(QtDcmPreviewWidget* widget)
+{
+  d->previewWidget = widget;
 }
 
 void QtDcmManager::displayErrorMessage ( QString message )

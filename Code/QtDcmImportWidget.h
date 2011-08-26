@@ -17,39 +17,23 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <QtDcmWidget.h>
-#include <QtDcmPreferences.h>
-#include <QtDcmPreferencesDialog.h>
 
-#include "QtDcm2.h"
+#ifndef QTDCMIMPORTWIDGET_H
+#define QTDCMIMPORTWIDGET_H
 
+#include <QtGui>
+#include "ui_qtdcmImportWidget.h"
 
-QtDcm2 * QtDcm2::_instance = 0;
+class QtDcmImportWidgetPrivate;
 
-
-class QtDcm2Private
+class QtDcmImportWidget : public QWidget, public Ui::QtDcmImportWidget
 {
+    Q_OBJECT
 public:
-    QtDcmWidget * widget;
+    QtDcmImportWidget ( QWidget * parent = 0 );
+
+private:
+    QtDcmImportWidgetPrivate * d;
 };
 
-QtDcm2::QtDcm2()
-{
-    
-    
-}
-
-void QtDcm2::attachQtDcmWidget ( QtDcmWidget* widget )
-{
-    d->widget = widget;
-}
-
-
-QtDcm2 * QtDcm2::instance()
-{
-    if ( _instance == 0 )
-        _instance = new QtDcm2();
-    return _instance;
-}
-
-
+#endif // QTDCMIMPORTWIDGET_H

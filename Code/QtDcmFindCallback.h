@@ -16,9 +16,7 @@ struct T_DIMSE_C_FindRQ;
 struct T_DIMSE_C_FindRSP;
 
 class DcmDataset;
-
 class QtDcmManager;
-
 class QtDcmFindCallbackPrivate;
 
 class QtDcmFindCallback : public DcmFindSCUCallback

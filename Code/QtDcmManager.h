@@ -12,10 +12,10 @@
 #include <QtNetwork>
 
 class QtDcmServer;
-
 class QtDcmPreferences;
-
 class QtDcmFindScuSignalManager;
+class QtDcmPreviewWidget;
+class QtDcmImportWidget;
 
 class QtDcmManagerPrivate;
 
@@ -91,6 +91,9 @@ public:
     void setStudiesTreeWidget ( QTreeWidget * widget );
     void setSeriesTreeWidget ( QTreeWidget * widget );
     void setProgressBar ( QProgressBar * progress );
+
+    void setImportWidget ( QtDcmImportWidget * widget );
+    void setPreviewWidget ( QtDcmPreviewWidget * widget );
 
     /**
      * This method read the dicomdir file and populate the patient treewidget

@@ -17,39 +17,23 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <QtDcmWidget.h>
-#include <QtDcmPreferences.h>
-#include <QtDcmPreferencesDialog.h>
 
-#include "QtDcm2.h"
+#ifndef QTDCMPREVIEWWIDGET_H
+#define QTDCMPREVIEWWIDGET_H
 
+#include <QtGui>
+#include "ui_qtdcmPreviewWidget.h"
 
-QtDcm2 * QtDcm2::_instance = 0;
+class QtDcmPreviewWidgetPrivate;
 
-
-class QtDcm2Private
+class QtDcmPreviewWidget : public QWidget, public Ui::QtDcmPreviewWidget
 {
+     Q_OBJECT
 public:
-    QtDcmWidget * widget;
+    QtDcmPreviewWidget ( QWidget * parent = 0 );
+
+private:
+    QtDcmPreviewWidgetPrivate * d;
 };
 
-QtDcm2::QtDcm2()
-{
-    
-    
-}
-
-void QtDcm2::attachQtDcmWidget ( QtDcmWidget* widget )
-{
-    d->widget = widget;
-}
-
-
-QtDcm2 * QtDcm2::instance()
-{
-    if ( _instance == 0 )
-        _instance = new QtDcm2();
-    return _instance;
-}
-
-
+#endif // QTDCMPREVIEWWIDGET_H

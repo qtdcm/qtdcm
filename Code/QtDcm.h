@@ -107,11 +107,9 @@ public slots:
     /**
      * Slot that launch a QFileDialog for choosing an output directory
      * where the current serie will be exported with dcm2nii (This is done by the _manager).
-     *
+     * 
      */
-    //        void
-    //        exportList();
-
+    
     void importSelectedSeries();
 
     /**
