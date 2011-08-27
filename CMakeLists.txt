@@ -75,6 +75,7 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImportWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewWidget.cpp
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.cpp
@@ -101,6 +102,7 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImportWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewWidget.h
+  ${QTDCM_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmManager.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindScu.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindDicomdir.h
@@ -123,6 +125,7 @@ set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcmwidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmImportWidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmPreviewWidget.ui
+  ${QTDCM_SOURCE_DIR}/Code/qtdcmSerieInfoWidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
 )
