@@ -20,13 +20,7 @@
 
 #include "QtDcmPreviewWidget.h"
 
-class QtDcmPreviewWidgetPrivate
-{
-public:
-
-};
-
-QtDcmPreviewWidget::QtDcmPreviewWidget(QWidget* parent): QWidget(parent), d(new QtDcmPreviewWidgetPrivate)
+QtDcmPreviewWidget::QtDcmPreviewWidget(QWidget* parent): QWidget(parent)
 {
   this->setupUi(this);
 }

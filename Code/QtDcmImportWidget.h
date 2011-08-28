@@ -24,16 +24,18 @@
 #include <QtGui>
 #include "ui_qtdcmImportWidget.h"
 
-class QtDcmImportWidgetPrivate;
-
 class QtDcmImportWidget : public QWidget, public Ui::QtDcmImportWidget
 {
     Q_OBJECT
 public:
     QtDcmImportWidget ( QWidget * parent = 0 );
+    void hideProgressBar();
+    void showProgressBar();
+    void setImportButtonEnabled(bool enable);
 
-private:
-    QtDcmImportWidgetPrivate * d;
+public slots:
+  void updateProgressBar ( int i );
+  
 };
 
 #endif // QTDCMIMPORTWIDGET_H

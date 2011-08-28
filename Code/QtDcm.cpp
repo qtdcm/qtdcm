@@ -132,6 +132,10 @@ void QtDcm::clearDisplay()
 void QtDcm::patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous )
 {
     detailsFrame->hide();
+
+    d->manager->clearSerieInfo();
+    d->manager->clearPreview();
+    
     treeWidgetStudies->clear();
 
     if ( current != 0 )   // Avoid crash when clearDisplay is called
@@ -147,6 +151,9 @@ void QtDcm::studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
 {
     treeWidgetSeries->clear();
     detailsFrame->hide();
+
+    d->manager->clearSerieInfo();
+    d->manager->clearPreview();
 
     if ( current != 0 )   // Avoid crash when clearDisplay is called
     {
@@ -164,17 +171,14 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
         if ( d->mode == QtDcm::CD )
             d->manager->findImagesDicomdir ( current->text ( 3 ) );
 
-        elementCountLabel->setText ( current->data ( 4, 0 ).toString() );
-        institutionLabel->setText ( current->data ( 5, 0 ).toString() );
-        operatorLabel->setText ( current->data ( 6, 0 ).toString() );
-
-        int elementCount = elementCountLabel->text().toInt();
-        imageLabel->setPixmap ( NULL );
-
+        d->manager->updateSerieInfo(current->data ( 4, 0 ).toString(), current->data ( 5, 0 ).toString(), current->data ( 6, 0 ).toString());
+        
+        int elementCount = current->data ( 4, 0 ).toInt();
+        d->manager->clearPreview();
         d->manager->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
     }
 
-    detailsFrame->show();
+//     detailsFrame->show();
 }
 
 void QtDcm::serieItemClicked ( QTreeWidgetItem * item, int column )
@@ -219,6 +223,7 @@ void QtDcm::loadPatientsFromDicomdir()
 
 void QtDcm::importSelectedSeries()
 {
+    qDebug() << "Import selected series called";
     if ( d->manager->useConverter() )
     {
         if ( d->manager->seriesToImportSize() != 0 )

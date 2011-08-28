@@ -20,12 +20,7 @@
 
 #include "QtDcmSerieInfoWidget.h"
 
-class QtDcmSerieInfoWidgetPrivate
-{
-public:
-};
-
-QtDcmSerieInfoWidget::QtDcmSerieInfoWidget(QWidget* parent): QWidget(parent), d(new QtDcmSerieInfoWidgetPrivate)
+QtDcmSerieInfoWidget::QtDcmSerieInfoWidget(QWidget* parent): QWidget(parent)
 {
   this->setupUi(this);
 }

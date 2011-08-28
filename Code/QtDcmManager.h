@@ -16,6 +16,7 @@ class QtDcmPreferences;
 class QtDcmFindScuSignalManager;
 class QtDcmPreviewWidget;
 class QtDcmImportWidget;
+class QtDcmSerieInfoWidget;
 
 class QtDcmManagerPrivate;
 
@@ -94,7 +95,13 @@ public:
 
     void setImportWidget ( QtDcmImportWidget * widget );
     void setPreviewWidget ( QtDcmPreviewWidget * widget );
+    void setSerieInfoWidget (QtDcmSerieInfoWidget * widget);
 
+    void clearSerieInfo();
+    void updateSerieInfo(QString eltCount, QString institution, QString name );
+
+    void clearPreview();
+    
     /**
      * This method read the dicomdir file and populate the patient treewidget
      *

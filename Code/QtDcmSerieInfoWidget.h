@@ -24,16 +24,11 @@
 #include <QtGui>
 #include "ui_qtdcmSerieInfoWidget.h"
 
-class QtDcmSerieInfoWidgetPrivate;
-
 class QtDcmSerieInfoWidget : public QWidget, public Ui::QtDcmSerieInfoWidget
 {
     Q_OBJECT
 public:
     QtDcmSerieInfoWidget ( QWidget * parent = 0 );
-
-private:
-    QtDcmSerieInfoWidgetPrivate * d;
 };
 
 #endif // QTDCMSERIEINFOWIDGET_H

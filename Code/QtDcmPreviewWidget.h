@@ -24,16 +24,11 @@
 #include <QtGui>
 #include "ui_qtdcmPreviewWidget.h"
 
-class QtDcmPreviewWidgetPrivate;
-
 class QtDcmPreviewWidget : public QWidget, public Ui::QtDcmPreviewWidget
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
     QtDcmPreviewWidget ( QWidget * parent = 0 );
-
-private:
-    QtDcmPreviewWidgetPrivate * d;
 };
 
 #endif // QTDCMPREVIEWWIDGET_H

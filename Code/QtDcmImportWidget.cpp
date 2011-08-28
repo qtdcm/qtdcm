@@ -20,14 +20,27 @@
 
 #include "QtDcmImportWidget.h"
 
-class QtDcmImportWidgetPrivate
-{
-public:
-
-};
-
-QtDcmImportWidget::QtDcmImportWidget(QWidget* parent): QWidget(parent), d(new QtDcmImportWidgetPrivate)
+QtDcmImportWidget::QtDcmImportWidget(QWidget* parent): QWidget(parent)
 {
     this->setupUi(this);
 }
 
+void QtDcmImportWidget::hideProgressBar()
+{
+    this->importProgressBar->hide();
+}
+
+void QtDcmImportWidget::showProgressBar()
+{
+    this->importProgressBar->show();
+}
+
+void QtDcmImportWidget::updateProgressBar(int i)
+{
+    this->importProgressBar->setValue(i);
+}
+
+void QtDcmImportWidget::setImportButtonEnabled(bool enable)
+{
+  this->importButton->setEnabled(enable);
+}

@@ -68,6 +68,7 @@
 #include <QtDcmConvert.h>
 #include <QtDcmPreviewWidget.h>
 #include <QtDcmImportWidget.h>
+#include <QtDcmSerieInfoWidget.h>
 
 #include <QtDcmManager.h>
 
@@ -113,7 +114,8 @@ public:
 
     QtDcmPreviewWidget * previewWidget;
     QtDcmImportWidget * importWidget;
-    
+    QtDcmSerieInfoWidget * serieInfoWidget;
+
     QProgressBar * progress;
 
     bool useConverter;
@@ -141,7 +143,8 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 
     d->importWidget = NULL;
     d->previewWidget = NULL;
-    
+    d->serieInfoWidget = NULL;
+
     d->progress = NULL;
 
     d->preferences = new QtDcmPreferences();
@@ -176,6 +179,7 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
 
     d->importWidget = NULL;
     d->previewWidget = NULL;
+    d->serieInfoWidget = NULL;
 
     d->currentPacs = d->preferences->getServers().at ( 0 );
 
@@ -211,13 +215,47 @@ void QtDcmManager::setProgressBar ( QProgressBar * progress )
 
 void QtDcmManager::setImportWidget(QtDcmImportWidget* widget)
 {
-  d->importWidget = widget;
+    d->importWidget = widget;
+    QObject::connect(d->importWidget->importButton, SIGNAL(clicked()), dynamic_cast<QtDcm *> (d->parent), SLOT(importSelectedSeries()));
 }
 
 void QtDcmManager::setPreviewWidget(QtDcmPreviewWidget* widget)
 {
-  d->previewWidget = widget;
+    d->previewWidget = widget;
 }
+
+void QtDcmManager::setSerieInfoWidget(QtDcmSerieInfoWidget* widget)
+{
+    d->serieInfoWidget = widget;
+}
+
+void QtDcmManager::clearSerieInfo()
+{
+    if (d->serieInfoWidget)
+    {
+        d->serieInfoWidget->elementCountLabel->setText("");
+        d->serieInfoWidget->institutionLabel->setText("");
+        d->serieInfoWidget->operatorLabel->setText("");
+    }
+}
+
+
+void QtDcmManager::updateSerieInfo(QString eltCount, QString institution, QString name)
+{
+    if (d->serieInfoWidget)
+    {
+        d->serieInfoWidget->elementCountLabel->setText(eltCount);
+        d->serieInfoWidget->institutionLabel->setText(institution);
+        d->serieInfoWidget->operatorLabel->setText(name);
+    }
+}
+
+void QtDcmManager::clearPreview()
+{
+    if (d->previewWidget)
+        d->previewWidget->imageLabel->setPixmap(NULL);
+}
+
 
 void QtDcmManager::displayErrorMessage ( QString message )
 {
@@ -451,14 +489,18 @@ void QtDcmManager::onSerieMoved ( QString directory )
 
 void QtDcmManager::moveSeriesFinished()
 {
-    d->progress->setValue ( 100 );
-    d->progress->hide();
-    d->progress->setValue ( 0 );
+//     d->progress->setValue ( 100 );
+//     d->progress->hide();
+//     d->progress->setValue ( 0 );
+    if (d->importWidget)
+        d->importWidget->importProgressBar->setValue(0);
 }
 
 void QtDcmManager::updateProgressBar ( int i )
 {
-    d->progress->setValue ( i );
+    if (d->importWidget)
+        d->importWidget->importProgressBar->setValue(i);
+//     d->progress->setValue ( i );
     qApp->processEvents();
 }
 
@@ -604,7 +646,8 @@ void QtDcmManager::makePreview ( QString filename )
 
                 QImage image ( colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 );
 
-                dynamic_cast<QtDcm*> ( d->parent )->getPreviewLabel()->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
+                if (d->previewWidget)
+                    d->previewWidget->imageLabel->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
             }
         }
     }
