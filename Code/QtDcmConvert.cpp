@@ -34,6 +34,8 @@ class QtDcmConvertPrivate
 {
 
 public:
+    QString tempDirectory;
+    QString serieUID;
     QString inputDirectory;
     QString outputDirectory;
     QString outputFilename;
@@ -53,10 +55,19 @@ void QtDcmConvert::convert()
 {
     if (d->manager->getPreferences()->useDcm2nii())
     {
-        //Put the code for use with dcm2nii !
+        QString program = d->manager->getPreferences()->getDcm2niiPath();
+        QStringList arguments;
+        arguments << "-x" << "N";
+        arguments << "-r" << "N";
+        arguments << "-g" << "N";
+        arguments << "-o" << d->outputDirectory << d->inputDirectory;
         
+        QProcess * process = new QProcess(this);
+        process->setStandardOutputFile(d->tempDirectory + QDir::separator() + "logs" + QDir::separator() + d->serieUID + ".txt");
+        process->start(program, arguments);
+        process->waitForFinished();
 
-        
+        delete process;
     }
     else
     {
@@ -205,3 +216,14 @@ void QtDcmConvert::setOutputFilename ( QString fname )
 {
     d->outputFilename = fname;
 }
+
+void QtDcmConvert::setSerieUID(QString uid)
+{
+  d->serieUID = uid;
+}
+
+void QtDcmConvert::setTempDirectory(QString dir)
+{
+  d->tempDirectory = dir;
+}
+

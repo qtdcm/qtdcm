@@ -36,6 +36,9 @@ public:
     void setInputDirectory ( QString dir );
     void setOutputDirectory ( QString dir );
     void setOutputFilename ( QString fname );
+    void setTempDirectory(QString dir);
+    void setSerieUID(QString uid);
+    
 
 private:
     QtDcmConvertPrivate * d;

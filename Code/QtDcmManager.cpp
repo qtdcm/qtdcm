@@ -564,6 +564,8 @@ void QtDcmManager::onSerieMoved ( QString directory , QString serie , int number
         converter->setInputDirectory ( directory);
         converter->setOutputFilename ( serie + ".nii" );
         converter->setOutputDirectory ( d->outputDir );
+        converter->setTempDirectory(d->tempDir.absolutePath());
+        converter->setSerieUID(serie);
         converter->convert();
         delete converter;
 

@@ -58,11 +58,6 @@ public:
         return treeWidgetSeries;
     }
 
-    QLabel * getPreviewLabel()
-    {
-        return imageLabel;
-    }
-
 public slots:
 //     void patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
 // 
