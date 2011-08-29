@@ -53,7 +53,28 @@ void QtDcmPreferencesDialog::updatePreferences()
 
 void QtDcmPreferencesDialog::browseDcm2niiPath()
 {
-    qDebug() << "Browse dcm2nii path";
+    // Open aa QFileDialog in directory mode.
+    QFileDialog * dialog = new QFileDialog(this);
+    dialog->setFileMode(QFileDialog::ExistingFile);
+#ifdef Q_OS_UNIX
+    dialog->setNameFilter(tr("Dcm2nii (dcm2nii)"));
+#else
+    dialog->setNameFilter(tr("Dcm2nii (dcm2nii.exe)"));
+#endif
+    dialog->setDirectory(QDir::home().dirName());
+    dialog->setWindowTitle("Choose dcm2nii path");
+    QString filename;
+    if (dialog->exec())
+    {
+        filename = dialog->selectedFiles()[0];
+    }
+    dialog->close();
+    if (!filename.isEmpty()) // A file has been chosen
+    {
+        // The the output directory to the manager and launch the conversion process
+        d->preferences->setDcm2niiPath(filename);
+        dcm2niiLineEdit->setText(filename);
+    }
 }
 
 void QtDcmPreferencesDialog::toggleDcm2niiFrame(int state)
