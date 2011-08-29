@@ -148,7 +148,7 @@ void QtDcmMoveScu::run()
         if ( d->mode == IMPORT )
         {
             cond = this->move ( d->series.at ( i ) );
-            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ));
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i);
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             progressTotal += step;
         }

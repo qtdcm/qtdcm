@@ -46,7 +46,7 @@ public:
 signals:
     void updateProgress ( int i );
     void previewSlice ( QString filename );
-    void serieMoved(QString directory, QString serie);
+    void serieMoved(QString directory, QString serie, int number);
 
 private:
     QString fixFilename ( QString name );

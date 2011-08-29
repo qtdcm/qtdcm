@@ -149,21 +149,6 @@ void QtDcmConvert::convert()
 //         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         WriterType::Pointer writer = WriterType::New();
 
         QString completeFilename = d->outputDirectory + QDir::separator() + d->outputFilename;

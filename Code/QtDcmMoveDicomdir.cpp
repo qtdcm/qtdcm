@@ -112,15 +112,11 @@ void QtDcmMoveDicomdir::run()
         d->filenames.clear();
 
         bool proceed = false;
-
         bool proceedIndex = false;
 
         static const OFString Patient ( "PATIENT" );
-
         static const OFString Study ( "STUDY" );
-
         static const OFString Series ( "SERIES" );
-
         static const OFString Image ( "IMAGE" );
 
         // Loading all the dicomdir items in a stack
@@ -136,7 +132,6 @@ void QtDcmMoveDicomdir::run()
         }
 
         OFString strName;
-
         OFString strDate;
         OFString strDesc;
 
@@ -249,7 +244,7 @@ void QtDcmMoveDicomdir::run()
                     emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
                 }
             }
-            emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) );
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) , s );
             progress += step;
         }
         else

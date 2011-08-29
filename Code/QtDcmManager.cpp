@@ -107,6 +107,8 @@ public:
     QByteArray query;
     QString previewImageUID;
 
+    QtDcmManager::outputdirmode outputdirMode;
+
     QtDcmServer * currentPacs;
 
     QTreeWidget * patientsTreeWidget;
@@ -129,6 +131,9 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->mode = "PACS";
     d->dicomdir = "";
     d->outputDir = "";
+
+    d->outputdirMode = DIALOG;
+    
     d->patientName = "*";
     d->patientId = "*";
     d->modality = "*";
@@ -163,6 +168,9 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->mode = "PACS";
     d->dicomdir = "";
     d->outputDir = "";
+
+    d->outputdirMode = DIALOG;
+    
     d->patientName = "*";
     d->patientId = "*";
     d->patientSex = "*";
@@ -218,7 +226,7 @@ void QtDcmManager::setProgressBar ( QProgressBar * progress )
 void QtDcmManager::setImportWidget(QtDcmImportWidget* widget)
 {
     d->importWidget = widget;
-    QObject::connect(d->importWidget->importButton, SIGNAL(clicked()), dynamic_cast<QtDcm *> (d->parent), SLOT(importSelectedSeries()));
+    QObject::connect(d->importWidget->importButton, SIGNAL(clicked()), this, SLOT(importSelectedSeries()));
 }
 
 void QtDcmManager::setPreviewWidget(QtDcmPreviewWidget* widget)
@@ -230,6 +238,17 @@ void QtDcmManager::setSerieInfoWidget(QtDcmSerieInfoWidget* widget)
 {
     d->serieInfoWidget = widget;
 }
+
+QtDcmManager::outputdirmode QtDcmManager::getOutputdirMode()
+{
+  return d->outputdirMode;
+}
+
+void QtDcmManager::setOutputdirMode(QtDcmManager::outputdirmode mode)
+{
+  d->outputdirMode = mode;
+}
+
 
 void QtDcmManager::clearSerieInfo()
 {
@@ -433,7 +452,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setSeries ( d->seriesToImport );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString, QString)), this, SLOT(onSerieMoved(QString, QString)));
+        QObject::connect (mover, SIGNAL (serieMoved(QString, QString, int)), this, SLOT(onSerieMoved(QString, QString, int)));
         mover->start();
     }
     else
@@ -444,7 +463,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setImportDir ( d->outputDir );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString, QString)), this, SLOT(onSerieMoved(QString, QString)));
+        QObject::connect (mover, SIGNAL (serieMoved(QString, QString, int)), this, SLOT(onSerieMoved(QString, QString, int)));
         mover->start();
     }
 }
@@ -482,7 +501,63 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     return;
 }
 
-void QtDcmManager::onSerieMoved ( QString directory , QString serie)
+void QtDcmManager::importSelectedSeries()
+{
+if ( this->useConverter() )  //Use QtDcm convertion tool (ITK or dcm2nii)
+    {
+        if ( this->seriesToImportSize() != 0 )
+        {
+            if (this->getOutputdirMode() == QtDcmManager::DIALOG)
+            {
+                QFileDialog * dialog = new QFileDialog ( d->parent );
+                dialog->setFileMode ( QFileDialog::Directory );
+                dialog->setOption ( QFileDialog::ShowDirsOnly, true );
+                dialog->setDirectory ( QDir::home().dirName() );
+                dialog->setWindowTitle ( tr ( "Export directory" ) );
+                QString directory;
+
+                if ( dialog->exec() )
+                {
+                    directory = dialog->selectedFiles() [0];
+                }
+
+                dialog->close();
+
+                if ( !directory.isEmpty() )   // A file has been chosen
+                {
+                    // Set the choosen output directory to the manager and launch the conversion process
+                    this->setOutputDirectory ( directory );
+                    this->moveSelectedSeries();
+                }
+
+                delete dialog;
+            }
+            else
+            {
+              if (QDir(this->getOutputDirectory()).exists())
+              {
+                this->moveSelectedSeries();
+              }
+            }
+        }
+    }
+    else //Only copy the dicom files in a temporary directory
+    {
+        this->setOutputDirectory ( "" );
+        this->moveSelectedSeries();
+    }
+}
+
+void QtDcmManager::importToDirectory(QString directory)
+{
+    if ( this->seriesToImportSize() != 0 )
+    {
+        this->setOutputDirectory ( directory );
+        this->moveSelectedSeries();
+    }
+}
+
+void QtDcmManager::onSerieMoved ( QString directory , QString serie , int number)
 {
     emit serieMoved(directory);
     if ( d->useConverter )
@@ -492,6 +567,10 @@ void QtDcmManager::onSerieMoved ( QString directory , QString serie)
         converter->setOutputFilename ( serie + ".nii" );
         converter->setOutputDirectory ( d->outputDir );
         converter->convert();
+        delete converter;
+
+        if (number == this->seriesToImportSize() - 1)
+          emit importFinished();
     }
 }
 

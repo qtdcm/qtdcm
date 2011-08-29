@@ -69,8 +69,6 @@ public:
      */
     void initConnections();
 
-    void importToDirectory ( QString directory );
-
 public slots:
     void findSCU();
 
@@ -103,14 +101,6 @@ public slots:
     void serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous );
 
     void serieItemClicked ( QTreeWidgetItem* current, int );
-
-    /**
-     * Slot that launch a QFileDialog for choosing an output directory
-     * where the current serie will be exported with dcm2nii (This is done by the _manager).
-     * 
-     */
-    
-    void importSelectedSeries();
 
     /**
      * Slot that query the list of server with the user specified parameters

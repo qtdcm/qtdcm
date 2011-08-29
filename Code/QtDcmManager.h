@@ -47,14 +47,12 @@ private:
      */
     void deleteTemporaryDirs();
 
-    //    /**
-    //     * This method parse and fill all the list with the result of C-FIND
-    //     */
-    //    void
-    //    parseQueryResult( QString query );
-
 public:
 
+    enum outputdirmode
+    {
+        CUSTOM, DIALOG
+    };
     /**
      * Default constructor. Instantiate the internal pointers and create the temporary directory.
      */
@@ -97,11 +95,14 @@ public:
     void setPreviewWidget ( QtDcmPreviewWidget * widget );
     void setSerieInfoWidget (QtDcmSerieInfoWidget * widget);
 
+    void setOutputdirMode(QtDcmManager::outputdirmode mode);
+    QtDcmManager::outputdirmode getOutputdirMode();
+
     void clearSerieInfo();
     void updateSerieInfo(QString eltCount, QString institution, QString name );
 
     void clearPreview();
-    
+
     /**
      * This method read the dicomdir file and populate the patient treewidget
      *
@@ -335,10 +336,14 @@ public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
     void makePreview ( QString filename );
-    void onSerieMoved(QString directory, QString uid);
+    void onSerieMoved(QString directory, QString uid, int number);
+
+    void importSelectedSeries();
+    void importToDirectory(QString directory);
 
 signals:
     void serieMoved(QString directory);
+    void importFinished();
 
 private:
     QtDcmManagerPrivate *d;

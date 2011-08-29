@@ -135,7 +135,7 @@ void QtDcm::patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* pre
 
     d->manager->clearSerieInfo();
     d->manager->clearPreview();
-    
+
     treeWidgetStudies->clear();
 
     if ( current != 0 )   // Avoid crash when clearDisplay is called
@@ -172,7 +172,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
             d->manager->findImagesDicomdir ( current->text ( 3 ) );
 
         d->manager->updateSerieInfo(current->data ( 4, 0 ).toString(), current->data ( 5, 0 ).toString(), current->data ( 6, 0 ).toString());
-        
+
         int elementCount = current->data ( 4, 0 ).toInt();
         d->manager->clearPreview();
         d->manager->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
@@ -219,53 +219,6 @@ void QtDcm::loadPatientsFromDicomdir()
 {
     this->clearDisplay();
     d->manager->loadDicomdir();
-}
-
-void QtDcm::importSelectedSeries()
-{
-    if ( d->manager->useConverter() )
-    {
-        qDebug() << d->manager->seriesToImportSize();
-        if ( d->manager->seriesToImportSize() != 0 )
-        {
-            QFileDialog * dialog = new QFileDialog ( this );
-            dialog->setFileMode ( QFileDialog::Directory );
-            dialog->setOption ( QFileDialog::ShowDirsOnly, true );
-            dialog->setDirectory ( QDir::home().dirName() );
-            dialog->setWindowTitle ( tr ( "Export directory" ) );
-            QString directory;
-
-            if ( dialog->exec() )
-            {
-                directory = dialog->selectedFiles() [0];
-            }
-
-            dialog->close();
-
-            if ( !directory.isEmpty() )   // A file has been chosen
-            {
-                // Set the output directory to the manager and launch the conversion process
-                d->manager->setOutputDirectory ( directory );
-                d->manager->moveSelectedSeries();
-            }
-
-            delete dialog;
-        }
-    }
-    else
-    {
-        d->manager->setOutputDirectory ( "" );
-        d->manager->moveSelectedSeries();
-    }
-}
-
-void QtDcm::importToDirectory ( QString directory )
-{
-    if ( d->manager->seriesToImportSize() != 0 )
-    {
-        d->manager->setOutputDirectory ( directory );
-        d->manager->moveSelectedSeries();
-    }
 }
 
 void QtDcm::queryPACS()
