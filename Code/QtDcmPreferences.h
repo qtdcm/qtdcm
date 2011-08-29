@@ -107,6 +107,15 @@ public:
      */
     void setPort ( QString port );
 
+
+    QString getDcm2niiPath();
+
+    void setDcm2niiPath(QString path);
+
+    bool useDcm2nii();
+
+    void useDcm2nii(bool use);
+    
     /**
      * Add server to the QList
      */

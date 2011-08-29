@@ -384,10 +384,12 @@ void QtDcm::editPreferences()
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog ( this );
     dialog->getWidget()->setPreferences ( d->manager->getPreferences() );
+    dialog->setPreferences(d->manager->getPreferences());
 
     if ( dialog->exec() )
     {
-        dialog->getWidget()->updatePreferences();;
+        dialog->getWidget()->updatePreferences();
+        dialog->updatePreferences();
         this->updatePacsComboBox();
     }
     dialog->close();

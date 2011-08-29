@@ -27,7 +27,6 @@
 
 
 class QtDcmPreferences;
-
 class QtDcmPreferencesWidgetPrivate;
 
 class QtDcmPreferencesWidget : public QWidget, public Ui::PreferencesWidget

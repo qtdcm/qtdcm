@@ -12,6 +12,7 @@
 
 #include <ui_qtdcmpreferencesdialog.h>
 
+class QtDcmPreferences;
 class QtDcmPreferencesWidget;
 class QtDcmPreferencesDialogPrivate;
 
@@ -28,9 +29,18 @@ public:
     virtual ~QtDcmPreferencesDialog() {};
 
     QtDcmPreferencesWidget * getWidget();
-    
-//     void setPreferences ( QtDcmPreferences * prefs );
-//     void updatePreferences();
+
+    void setPreferences ( QtDcmPreferences * prefs );
+    void updatePreferences();
+
+public slots:
+  void browseDcm2niiPath();
+  void toggleDcm2niiFrame(int state);
+
+private:
+    void initConnections();
+
+    QtDcmPreferencesDialogPrivate * d;
 };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */

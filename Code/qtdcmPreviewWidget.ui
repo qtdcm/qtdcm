@@ -16,6 +16,12 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <widget class="QGroupBox" name="previewGroupBox">
+     <property name="minimumSize">
+      <size>
+       <width>130</width>
+       <height>130</height>
+      </size>
+     </property>
      <property name="title">
       <string>Preview</string>
      </property>
@@ -23,7 +29,10 @@
       <item row="0" column="0">
        <widget class="QLabel" name="imageLabel">
         <property name="text">
-         <string>Image !</string>
+         <string>Preview</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
