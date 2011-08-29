@@ -18,6 +18,9 @@
 */
 #include "QtDcmConvert.h"
 
+#include <QtDcmManager.h>
+#include <QtDcmPreferences.h>
+
 #include <itkOrientedImage.h>
 #include <itkGDCMImageIO.h>
 #include <itkGDCMSeriesFileNames.h>
@@ -34,74 +37,87 @@ public:
     QString inputDirectory;
     QString outputDirectory;
     QString outputFilename;
+
+    QtDcmManager * manager;
 };
 
 QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
 {
     d->inputDirectory = "";
     d->outputFilename = "";
+
+    d->manager = dynamic_cast<QtDcmManager * > (parent);
 }
 
 void QtDcmConvert::convert()
 {
-    typedef signed short                                PixelType;
-    const unsigned int Dimension = 3;
-    typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
-    typedef itk::ImageSeriesReader< ImageType >         ReaderType;
-    typedef ImageType::RegionType                       RegionType;
-    typedef ImageType::SpacingType                      SpacingType;
-    typedef ImageType::PointType                        PointType;
-    typedef ImageType::DirectionType                    DirectionType;
-    typedef itk::ImageRegionIterator<ImageType>         IteratorType;
-    typedef IteratorType::IndexType                     IndexType;
-    typedef itk::ImageFileWriter<ImageType>             WriterType;
-    typedef itk::GDCMImageIO                            ImageIOType;
-    typedef itk::GDCMSeriesFileNames                    NamesGeneratorType;
-    typedef std::vector< std::string >                  FileNamesContainer;
-    typedef std::vector< std::string >                  SeriesIdContainer;
+    if (d->manager->getPreferences()->useDcm2nii())
+    {
+        //Put the code for use with dcm2nii !
+        
+
+        
+    }
+    else
+    {
+        typedef signed short                                PixelType;
+        const unsigned int Dimension = 3;
+        typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
+        typedef itk::ImageSeriesReader< ImageType >         ReaderType;
+        typedef ImageType::RegionType                       RegionType;
+        typedef ImageType::SpacingType                      SpacingType;
+        typedef ImageType::PointType                        PointType;
+        typedef ImageType::DirectionType                    DirectionType;
+        typedef itk::ImageRegionIterator<ImageType>         IteratorType;
+        typedef IteratorType::IndexType                     IndexType;
+        typedef itk::ImageFileWriter<ImageType>             WriterType;
+        typedef itk::GDCMImageIO                            ImageIOType;
+        typedef itk::GDCMSeriesFileNames                    NamesGeneratorType;
+        typedef std::vector< std::string >                  FileNamesContainer;
+        typedef std::vector< std::string >                  SeriesIdContainer;
 
 //     ImageType::Pointer image = 0;
 
-    ReaderType::Pointer reader = ReaderType::New();
-    ImageIOType::Pointer dicomIO = ImageIOType::New();
+        ReaderType::Pointer reader = ReaderType::New();
+        ImageIOType::Pointer dicomIO = ImageIOType::New();
 
-    NamesGeneratorType::Pointer inputNames = NamesGeneratorType::New();
-    inputNames->SetUseSeriesDetails ( true );
-    inputNames->AddSeriesRestriction ( "0008|0021" );
-    inputNames->AddSeriesRestriction ( "0020,0037" );
-    inputNames->LoadSequencesOn();
-    inputNames->LoadPrivateTagsOn();
-    inputNames->SetInputDirectory ( d->inputDirectory.toStdString() );
-    try
-    {
-        const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
-        std::string seriesIdentifier = seriesUID.begin()->c_str();
-        FileNamesContainer filenames = inputNames->GetFileNames ( seriesIdentifier );
-
-        dicomIO->SetFileName ( filenames.begin()->c_str() );
+        NamesGeneratorType::Pointer inputNames = NamesGeneratorType::New();
+        inputNames->SetUseSeriesDetails ( true );
+        inputNames->AddSeriesRestriction ( "0008|0021" );
+        inputNames->AddSeriesRestriction ( "0020,0037" );
+        inputNames->LoadSequencesOn();
+        inputNames->LoadPrivateTagsOn();
+        inputNames->SetInputDirectory ( d->inputDirectory.toStdString() );
         try
         {
-            dicomIO->ReadImageInformation();
-        }
-        catch ( itk::ExceptionObject &e )
-        {
-            qDebug() << e.GetDescription();
-            return;
-        }
+            const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
+            std::string seriesIdentifier = seriesUID.begin()->c_str();
+            FileNamesContainer filenames = inputNames->GetFileNames ( seriesIdentifier );
 
-        reader->UseStreamingOn();
-        reader->SetFileNames ( filenames );
-        reader->SetImageIO ( dicomIO );
+            dicomIO->SetFileName ( filenames.begin()->c_str() );
+            try
+            {
+                dicomIO->ReadImageInformation();
+            }
+            catch ( itk::ExceptionObject &e )
+            {
+                qDebug() << e.GetDescription();
+                return;
+            }
 
-        try
-        {
-            reader->Update();
-        }
-        catch ( itk::ExceptionObject &excp )
-        {
-            std::cerr << excp << std::endl;
-            return;
-        }
+            reader->UseStreamingOn();
+            reader->SetFileNames ( filenames );
+            reader->SetImageIO ( dicomIO );
+
+            try
+            {
+                reader->Update();
+            }
+            catch ( itk::ExceptionObject &excp )
+            {
+                std::cerr << excp << std::endl;
+                return;
+            }
 
 //         IteratorType itOut;
 //
@@ -149,28 +165,29 @@ void QtDcmConvert::convert()
 //         }
 
 
-        WriterType::Pointer writer = WriterType::New();
+            WriterType::Pointer writer = WriterType::New();
 
-        QString completeFilename = d->outputDirectory + QDir::separator() + d->outputFilename;
+            QString completeFilename = d->outputDirectory + QDir::separator() + d->outputFilename;
 
-        writer->SetFileName ( completeFilename.toStdString() );
-        writer->SetInput ( reader->GetOutput() );
+            writer->SetFileName ( completeFilename.toStdString() );
+            writer->SetInput ( reader->GetOutput() );
 //         writer->SetInput ( image );
 
-        try
-        {
-            writer->Update();
+            try
+            {
+                writer->Update();
+            }
+            catch ( itk::ExceptionObject &ex )
+            {
+                std::cout << ex << std::endl;
+                return;
+            }
         }
         catch ( itk::ExceptionObject &ex )
         {
             std::cout << ex << std::endl;
             return;
         }
-    }
-    catch ( itk::ExceptionObject &ex )
-    {
-        std::cout << ex << std::endl;
-        return;
     }
 }
 

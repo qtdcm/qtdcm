@@ -108,7 +108,6 @@ public:
     QString previewImageUID;
 
     QtDcmManager::outputdirmode outputdirMode;
-
     QtDcmServer * currentPacs;
 
     QTreeWidget * patientsTreeWidget;
@@ -133,7 +132,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->outputDir = "";
 
     d->outputdirMode = DIALOG;
-    
+
     d->patientName = "*";
     d->patientId = "*";
     d->modality = "*";
@@ -170,7 +169,7 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->outputDir = "";
 
     d->outputdirMode = DIALOG;
-    
+
     d->patientName = "*";
     d->patientId = "*";
     d->patientSex = "*";
@@ -241,14 +240,13 @@ void QtDcmManager::setSerieInfoWidget(QtDcmSerieInfoWidget* widget)
 
 QtDcmManager::outputdirmode QtDcmManager::getOutputdirMode()
 {
-  return d->outputdirMode;
+    return d->outputdirMode;
 }
 
 void QtDcmManager::setOutputdirMode(QtDcmManager::outputdirmode mode)
 {
-  d->outputdirMode = mode;
+    d->outputdirMode = mode;
 }
-
 
 void QtDcmManager::clearSerieInfo()
 {
@@ -503,7 +501,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
 
 void QtDcmManager::importSelectedSeries()
 {
-if ( this->useConverter() )  //Use QtDcm convertion tool (ITK or dcm2nii)
+    if ( this->useConverter() )  //Use QtDcm convertion tool (ITK or dcm2nii)
     {
         if ( this->seriesToImportSize() != 0 )
         {
@@ -534,10 +532,10 @@ if ( this->useConverter() )  //Use QtDcm convertion tool (ITK or dcm2nii)
             }
             else
             {
-              if (QDir(this->getOutputDirectory()).exists())
-              {
-                this->moveSelectedSeries();
-              }
+                if (QDir(this->getOutputDirectory()).exists())
+                {
+                    this->moveSelectedSeries();
+                }
             }
         }
     }
@@ -570,7 +568,7 @@ void QtDcmManager::onSerieMoved ( QString directory , QString serie , int number
         delete converter;
 
         if (number == this->seriesToImportSize() - 1)
-          emit importFinished();
+            emit importFinished();
     }
 }
 

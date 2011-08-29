@@ -48,11 +48,16 @@ private:
     void deleteTemporaryDirs();
 
 public:
-
     enum outputdirmode
     {
         CUSTOM, DIALOG
     };
+
+    enum convertiontool
+    {
+      ITK, DCM2NII
+    };
+    
     /**
      * Default constructor. Instantiate the internal pointers and create the temporary directory.
      */
