@@ -483,15 +483,11 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
 
 void QtDcmManager::onSerieMoved ( QString directory )
 {
-    qDebug() << directory << " QtDcmManager";
     emit serieMoved(directory);
 }
 
 void QtDcmManager::moveSeriesFinished()
 {
-//     d->progress->setValue ( 100 );
-//     d->progress->hide();
-//     d->progress->setValue ( 0 );
     if (d->importWidget)
         d->importWidget->importProgressBar->setValue(0);
 }
@@ -500,7 +496,6 @@ void QtDcmManager::updateProgressBar ( int i )
 {
     if (d->importWidget)
         d->importWidget->importProgressBar->setValue(i);
-//     d->progress->setValue ( i );
     qApp->processEvents();
 }
 
