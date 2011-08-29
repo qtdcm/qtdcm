@@ -52,7 +52,6 @@ class QtDcmMoveScuPrivate
 
 public:
     QtDcmManager * manager;
-    QtDcmConvert * converter;
     QList<QString> series;
     QList<QString> filenames;
     QString outputDir;
@@ -66,7 +65,6 @@ public:
 QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
 {
     d->manager = dynamic_cast<QtDcmManager *> ( parent );
-    d->converter = new QtDcmConvert ( this );
     progressTotal = 0;
     progressSerie = 0;
     step = 0;
@@ -150,15 +148,7 @@ void QtDcmMoveScu::run()
         if ( d->mode == IMPORT )
         {
             cond = this->move ( d->series.at ( i ) );
-            //Test if files are present (avoir crash of the application)
-            if ( d->manager->useConverter() )
-            {
-                d->converter->setInputDirectory ( serieDir.absolutePath() );
-                d->converter->setOutputFilename ( d->series.at ( i ) + ".nii" );
-                d->converter->setOutputDirectory ( d->importDir );
-                d->converter->convert();
-            }
-            emit serieMoved ( serieDir.absolutePath() );
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ));
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             progressTotal += step;
         }

@@ -93,7 +93,7 @@ void QtDcm::initConnections()
     QObject::connect ( serieDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serieDescriptionTextChanged ( QString ) ) );
     QObject::connect ( studyDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( studyDescriptionTextChanged ( QString ) ) );
     QObject::connect ( searchButton, SIGNAL ( clicked() ), this, SLOT ( findSCU() ) );
-    QObject::connect ( importButton, SIGNAL ( clicked() ), this, SLOT ( importSelectedSeries() ) );
+//     QObject::connect ( importButton, SIGNAL ( clicked() ), this, SLOT ( importSelectedSeries() ) );
     QObject::connect ( patientSexComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateSex ( int ) ) );
     QObject::connect ( serieModalityComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateModality ( int ) ) );
     QObject::connect ( pacsComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updatePACS ( int ) ) );
@@ -223,9 +223,9 @@ void QtDcm::loadPatientsFromDicomdir()
 
 void QtDcm::importSelectedSeries()
 {
-    qDebug() << "Import selected series called";
     if ( d->manager->useConverter() )
     {
+        qDebug() << d->manager->seriesToImportSize();
         if ( d->manager->seriesToImportSize() != 0 )
         {
             QFileDialog * dialog = new QFileDialog ( this );

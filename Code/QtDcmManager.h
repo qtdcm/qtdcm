@@ -335,7 +335,7 @@ public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
     void makePreview ( QString filename );
-    void onSerieMoved(QString directory);
+    void onSerieMoved(QString directory, QString uid);
 
 signals:
     void serieMoved(QString directory);

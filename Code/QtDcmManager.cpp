@@ -66,6 +66,7 @@
 #include <QtDcmMoveScu.h>
 #include <QtDcmMoveDicomdir.h>
 #include <QtDcmConvert.h>
+#include <QtDcmConvert.h>
 #include <QtDcmPreviewWidget.h>
 #include <QtDcmImportWidget.h>
 #include <QtDcmSerieInfoWidget.h>
@@ -158,6 +159,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
 {
     //Initialization of the private attributes
+    d->useConverter = true;
     d->mode = "PACS";
     d->dicomdir = "";
     d->outputDir = "";
@@ -425,14 +427,13 @@ void QtDcmManager::moveSelectedSeries()
     if ( d->mode == "CD" )
     {
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
-        mover->setMode ( QtDcmMoveDicomdir::IMPORT );
         mover->setDcmItem ( d->dfile.getDataset() );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setImportDir ( d->outputDir );
         mover->setSeries ( d->seriesToImport );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
+        QObject::connect (mover, SIGNAL (serieMoved(QString, QString)), this, SLOT(onSerieMoved(QString, QString)));
         mover->start();
     }
     else
@@ -443,7 +444,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setImportDir ( d->outputDir );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
+        QObject::connect (mover, SIGNAL (serieMoved(QString, QString)), this, SLOT(onSerieMoved(QString, QString)));
         mover->start();
     }
 }
@@ -481,9 +482,17 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     return;
 }
 
-void QtDcmManager::onSerieMoved ( QString directory )
+void QtDcmManager::onSerieMoved ( QString directory , QString serie)
 {
     emit serieMoved(directory);
+    if ( d->useConverter )
+    {
+        QtDcmConvert * converter = new QtDcmConvert(this);
+        converter->setInputDirectory ( directory);
+        converter->setOutputFilename ( serie + ".nii" );
+        converter->setOutputDirectory ( d->outputDir );
+        converter->convert();
+    }
 }
 
 void QtDcmManager::moveSeriesFinished()

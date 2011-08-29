@@ -43,7 +43,6 @@ class QtDcmMoveDicomdirPrivate
 
 public:
     QtDcmManager * manager;
-    QtDcmConvert * converter;
     QString outputDir;
     QString importDir;
     DcmItem * dcmObject;
@@ -57,7 +56,6 @@ public:
 QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) : d ( new QtDcmMoveDicomdirPrivate )
 {
     d->manager = dynamic_cast<QtDcmManager *> ( parent );
-    d->converter = new QtDcmConvert ( this );
     d->mode = QtDcmMoveDicomdir::IMPORT;
 }
 
@@ -251,14 +249,7 @@ void QtDcmMoveDicomdir::run()
                     emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
                 }
             }
-            if ( d->manager->useConverter() )
-            {
-                d->converter->setInputDirectory ( serieDir.absolutePath() );
-                d->converter->setOutputFilename ( QString ( strDate.c_str() ).replace ( " ", "_" ) + "_" + QString ( strName.c_str() ).replace ( " ", "_" ).replace ( "^", "_" ) + "_" + QString ( strDesc.c_str() ).replace ( " ", "_" ) + ".nii" );
-                d->converter->setOutputDirectory ( d->importDir );
-                d->converter->convert();
-            }
-            emit serieMoved ( serieDir.absolutePath() );
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) );
             progress += step;
         }
         else
