@@ -7,8 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>301</width>
-    <height>123</height>
+    <height>71</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>71</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>71</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -35,6 +47,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Import</string>
      </property>
@@ -43,19 +58,6 @@
        <normaloff>:/Images/save.svg</normaloff>:/Images/save.svg</iconset>
      </property>
     </widget>
-   </item>
-   <item row="2" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
