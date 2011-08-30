@@ -18,46 +18,43 @@
 */
 
 
-#ifndef QTDCMPREFERENCESWIDGET_H
-#define QTDCMPREFERENCESWIDGET_H
+#ifndef QTDCMSERVERSDICOMSETTINGSWIDGET_H
+#define QTDCMSERVERSDICOMSETTINGSWIDGET_H
 
 #include <QtGui>
 
-#include "ui_qtdcmpreferenceswidget.h"
+#include "ui_qtdcmServersDicomSettingsWidget.h"
 
 
 class QtDcmPreferences;
-class QtDcmPreferencesWidgetPrivate;
+class QtDcmServersDicomSettingsWidgetPrivate;
 
-class QtDcmPreferencesWidget : public QWidget, public Ui::PreferencesWidget
+
+class QtDcmServersDicomSettingsWidget : public QWidget, public Ui::QtDcmServersDicomSettingsWidget
 {
     Q_OBJECT
-
 public:
-    QtDcmPreferencesWidget ( QWidget * parent = 0 );
+    QtDcmServersDicomSettingsWidget ( QWidget* parent = 0 );
 
     QtDcmPreferences * getPreferences();
 
     void setPreferences ( QtDcmPreferences * prefs );
     void updatePreferences();
 
-// public slots:
-//     void itemSelected ( QTreeWidgetItem* current , QTreeWidgetItem* previous );
-//     void serverHostnameChanged ( QString text );
-//     void serverNameChanged ( QString text );
-//     void serverAetitleChanged ( QString text );
-//     void serverPortChanged ( QString text );
-//     void removeServer();
-//     void addServer();
-//     void sendEcho();
-/*
-signals:
-    void sendEchoToPacs ( int index );*/
+public slots:
+    void itemSelected ( QTreeWidgetItem* current , QTreeWidgetItem* previous );
+    void serverHostnameChanged ( QString text );
+    void serverNameChanged ( QString text );
+    void serverAetitleChanged ( QString text );
+    void serverPortChanged ( QString text );
+    void removeServer();
+    void addServer();
+    void sendEcho();
 
 private:
-    QtDcmPreferencesWidgetPrivate * d;
+    void initConnections();
 
-//     void initConnections();
+    QtDcmServersDicomSettingsWidgetPrivate * d;
 };
 
-#endif // QTDCMPREFERENCESWIDGET_H
+#endif // QTDCMSERVERSDICOMSETTINGSWIDGET_H
