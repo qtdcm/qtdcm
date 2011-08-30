@@ -94,7 +94,6 @@ public:
     void setPatientsTreeWidget ( QTreeWidget * widget );
     void setStudiesTreeWidget ( QTreeWidget * widget );
     void setSeriesTreeWidget ( QTreeWidget * widget );
-    void setProgressBar ( QProgressBar * progress );
 
     void setImportWidget ( QtDcmImportWidget * widget );
     void setPreviewWidget ( QtDcmPreviewWidget * widget );

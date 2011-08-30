@@ -118,8 +118,6 @@ public:
     QtDcmImportWidget * importWidget;
     QtDcmSerieInfoWidget * serieInfoWidget;
 
-    QProgressBar * progress;
-
     bool useConverter;
 };
 
@@ -149,8 +147,6 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->importWidget = NULL;
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
-
-    d->progress = NULL;
 
     d->preferences = new QtDcmPreferences();
 
@@ -184,7 +180,6 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;
-    d->progress = NULL;
 
     d->importWidget = NULL;
     d->previewWidget = NULL;
@@ -215,11 +210,6 @@ void QtDcmManager::setStudiesTreeWidget ( QTreeWidget * widget )
 void QtDcmManager::setSeriesTreeWidget ( QTreeWidget * widget )
 {
     d->seriesTreeWidget = widget;
-}
-
-void QtDcmManager::setProgressBar ( QProgressBar * progress )
-{
-    d->progress = progress;
 }
 
 void QtDcmManager::setImportWidget(QtDcmImportWidget* widget)
@@ -436,8 +426,6 @@ void QtDcmManager::moveSelectedSeries()
 {
     if ( !d->tempDir.exists() )
         return;
-
-    d->progress->show();
 
     qApp->processEvents();
 

@@ -1,7 +1,7 @@
 #ifndef QTDCM_H
 #define QTDCM_H
 
-#include "ui_qtdcm.h"
+#include "ui_qtdcmwidget.h"
 #include <QtGui>
 
 class QtDcmPrivate;
@@ -14,7 +14,7 @@ class QtDcmManager;
  * Once read/retrieve, each serie can be reconstructed, using the QtDcmManager.
  */
 
-class QtDcm : public QWidget, public Ui::QtDcm
+class QtDcm : public QWidget, public Ui::QtDcmWidget
 {
     Q_OBJECT
 
@@ -39,11 +39,6 @@ public:
     QTreeView * getSeriesTreeView()
     {
         return treeWidgetSeries;
-    }
-
-    QLabel * getPreviewLabel()
-    {
-        return imageLabel;
     }
 
     enum mode

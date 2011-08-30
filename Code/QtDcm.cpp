@@ -55,15 +55,11 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
     //Initialize widgets
     startDateEdit->setDate ( QDate ( 1900, 01, 01 ) );
     endDateEdit->setDate ( QDate::currentDate() );
-    //    previewGroupBox->hide();
-    detailsFrame->hide();
 
     d->manager = new QtDcmManager ( this );
     d->manager->setPatientsTreeWidget ( treeWidgetPatients );
     d->manager->setStudiesTreeWidget ( treeWidgetStudies );
     d->manager->setSeriesTreeWidget ( treeWidgetSeries );
-    d->manager->setProgressBar ( importProgressBar );
-    importProgressBar->hide();
 
     d->manager->setDate1 ( startDateEdit->date().toString ( "yyyyMMdd" ) );
     d->manager->setDate2 ( endDateEdit->date().toString ( "yyyyMMdd" ) );
@@ -93,7 +89,7 @@ void QtDcm::initConnections()
     QObject::connect ( serieDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serieDescriptionTextChanged ( QString ) ) );
     QObject::connect ( studyDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( studyDescriptionTextChanged ( QString ) ) );
     QObject::connect ( searchButton, SIGNAL ( clicked() ), this, SLOT ( findSCU() ) );
-//     QObject::connect ( importButton, SIGNAL ( clicked() ), this, SLOT ( importSelectedSeries() ) );
+    QObject::connect ( cdromButton, SIGNAL ( clicked() ), this, SLOT ( openDicomdir() ));
     QObject::connect ( patientSexComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateSex ( int ) ) );
     QObject::connect ( serieModalityComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateModality ( int ) ) );
     QObject::connect ( pacsComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updatePACS ( int ) ) );
@@ -131,8 +127,6 @@ void QtDcm::clearDisplay()
 
 void QtDcm::patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous )
 {
-    detailsFrame->hide();
-
     d->manager->clearSerieInfo();
     d->manager->clearPreview();
 
@@ -150,7 +144,6 @@ void QtDcm::patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* pre
 void QtDcm::studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous )
 {
     treeWidgetSeries->clear();
-    detailsFrame->hide();
 
     d->manager->clearSerieInfo();
     d->manager->clearPreview();
