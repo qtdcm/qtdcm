@@ -111,6 +111,8 @@ void QtDcmPreferences::writeSettings()
     }
 
     prefs.endGroup();
+
+    emit preferencesUpdated();
 }
 
 void QtDcmPreferences::setDefaultIniFile()

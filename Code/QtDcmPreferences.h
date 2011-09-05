@@ -115,7 +115,7 @@ public:
     bool useDcm2nii();
 
     void useDcm2nii(bool use);
-    
+
     /**
      * Add server to the QList
      */
@@ -135,6 +135,9 @@ public:
      * @see QtDcmServer
      */
     void setServers ( QList<QtDcmServer *> servers );
+
+signals:
+    void preferencesUpdated();
 
 private:
     /**

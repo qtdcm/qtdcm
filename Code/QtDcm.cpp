@@ -336,7 +336,7 @@ void QtDcm::editPreferences()
     {
         dialog->getWidget()->updatePreferences();
         dialog->updatePreferences();
-        this->updatePacsComboBox();
+//         this->updatePacsComboBox();
     }
     dialog->close();
     delete dialog;

@@ -177,6 +177,8 @@ QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
     d->preferences = new QtDcmPreferences();
     d->parent = dynamic_cast<QtDcm *> ( parent );
 
+    QObject::connect(d->preferences, SIGNAL(preferencesUpdated()), d->parent, SLOT(updatePacsComboBox()));
+
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;

@@ -49,6 +49,8 @@ void QtDcmPreferencesDialog::updatePreferences()
 {
     d->preferences->setDcm2niiPath(dcm2niiLineEdit->text());
     d->preferences->useDcm2nii (dcm2niiCheckBox->isChecked());
+
+    d->preferences->writeSettings();
 }
 
 void QtDcmPreferencesDialog::browseDcm2niiPath()

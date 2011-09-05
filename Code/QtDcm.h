@@ -132,13 +132,16 @@ public slots:
      */
     void studyDescriptionTextChanged ( QString );
 
+    /**
+     * Update the PACS combo box when the user modify the preferences
+     */
+    void updatePacsComboBox();
+
 signals:
     void serieChecked ( bool checked );
     void serieSelected ( bool selected );
 
 private:
-    void updatePacsComboBox();
-
     QtDcmPrivate *d;
 };
 
