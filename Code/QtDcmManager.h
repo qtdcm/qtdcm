@@ -11,6 +11,7 @@
 #include <QtGui>
 #include <QtNetwork>
 
+class QtDcm;
 class QtDcmServer;
 class QtDcmPreferences;
 class QtDcmFindScuSignalManager;
@@ -55,19 +56,16 @@ public:
 
     enum convertiontool
     {
-      ITK, DCM2NII
+        ITK, DCM2NII
     };
-    
+
+    static QtDcmManager*
+    instance();
+
     /**
      * Default constructor. Instantiate the internal pointers and create the temporary directory.
      */
     QtDcmManager();
-
-    /**
-     * Default constructor. Instantiate the internal pointers and create the temporary directory.
-     * @param parent the parent widget (the qtdcm object)
-     */
-    QtDcmManager ( QWidget * parent );
 
     /**
      * The default destructor
@@ -91,19 +89,21 @@ public:
     void findStudiesDicomdir ( QString patientName );
     void findSeriesDicomdir ( QString patientName, QString studyDescription );
     void findImagesDicomdir ( QString serieUID );
+
+    void setQtDcmWidget ( QtDcm * widget );
     void setPatientsTreeWidget ( QTreeWidget * widget );
     void setStudiesTreeWidget ( QTreeWidget * widget );
     void setSeriesTreeWidget ( QTreeWidget * widget );
 
     void setImportWidget ( QtDcmImportWidget * widget );
     void setPreviewWidget ( QtDcmPreviewWidget * widget );
-    void setSerieInfoWidget (QtDcmSerieInfoWidget * widget);
+    void setSerieInfoWidget ( QtDcmSerieInfoWidget * widget );
 
-    void setOutputdirMode(QtDcmManager::outputdirmode mode);
+    void setOutputdirMode ( QtDcmManager::outputdirmode mode );
     QtDcmManager::outputdirmode getOutputdirMode();
 
     void clearSerieInfo();
-    void updateSerieInfo(QString eltCount, QString institution, QString name );
+    void updateSerieInfo ( QString eltCount, QString institution, QString name );
 
     void clearPreview();
 
@@ -275,15 +275,6 @@ public:
      */
     QString getDate2();
 
-    /**
-     * Return the current patient list
-     *
-     * @return QList<QtDcmPatient *> the list of patient loaded
-     * @see QtDcmPatient
-     */
-    //    QList<QtDcmPatient *>
-    //    getPatients();
-
     void addSerieToImport ( QString uid );
 
     void removeSerieToImport ( QString uid );
@@ -291,22 +282,6 @@ public:
     void clearSeriesToImport();
 
     int seriesToImportSize();
-
-    /**
-     * Call dcm2nii in a QProcess object to reconstruct the given list of images
-     *
-     * @param images
-     */
-    //    void
-    //    importSeriesFromDicomdir();
-
-    /**
-     * Call dcm2nii in a QProcess object to reconstruct the given list of images
-     *
-     * @param images
-     */
-    //    void
-    //    importSeriesFromPACS();
 
     /**
      * add patient in the list
@@ -334,22 +309,23 @@ public:
 
     bool useConverter();
 
-    void useConverter(bool use);
+    void useConverter ( bool use );
 
 public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
     void makePreview ( QString filename );
-    void onSerieMoved(QString directory, QString uid, int number);
+    void onSerieMoved ( QString directory, QString uid, int number );
 
     void importSelectedSeries();
-    void importToDirectory(QString directory);
+    void importToDirectory ( QString directory );
 
 signals:
-    void serieMoved(QString directory);
+    void serieMoved ( QString directory );
     void importFinished();
 
 private:
+    static QtDcmManager * _instance;
     QtDcmManagerPrivate *d;
 };
 

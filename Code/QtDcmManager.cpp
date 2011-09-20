@@ -77,8 +77,7 @@ class QtDcmManagerPrivate
 {
 
 public:
-    QWidget * parent; /** Here the parent is corresponding to the QtDcm object */
-    //        QProgressDialog * progress; /** Dialog window showing file copy in progress */
+    QtDcm * mainWidget;
     QString dicomdir; /** Dicomdir absolute file path */
     QString outputDir; /** Output directory for reconstructed serie absolute path */
     QDir currentSerieDir; /** Directory containing current serie dicom slice */
@@ -121,6 +120,16 @@ public:
     bool useConverter;
 };
 
+QtDcmManager * QtDcmManager::_instance = 0;
+
+QtDcmManager *
+QtDcmManager ::instance()
+{
+    if ( _instance == 0 )
+        _instance = new QtDcmManager();
+    return _instance;
+}
+
 QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 {
     //Initialization of the private attributes
@@ -140,6 +149,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->studyDescription = "*";
     d->patientSex = "*";
 
+    d->mainWidget = NULL;
     d->patientsTreeWidget = NULL;
     d->studiesTreeWidget = NULL;
     d->seriesTreeWidget = NULL;
@@ -149,43 +159,6 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->serieInfoWidget = NULL;
 
     d->preferences = new QtDcmPreferences();
-
-    d->currentPacs = d->preferences->getServers().at ( 0 );
-
-    //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
-    this->createTemporaryDirs();
-}
-
-QtDcmManager::QtDcmManager ( QWidget * parent ) : d ( new QtDcmManagerPrivate )
-{
-    //Initialization of the private attributes
-    d->useConverter = true;
-    d->mode = "PACS";
-    d->dicomdir = "";
-    d->outputDir = "";
-
-    d->outputdirMode = DIALOG;
-
-    d->patientName = "*";
-    d->patientId = "*";
-    d->patientSex = "*";
-    d->date1 = "*";
-    d->date2 = "*";
-    d->modality = "*";
-    d->serieDescription = "*";
-    d->studyDescription = "*";
-    d->preferences = new QtDcmPreferences();
-    d->parent = dynamic_cast<QtDcm *> ( parent );
-
-    QObject::connect(d->preferences, SIGNAL(preferencesUpdated()), d->parent, SLOT(updatePacsComboBox()));
-
-    d->patientsTreeWidget = NULL;
-    d->studiesTreeWidget = NULL;
-    d->seriesTreeWidget = NULL;
-
-    d->importWidget = NULL;
-    d->previewWidget = NULL;
-    d->serieInfoWidget = NULL;
 
     d->currentPacs = d->preferences->getServers().at ( 0 );
 
@@ -197,6 +170,13 @@ QtDcmManager::~QtDcmManager()
 {
     this->deleteTemporaryDirs();
     delete d->preferences;
+}
+
+void QtDcmManager::setQtDcmWidget ( QtDcm* widget )
+{
+    d->mainWidget = widget;
+    if ( d->mainWidget )
+        QObject::connect ( d->preferences, SIGNAL ( preferencesUpdated() ), d->mainWidget, SLOT ( updatePacsComboBox() ) );
 }
 
 void QtDcmManager::setPatientsTreeWidget ( QTreeWidget * widget )
@@ -214,18 +194,18 @@ void QtDcmManager::setSeriesTreeWidget ( QTreeWidget * widget )
     d->seriesTreeWidget = widget;
 }
 
-void QtDcmManager::setImportWidget(QtDcmImportWidget* widget)
+void QtDcmManager::setImportWidget ( QtDcmImportWidget* widget )
 {
     d->importWidget = widget;
-    QObject::connect(d->importWidget->importButton, SIGNAL(clicked()), this, SLOT(importSelectedSeries()));
+    QObject::connect ( d->importWidget->importButton, SIGNAL ( clicked() ), this, SLOT ( importSelectedSeries() ) );
 }
 
-void QtDcmManager::setPreviewWidget(QtDcmPreviewWidget* widget)
+void QtDcmManager::setPreviewWidget ( QtDcmPreviewWidget* widget )
 {
     d->previewWidget = widget;
 }
 
-void QtDcmManager::setSerieInfoWidget(QtDcmSerieInfoWidget* widget)
+void QtDcmManager::setSerieInfoWidget ( QtDcmSerieInfoWidget* widget )
 {
     d->serieInfoWidget = widget;
 }
@@ -235,43 +215,43 @@ QtDcmManager::outputdirmode QtDcmManager::getOutputdirMode()
     return d->outputdirMode;
 }
 
-void QtDcmManager::setOutputdirMode(QtDcmManager::outputdirmode mode)
+void QtDcmManager::setOutputdirMode ( QtDcmManager::outputdirmode mode )
 {
     d->outputdirMode = mode;
 }
 
 void QtDcmManager::clearSerieInfo()
 {
-    if (d->serieInfoWidget)
+    if ( d->serieInfoWidget )
     {
-        d->serieInfoWidget->elementCountLabel->setText("");
-        d->serieInfoWidget->institutionLabel->setText("");
-        d->serieInfoWidget->operatorLabel->setText("");
+        d->serieInfoWidget->elementCountLabel->setText ( "" );
+        d->serieInfoWidget->institutionLabel->setText ( "" );
+        d->serieInfoWidget->operatorLabel->setText ( "" );
     }
 }
 
 
-void QtDcmManager::updateSerieInfo(QString eltCount, QString institution, QString name)
+void QtDcmManager::updateSerieInfo ( QString eltCount, QString institution, QString name )
 {
-    if (d->serieInfoWidget)
+    if ( d->serieInfoWidget )
     {
-        d->serieInfoWidget->elementCountLabel->setText(eltCount);
-        d->serieInfoWidget->institutionLabel->setText(institution);
-        d->serieInfoWidget->operatorLabel->setText(name);
+        d->serieInfoWidget->elementCountLabel->setText ( eltCount );
+        d->serieInfoWidget->institutionLabel->setText ( institution );
+        d->serieInfoWidget->operatorLabel->setText ( name );
     }
 }
 
 void QtDcmManager::clearPreview()
 {
-    if (d->previewWidget)
-        d->previewWidget->imageLabel->setPixmap(NULL);
+    if ( d->previewWidget )
+        d->previewWidget->imageLabel->setPixmap ( NULL );
 }
 
 
 void QtDcmManager::displayErrorMessage ( QString message )
 {
     //Instanciate a message from the parent i.e qtdcm
-    QMessageBox * msgBox = new QMessageBox ( d->parent );
+    QMessageBox * msgBox = new QMessageBox ( d->mainWidget );
     msgBox->setIcon ( QMessageBox::Critical );
     msgBox->setText ( message );
     msgBox->exec();
@@ -281,7 +261,7 @@ void QtDcmManager::displayErrorMessage ( QString message )
 void QtDcmManager::displayMessage ( QString info )
 {
     //Instanciate a message from the parent i.e qtdcm
-    QMessageBox * msgBox = new QMessageBox ( d->parent );
+    QMessageBox * msgBox = new QMessageBox ( d->mainWidget );
     msgBox->setIcon ( QMessageBox::Information );
     msgBox->setText ( info );
     msgBox->exec();
@@ -440,7 +420,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setSeries ( d->seriesToImport );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString, QString, int)), this, SLOT(onSerieMoved(QString, QString, int)));
+        QObject::connect ( mover, SIGNAL ( serieMoved ( QString, QString, int ) ), this, SLOT ( onSerieMoved ( QString, QString, int ) ) );
         mover->start();
     }
     else
@@ -451,7 +431,7 @@ void QtDcmManager::moveSelectedSeries()
         mover->setImportDir ( d->outputDir );
         QObject::connect ( mover, SIGNAL ( updateProgress ( int ) ), this, SLOT ( updateProgressBar ( int ) ) );
         QObject::connect ( mover, SIGNAL ( finished() ), this, SLOT ( moveSeriesFinished() ) );
-        QObject::connect (mover, SIGNAL (serieMoved(QString, QString, int)), this, SLOT(onSerieMoved(QString, QString, int)));
+        QObject::connect ( mover, SIGNAL ( serieMoved ( QString, QString, int ) ), this, SLOT ( onSerieMoved ( QString, QString, int ) ) );
         mover->start();
     }
 }
@@ -495,9 +475,9 @@ void QtDcmManager::importSelectedSeries()
     {
         if ( this->seriesToImportSize() != 0 )
         {
-            if (this->getOutputdirMode() == QtDcmManager::DIALOG)
+            if ( this->getOutputdirMode() == QtDcmManager::DIALOG )
             {
-                QFileDialog * dialog = new QFileDialog ( d->parent );
+                QFileDialog * dialog = new QFileDialog ( d->mainWidget );
                 dialog->setFileMode ( QFileDialog::Directory );
                 dialog->setOption ( QFileDialog::ShowDirsOnly, true );
                 dialog->setDirectory ( QDir::home().dirName() );
@@ -522,7 +502,7 @@ void QtDcmManager::importSelectedSeries()
             }
             else
             {
-                if (QDir(this->getOutputDirectory()).exists())
+                if ( QDir ( this->getOutputDirectory() ).exists() )
                 {
                     this->moveSelectedSeries();
                 }
@@ -536,7 +516,7 @@ void QtDcmManager::importSelectedSeries()
     }
 }
 
-void QtDcmManager::importToDirectory(QString directory)
+void QtDcmManager::importToDirectory ( QString directory )
 {
     if ( this->seriesToImportSize() != 0 )
     {
@@ -545,35 +525,35 @@ void QtDcmManager::importToDirectory(QString directory)
     }
 }
 
-void QtDcmManager::onSerieMoved ( QString directory , QString serie , int number)
+void QtDcmManager::onSerieMoved ( QString directory , QString serie , int number )
 {
-    emit serieMoved(directory);
+    emit serieMoved ( directory );
     if ( d->useConverter )
     {
-        QtDcmConvert * converter = new QtDcmConvert(this);
-        converter->setInputDirectory ( directory);
+        QtDcmConvert * converter = new QtDcmConvert ( this );
+        converter->setInputDirectory ( directory );
         converter->setOutputFilename ( serie + ".nii" );
         converter->setOutputDirectory ( d->outputDir );
-        converter->setTempDirectory(d->tempDir.absolutePath());
-        converter->setSerieUID(serie);
+        converter->setTempDirectory ( d->tempDir.absolutePath() );
+        converter->setSerieUID ( serie );
         converter->convert();
         delete converter;
 
-        if (number == this->seriesToImportSize() - 1)
+        if ( number == this->seriesToImportSize() - 1 )
             emit importFinished();
     }
 }
 
 void QtDcmManager::moveSeriesFinished()
 {
-    if (d->importWidget)
-        d->importWidget->importProgressBar->setValue(0);
+    if ( d->importWidget )
+        d->importWidget->importProgressBar->setValue ( 0 );
 }
 
 void QtDcmManager::updateProgressBar ( int i )
 {
-    if (d->importWidget)
-        d->importWidget->importProgressBar->setValue(i);
+    if ( d->importWidget )
+        d->importWidget->importProgressBar->setValue ( i );
     qApp->processEvents();
 }
 
@@ -719,7 +699,7 @@ void QtDcmManager::makePreview ( QString filename )
 
                 QImage image ( colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 );
 
-                if (d->previewWidget)
+                if ( d->previewWidget )
                     d->previewWidget->imageLabel->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
             }
         }

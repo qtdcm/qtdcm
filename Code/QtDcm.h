@@ -47,13 +47,6 @@ public:
     };
 
     /**
-     * Get the pointer of the QtDcm manager
-     *
-     * @return Pointer on QtDcmManager
-     */
-    QtDcmManager * getManager();
-
-    /**
      * Clear the content of the QTreeWidget
      */
     void clearDisplay();
