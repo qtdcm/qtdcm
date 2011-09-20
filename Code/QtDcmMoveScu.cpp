@@ -191,7 +191,7 @@ OFCondition QtDcmMoveScu::move ( QString uid )
         this->addOverrideKey ( QString ( "SOPInstanceUID=" + uid ) );
     }
 
-    cond = ASC_initializeNetwork ( NET_ACCEPTORREQUESTOR, d->manager->getPreferences()->getPort().toInt(), acseTimeout, &net );
+    cond = ASC_initializeNetwork ( NET_ACCEPTORREQUESTOR, QtDcmPreferences::instance()->getPort().toInt(), acseTimeout, &net );
 
     if ( cond.bad() )
     {
@@ -207,9 +207,9 @@ OFCondition QtDcmMoveScu::move ( QString uid )
         return cond;
     }
 
-    ASC_setAPTitles ( params, d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data() );
+    ASC_setAPTitles ( params, QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data() );
 
-    ASC_setPresentationAddresses ( params, d->manager->getPreferences()->getHostname().toUtf8().data(), QString ( d->manager->getCurrentPacs()->getServer() + ":"
+    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( d->manager->getCurrentPacs()->getServer() + ":"
                                    + d->manager->getCurrentPacs()->getPort() ).toUtf8().data() );
 
     cond = addPresentationContext ( params, 1, querySyntax[queryModel].findSyntax, networkTransferSyntax );

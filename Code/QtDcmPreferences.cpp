@@ -22,6 +22,8 @@ public:
     QList<QtDcmServer *> servers; /** List of server that QtDcm can query */
 };
 
+QtDcmPreferences * QtDcmPreferences::_instance = 0;
+
 QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
 {
     // Check if the .qtdcm directory exists and if not, create it in the home directory
@@ -37,6 +39,13 @@ QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
         this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
     else
         this->readSettings(); // else load the parameters
+}
+
+QtDcmPreferences* QtDcmPreferences::instance()
+{
+    if ( _instance == 0 )
+        _instance = new QtDcmPreferences();
+    return _instance;
 }
 
 void QtDcmPreferences::addServer()
@@ -60,11 +69,11 @@ void QtDcmPreferences::readSettings()
     d->hostname = prefs.value ( "Hostname" ).toString();
     prefs.endGroup();
 
-    prefs.beginGroup("Converter");
-    d->useDcm2nii = prefs.value("UseDcm2nii").toBool();
-    d->dcm2niiPath = prefs.value("Dcm2nii").toString();
+    prefs.beginGroup ( "Converter" );
+    d->useDcm2nii = prefs.value ( "UseDcm2nii" ).toBool();
+    d->dcm2niiPath = prefs.value ( "Dcm2nii" ).toString();
     prefs.endGroup();
-    
+
     //For each server load corresponding settings
     prefs.beginGroup ( "Servers" );
     for ( int i = 0; i < prefs.childGroups().size(); i++ )
@@ -95,11 +104,11 @@ void QtDcmPreferences::writeSettings()
     prefs.setValue ( "Hostname", d->hostname );
     prefs.endGroup();
 
-    prefs.beginGroup("Converter");
-    prefs.setValue("Dcm2nii", d->dcm2niiPath);
-    prefs.setValue("UseDcm2nii", d->useDcm2nii);
+    prefs.beginGroup ( "Converter" );
+    prefs.setValue ( "Dcm2nii", d->dcm2niiPath );
+    prefs.setValue ( "UseDcm2nii", d->useDcm2nii );
     prefs.endGroup();
-    
+
     //Do the job for each server
     prefs.beginGroup ( "Servers" );
     for ( int i = 0; i < d->servers.size(); i++ )
@@ -136,20 +145,25 @@ void QtDcmPreferences::setDefaultIniFile()
     this->writeSettings();
 }
 
-QString QtDcmPreferences::getIniFile(void )
+QString QtDcmPreferences::getIniFile ( void )
 {
-  return d->iniFile.fileName();
+    return d->iniFile.fileName();
 }
 
-void QtDcmPreferences::setIniFile(const QString ini)
+void QtDcmPreferences::setIniFile ( const QString ini )
 {
-  if (QFile(ini).exists())
-  {
-    d->iniFile.setFileName(ini);
-    this->readSettings();
-  }
-}
+    QDir iniDir = QDir ( QDir::homePath() + QDir::separator() + ".qtdcm" );
 
+    if ( !iniDir.exists() )
+        QDir::home().mkdir ( ".qtdcm" );
+    
+    d->iniFile.setFileName ( iniDir.absolutePath() + QDir::separator() + ini );
+    
+    if ( !d->iniFile.exists() )
+        this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
+    else
+        this->readSettings();
+}
 
 QString QtDcmPreferences::getAetitle() const
 {
@@ -193,21 +207,21 @@ void QtDcmPreferences::setServers ( QList<QtDcmServer *> servers )
 
 QString QtDcmPreferences::getDcm2niiPath()
 {
-  return d->dcm2niiPath;
+    return d->dcm2niiPath;
 }
 
-void QtDcmPreferences::setDcm2niiPath(QString path)
+void QtDcmPreferences::setDcm2niiPath ( QString path )
 {
-  d->dcm2niiPath = path;
+    d->dcm2niiPath = path;
 }
 
 bool QtDcmPreferences::useDcm2nii()
 {
-  return d->useDcm2nii;
+    return d->useDcm2nii;
 }
 
-void QtDcmPreferences::useDcm2nii(bool use)
+void QtDcmPreferences::useDcm2nii ( bool use )
 {
-  d->useDcm2nii = use;
+    d->useDcm2nii = use;
 }
 

@@ -90,7 +90,7 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     if ( findscu.initializeNetwork ( 30 ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
     if ( findscu.dropNetwork().bad() )
@@ -129,7 +129,7 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     if ( findscu.initializeNetwork ( 30 ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
     if ( findscu.dropNetwork().bad() )
@@ -177,7 +177,7 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription
     if ( findscu.initializeNetwork ( 30 ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
     if ( findscu.dropNetwork().bad() )
@@ -203,7 +203,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     if ( findscu.initializeNetwork ( 30 ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
     if ( findscu.dropNetwork().bad() )
@@ -230,7 +230,7 @@ void QtDcmFindScu::findImageScu ( QString seriesUID, QString instanceNumber )
     if ( findscu.initializeNetwork ( 30 ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), d->manager->getPreferences()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
 
     if ( findscu.dropNetwork().bad() )

@@ -155,23 +155,7 @@ public:
      */
     void setOutputDirectory ( QString directory );
 
-    /**
-     * Return the pointer to the QtDcmPreferences instance
-     *
-     * @return _preferences
-     * @see QtDcmPreferences
-     */
-    QtDcmPreferences * getPreferences();
-
     QtDcmServer * getCurrentPacs();
-
-    /**
-     * Set the pointer to the QtDcmPreferences instance
-     *
-     * @param prefs
-     * @see QtDcmPreferences
-     */
-    void setPreferences ( QtDcmPreferences * prefs );
 
     void setCurrentPacs ( int index );
 

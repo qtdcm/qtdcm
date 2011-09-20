@@ -53,9 +53,9 @@ QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
 
 void QtDcmConvert::convert()
 {
-    if (d->manager->getPreferences()->useDcm2nii())
+    if (QtDcmPreferences::instance()->useDcm2nii())
     {
-        QString program = d->manager->getPreferences()->getDcm2niiPath();
+        QString program = QtDcmPreferences::instance()->getDcm2niiPath();
         QStringList arguments;
         arguments << "-x" << "N";
         arguments << "-r" << "N";

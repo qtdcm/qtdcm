@@ -100,9 +100,9 @@ void QtDcm::updatePacsComboBox()
     pacsComboBox->blockSignals ( true );
     pacsComboBox->clear();
 
-    for ( int i = 0; i < QtDcmManager::instance()->getPreferences()->getServers().size(); i++ )
+    for ( int i = 0; i < QtDcmPreferences::instance()->getServers().size(); i++ )
     {
-        pacsComboBox->addItem ( QtDcmManager::instance()->getPreferences()->getServers().at ( i )->getName() );
+        pacsComboBox->addItem ( QtDcmPreferences::instance()->getServers().at ( i )->getName() );
     }
     pacsComboBox->blockSignals ( false );
 }
@@ -327,8 +327,8 @@ void QtDcm::editPreferences()
 {
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog ( this );
-    dialog->getWidget()->setPreferences ( QtDcmManager::instance()->getPreferences() );
-    dialog->setPreferences(QtDcmManager::instance()->getPreferences());
+    dialog->getWidget()->setPreferences ( QtDcmPreferences::instance() );
+    dialog->setPreferences(QtDcmPreferences::instance());
 
     if ( dialog->exec() )
     {

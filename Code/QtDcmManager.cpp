@@ -91,8 +91,8 @@ public:
     QList<QString> seriesToImport;
     QString serieId; /** Id of the serie to export from the PACS */
     QProcess * process; /** This attribute launch the reconstruction process */
-    QtDcmPreferences * preferences; /** Attribute that give access to the Pacs settings */
-    QString patientName; /** Attribute representing the patient name used for query PACS */
+//     QtDcmPreferences * preferences; /** Attribute that give access to the Pacs settings */
+    QString patientName; /** Attribute frepresenting the patient name used for query PACS */
     QString patientId; /** Attribute representing the patient id used for query PACS */
     QString patientSex;
     QString modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
@@ -158,9 +158,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
 
-    d->preferences = new QtDcmPreferences();
-
-    d->currentPacs = d->preferences->getServers().at ( 0 );
+    d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
 
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -169,14 +167,13 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 QtDcmManager::~QtDcmManager()
 {
     this->deleteTemporaryDirs();
-    delete d->preferences;
 }
 
 void QtDcmManager::setQtDcmWidget ( QtDcm* widget )
 {
     d->mainWidget = widget;
     if ( d->mainWidget )
-        QObject::connect ( d->preferences, SIGNAL ( preferencesUpdated() ), d->mainWidget, SLOT ( updatePacsComboBox() ) );
+        QObject::connect ( QtDcmPreferences::instance(), SIGNAL ( preferencesUpdated() ), d->mainWidget, SLOT ( updatePacsComboBox() ) );
 }
 
 void QtDcmManager::setPatientsTreeWidget ( QTreeWidget * widget )
@@ -734,16 +731,6 @@ void QtDcmManager::setOutputDirectory ( QString directory )
     d->outputDir = directory;
 }
 
-QtDcmPreferences * QtDcmManager::getPreferences()
-{
-    return d->preferences;
-}
-
-void QtDcmManager::setPreferences ( QtDcmPreferences * prefs )
-{
-    d->preferences = prefs;
-}
-
 QtDcmServer * QtDcmManager::getCurrentPacs()
 {
     return d->currentPacs;
@@ -751,8 +738,8 @@ QtDcmServer * QtDcmManager::getCurrentPacs()
 
 void QtDcmManager::setCurrentPacs ( int index )
 {
-    if ( index < d->preferences->getServers().size() )
-        d->currentPacs = d->preferences->getServers().at ( index );
+    if ( index < QtDcmPreferences::instance()->getServers().size() )
+        d->currentPacs = QtDcmPreferences::instance()->getServers().at ( index );
 }
 
 QString QtDcmManager::getPatientName()

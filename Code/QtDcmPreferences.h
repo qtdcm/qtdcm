@@ -39,6 +39,8 @@ class QtDcmPreferences : public QObject
     Q_OBJECT
 
 public:
+    static QtDcmPreferences *
+    instance();
     /**
      * Default constructor
      */
@@ -62,9 +64,9 @@ public:
      */
     void writeSettings();
 
-    void setIniFile(const QString ini);
+    void setIniFile ( const QString ini );
 
-    QString getIniFile(void);
+    QString getIniFile ( void );
 
     /**
      * QtDcm local AETitle getter
@@ -114,11 +116,11 @@ public:
 
     QString getDcm2niiPath();
 
-    void setDcm2niiPath(QString path);
+    void setDcm2niiPath ( QString path );
 
     bool useDcm2nii();
 
-    void useDcm2nii(bool use);
+    void useDcm2nii ( bool use );
 
     /**
      * Add server to the QList
@@ -149,6 +151,7 @@ private:
      */
     void setDefaultIniFile();
 
+    static QtDcmPreferences * _instance;
     QtDcmPreferencesPrivate * d;
 };
 
