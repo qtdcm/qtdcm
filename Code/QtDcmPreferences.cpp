@@ -77,6 +77,8 @@ void QtDcmPreferences::readSettings()
     }
 
     prefs.endGroup();
+
+    emit preferencesUpdated();
 }
 
 void QtDcmPreferences::writeSettings()
@@ -133,6 +135,21 @@ void QtDcmPreferences::setDefaultIniFile()
     d->servers.append ( server );
     this->writeSettings();
 }
+
+QString QtDcmPreferences::getIniFile(void )
+{
+  return d->iniFile.fileName();
+}
+
+void QtDcmPreferences::setIniFile(const QString ini)
+{
+  if (QFile(ini).exists())
+  {
+    d->iniFile.setFileName(ini);
+    this->readSettings();
+  }
+}
+
 
 QString QtDcmPreferences::getAetitle() const
 {

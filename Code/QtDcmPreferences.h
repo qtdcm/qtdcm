@@ -62,6 +62,10 @@ public:
      */
     void writeSettings();
 
+    void setIniFile(const QString ini);
+
+    QString getIniFile(void);
+
     /**
      * QtDcm local AETitle getter
      *
