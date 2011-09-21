@@ -26,19 +26,6 @@ QtDcmPreferences * QtDcmPreferences::_instance = 0;
 
 QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
 {
-    // Check if the .qtdcm directory exists and if not, create it in the home directory
-    QDir iniDir = QDir ( QDir::homePath() + QDir::separator() + ".qtdcm" );
-
-    if ( !iniDir.exists() )
-        QDir::home().mkdir ( ".qtdcm" );
-
-    //Check for the ini settings file
-    d->iniFile.setFileName ( iniDir.absolutePath() + QDir::separator() + "qtdcm.ini" );
-
-    if ( !d->iniFile.exists() )
-        this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
-    else
-        this->readSettings(); // else load the parameters
 }
 
 QtDcmPreferences* QtDcmPreferences::instance()
@@ -60,6 +47,8 @@ void QtDcmPreferences::removeServer ( int index )
 
 void QtDcmPreferences::readSettings()
 {
+    if ( !d->iniFile.exists() )
+        this->setDefaultIniFile();
     //Instantiate a QSettings object from the ini file.
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
     //Load local settings
@@ -156,9 +145,9 @@ void QtDcmPreferences::setIniFile ( const QString ini )
 
     if ( !iniDir.exists() )
         QDir::home().mkdir ( ".qtdcm" );
-    
+
     d->iniFile.setFileName ( iniDir.absolutePath() + QDir::separator() + ini );
-    
+
     if ( !d->iniFile.exists() )
         this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
     else
