@@ -7,109 +7,22 @@
     <x>0</x>
     <y>0</y>
     <width>535</width>
-    <height>575</height>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QtDcm settings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QtDcmPreferencesWidget" name="preferencesWidget" native="true"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Dicom converter</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QCheckBox" name="dcm2niiCheckBox">
-          <property name="text">
-           <string>Use Dcm2nii</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QFrame" name="dcm2niiPathFrame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Dcm2nii path :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="dcm2niiLineEdit">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="browseDcm2niiButton">
-             <property name="text">
-              <string>Browse...</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
+    <widget class="QtDcmPreferencesWidget" name="preferencesWidget" native="true">
+     <zorder>groupBox</zorder>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
+    <widget class="QtDcmDcm2niiSettingsWidget" name="dcm2niiWidget" native="true"/>
+   </item>
+   <item row="3" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -119,6 +32,19 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -126,6 +52,12 @@
    <class>QtDcmPreferencesWidget</class>
    <extends>QWidget</extends>
    <header>QtDcmPreferencesWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtDcmDcm2niiSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtDcmDcm2niiSettingsWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

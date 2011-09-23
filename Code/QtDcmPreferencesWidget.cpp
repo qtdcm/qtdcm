@@ -87,105 +87,6 @@ QtDcmPreferencesWidget::QtDcmPreferencesWidget ( QWidget* parent ) : d ( new QtD
 
 }
 
-// void QtDcmPreferencesWidget::initConnections()
-// {
-//     QObject::connect ( treeWidget, SIGNAL ( currentItemChanged ( QTreeWidgetItem*, QTreeWidgetItem* ) ), this, SLOT ( itemSelected ( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
-//     QObject::connect ( serverNameEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverNameChanged ( QString ) ) );
-//     QObject::connect ( serverHostnameEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverHostnameChanged ( QString ) ) );
-//     QObject::connect ( serverAetitleEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverAetitleChanged ( QString ) ) );
-//     QObject::connect ( serverPortEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverPortChanged ( QString ) ) );
-//     QObject::connect ( addButton, SIGNAL ( clicked() ), this, SLOT ( addServer() ) );
-//     QObject::connect ( removeButton, SIGNAL ( clicked() ), this, SLOT ( removeServer() ) );
-//     QObject::connect ( echoButton, SIGNAL ( clicked() ), this, SLOT ( sendEcho() ) );
-// }
-
-// void QtDcmPreferencesWidget::sendEcho()
-// {
-//     if ( !d->preferences )
-//         return;
-// 
-//     if ( !treeWidget->currentItem() )
-//         return;
-// 
-//     QString aet = d->preferences->getAetitle();
-//     QString serverAet = treeWidget->currentItem()->data ( 1, 1 ).toString();
-//     QString hostname = d->preferences->getHostname();
-//     QString serverHostname = treeWidget->currentItem()->data ( 3, 1 ).toString();
-//     QString serverPort = treeWidget->currentItem()->data ( 2, 1 ).toString();
-// 
-//     T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
-// 
-//     OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 5 /* timeout */, &net );
-//     if ( cond != EC_Normal )
-//     {
-//         QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-//         msgBox->setIcon ( QMessageBox::Critical );
-//         msgBox->setText ( "Cannot initialize network" );
-//         msgBox->exec();
-//         delete msgBox;
-//         return;
-//     }
-// 
-//     T_ASC_Parameters *params; // parameters of association request
-// 
-//     cond = ASC_createAssociationParameters ( &params, ASC_DEFAULTMAXPDU );
-// 
-//     // set calling and called AE titles
-//     cond = ASC_setAPTitles ( params, aet.toUtf8().data(), serverAet.toUtf8().data(), NULL );
-// 
-//     // the DICOM server accepts connections at server.nowhere.com port 104
-//     cond = ASC_setPresentationAddresses ( params, hostname.toUtf8().data(), QString ( serverHostname + ":" + serverPort ).toAscii().data() );
-// 
-//     // list of transfer syntaxes, only a single entry here
-//     const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
-// 
-//     // add presentation context to association request
-//     cond = ASC_addPresentationContext ( params, 1, UID_VerificationSOPClass, ts, 1 );
-// 
-//     // request DICOM association
-//     T_ASC_Association *assoc;
-// 
-//     if ( ASC_requestAssociation ( net, params, &assoc ).good() )
-//     {
-//         if ( ASC_countAcceptedPresentationContexts ( params ) == 1 )
-//         {
-//             // the remote SCP has accepted the Verification Service Class
-//             DIC_US id = assoc->nextMsgID++; // generate next message ID
-//             DIC_US status; // DIMSE status of C-ECHO-RSP will be stored here
-//             DcmDataset *sd = NULL; // status detail will be stored here
-//             // send C-ECHO-RQ and handle response
-//             DIMSE_echoUser ( assoc, id, DIMSE_BLOCKING, 0, &status, &sd );
-// 
-//             delete sd; // we don't care about status detail
-//             QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-//             msgBox->setIcon ( QMessageBox::Information );
-//             msgBox->setText ( "Echo request successful !" );
-//             msgBox->exec();
-//             delete msgBox;
-//         }
-//         else
-//         {
-//             QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-//             msgBox->setIcon ( QMessageBox::Critical );
-//             msgBox->setText ( "Wrong presentation context, echo request failed" );
-//             msgBox->exec();
-//             delete msgBox;
-//         }
-//     }
-//     else
-//     {
-//         QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-//         msgBox->setIcon ( QMessageBox::Critical );
-//         msgBox->setText ( "Wrong dicom association, echo request failed" );
-//         msgBox->exec();
-//         delete msgBox;
-//     }
-// 
-//     ASC_releaseAssociation ( assoc ); // release association
-//     ASC_destroyAssociation ( &assoc ); // delete assoc structure
-//     ASC_dropNetwork ( &net ); // delete net structure
-// }
-
 QtDcmPreferences * QtDcmPreferencesWidget::getPreferences()
 {
     return d->preferences;
@@ -197,24 +98,6 @@ void QtDcmPreferencesWidget::setPreferences ( QtDcmPreferences * prefs )
 
     localDicomSettingsWidget->setPreferences(d->preferences);
     serversDicomSettingsWidget->setPreferences(d->preferences);
-
-//     localAetitleEdit->setText ( d->preferences->getAetitle() );
-//     localPortEdit->setText ( d->preferences->getPort() );
-//     localHostnameEdit->setText ( d->preferences->getHostname() );
-// 
-//     for ( int i = 0; i < d->preferences->getServers().size(); i++ )
-//     {
-//         QTreeWidgetItem * item = new QTreeWidgetItem ( treeWidget );
-//         item->setText ( 0, d->preferences->getServers().at ( i )->getName() );
-//         item->setData ( 0, 1, QVariant ( d->preferences->getServers().at ( i )->getName() ) );
-//         item->setData ( 4, 1, QVariant ( i ) );
-//         item->setText ( 1, d->preferences->getServers().at ( i )->getAetitle() );
-//         item->setData ( 1, 1, QVariant ( d->preferences->getServers().at ( i )->getAetitle() ) );
-//         item->setText ( 2, d->preferences->getServers().at ( i )->getPort() );
-//         item->setData ( 2, 1, QVariant ( d->preferences->getServers().at ( i )->getPort() ) );
-//         item->setText ( 3, d->preferences->getServers().at ( i )->getServer() );
-//         item->setData ( 3, 1, QVariant ( d->preferences->getServers().at ( i )->getServer() ) );
-//     }
 }
 
 void QtDcmPreferencesWidget::updatePreferences()

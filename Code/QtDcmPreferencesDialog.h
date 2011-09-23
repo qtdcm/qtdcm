@@ -33,13 +33,7 @@ public:
     void setPreferences ( QtDcmPreferences * prefs );
     void updatePreferences();
 
-public slots:
-  void browseDcm2niiPath();
-  void toggleDcm2niiFrame(int state);
-
 private:
-    void initConnections();
-
     QtDcmPreferencesDialogPrivate * d;
 };
 
