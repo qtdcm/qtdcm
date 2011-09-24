@@ -17,6 +17,7 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
 add_definitions(-g -Wno-deprecated -DPACKAGE_DATE="" -DPACKAGE_VERSION="" -DPACKAGE_VERSION_NUMBER="")
 
+option(BUILD_EXAMPLE "Build qtdcm example application" OFF)
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
 option(BUILD_DOCUMENTATION "Build QtDcm Documentation" OFF)
 option(BUILD_PACKAGE "Configure QtDcm packaging" OFF)
@@ -168,6 +169,10 @@ include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})# ${qm_files})
 target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage)# jpeg ijg12 ijg16 ijg8)# tiff /lib/libwrap.so.0)
 
+if (BUILD_EXAMPLE)
+  add_subdirectory(Example)
+endif()
+
 
 # External inclusion stuff :
 set(QTDCM_USE_FILE ${QTDCM_BINARY_DIR}/UseQtDCM.cmake)
@@ -189,5 +194,3 @@ include (${QTDCM_SOURCE_DIR}/CMake/QtDCMGenerateInstall.cmake)
 if ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
   install_targets(${INSTALL_LIB} qtdcm)
 endif ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
-
-
