@@ -1,6 +1,6 @@
 /*
     <one line to give the library's name and an idea of what it does.>
-    Copyright (C) 2011  Alexandre <email>
+    Copyright (C) 2011  Alexandre Abadie <Alexandre.Abadie@univ-rennes1.fr>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
