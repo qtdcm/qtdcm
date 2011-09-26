@@ -6,8 +6,8 @@ project(QTDCM)
 #set(QTDCM_VERSION_MINOR "1")
 #set(QTDCM_VERSION_PATCH "0")
 
-set(${PROJECT_NAME}_VERSION_MAJOR 0 CACHE STRING "${PROJECT_NAME} major version number.")
-set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "${PROJECT_NAME} minor version number.")
+set(${PROJECT_NAME}_VERSION_MAJOR 2 CACHE STRING "${PROJECT_NAME} major version number.")
+set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number.")
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
@@ -72,8 +72,6 @@ set(QTDCM_RCCS
 
 set(SAMPLE_SRCS 
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcm2.cpp
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImportWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.cpp
@@ -90,20 +88,14 @@ set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.cpp
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmServer.cpp
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmExportThread.cpp
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmQueryThread.cpp
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewDialog.cpp
 )
 
 set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcm2.h
-  ${QTDCM_SOURCE_DIR}/Code/QtDcmWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImportWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.h
@@ -120,7 +112,6 @@ set(SAMPLE_HDRS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmSerie.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmStudy.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPatient.h
-#   ${QTDCM_SOURCE_DIR}/Code/QtDcmDateDialog.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferences.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
@@ -129,7 +120,6 @@ set(SAMPLE_HDRS
 
 set(SAMPLE_UIS
   ${QTDCM_SOURCE_DIR}/Code/qtdcm.ui
-  ${QTDCM_SOURCE_DIR}/Code/qtdcmwidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmImportWidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmPreviewWidget.ui
   ${QTDCM_SOURCE_DIR}/Code/qtdcmSerieInfoWidget.ui
