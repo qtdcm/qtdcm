@@ -1,27 +1,29 @@
-QtDcm - version 0.1
+QtDcm - version 2.0
 (c) Alexandre Abadie
 =============================================
 contact : alexandre.abadie@univ-rennes1.fr
-          romain.carpentier@irisa.fr
 =============================================
 
-1 - Présentation
+1 - Presentation
 2 - Installation
 
 
-1 - Présentation
+1 - Presentation
 ================
 
-La bibliothèque QtDcm implémente un widget Qt pour manipuler des données Dicom.
-Avec QtDcm, il est possible d'explorer un CD Dicom, d'interroger un PACS (Pictures
-Archive and Communications System) et de convertir ces données en format Nifti. Il
-est également possible d'afficher une prévisualisation des images dicom.
+QtDcm implements a Qt widget in order to manipulate Dicom data. With QtDcm, it is now possible
+to explore a Dicom CD-ROM, to query a PACS (Pictures Archive and Communications System) and
+to convert series of images to the nifti format.
+Due to its modular design, QtDcm is very easy to integrate in other application (see the example
+in the code).
 
 2 - Installation
 ================
 
-QtDcm nécessite l'installation de CMake (version 2.6 et supérieures), Qt (version 4.5
-et supérieures, Dcmtk (version 3.5.4 et supérieures).
-La conversion des données Dicom en format Nifti se base sur l'outil en ligne de commande
-<< dcm2nii >> téléchargeable sur le site de Mricron.
-La communications avec un PACS utilise la distribution des outils Dcm4che2.
+QtDcm requires :
+ - CMake (version 2.6 and later),
+ - Qt (version 4.5 and later),
+ - Dcmtk (version 3.5.4 and later).
+The conversion of Dicom data to Nifti format is based (for the moment) on a command line tool
+<<dcm2nii>>. This tool can be downloaded from the mricron website
+(http://www.cabiatl.com/mricro/mricron/dcm2nii.html).
