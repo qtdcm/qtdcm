@@ -1,6 +1,6 @@
 /*!
- * \file QtM3d.cpp
- * \brief Main class for the QtM3DViewer application
+ * \file dicom.cpp
+ * \brief Main class for the QtDcm example
  * \author Alexandre Abadie
  * \version 0.1
  */
