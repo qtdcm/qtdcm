@@ -199,6 +199,10 @@ public:
      */
     void setPatientId ( QString patientId );
 
+    QString getPatientBirthDate();
+    
+    QString getPatientSex();
+    
     void setPatientSex ( QString sex );
 
     /**
@@ -229,6 +233,8 @@ public:
      */
     void setStudyDescription ( QString studyDescription );
 
+    QString getExamDate();
+    
     /**
      * Study modality setter
      *

@@ -13,8 +13,8 @@
 
 Dicom::Dicom ( QWidget *parent ) : QMainWindow ( parent )
 {
-    QtDcmPreferences::instance()->setIniFile("qtdcm.ini");
     ui.setupUi ( this );
+    QtDcmPreferences::instance()->setIniFile("qtdcm.ini");
     QtDcmManager::instance()->setQtDcmWidget ( ui.qtdcm );
     QtDcmManager::instance()->setSerieInfoWidget ( ui.serieInfoWidget );
     QtDcmManager::instance()->setPreviewWidget ( ui.previewWidget );

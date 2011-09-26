@@ -72,7 +72,8 @@ public:
 
 QtDcmFindScu::QtDcmFindScu ( QObject * parent ) : d ( new QtDcmFindScuPrivate )
 {
-    d->manager = dynamic_cast<QtDcmManager *> ( parent );
+//     d->manager = dynamic_cast<QtDcmManager *> ( parent );
+    d->manager = QtDcmManager::instance();
 }
 
 QtDcmFindScu::~QtDcmFindScu() {}

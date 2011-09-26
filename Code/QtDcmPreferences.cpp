@@ -20,6 +20,7 @@
 
 #include <QtDcmServer.h>
 #include <QtDcmPreferences.h>
+#include <QtDcmManager.h>
 
 class QtDcmPreferencesPrivate
 {
@@ -86,7 +87,6 @@ void QtDcmPreferences::readSettings()
         d->servers.at ( i )->setPort ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Port" ).toString() );
         d->servers.at ( i )->setName ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Name" ).toString() );
     }
-
     prefs.endGroup();
 
     emit preferencesUpdated();
@@ -165,6 +165,8 @@ void QtDcmPreferences::setIniFile ( const QString ini )
         this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
     else
         this->readSettings();
+
+    emit preferencesUpdated();
 }
 
 QString QtDcmPreferences::getAetitle() const

@@ -99,6 +99,7 @@ public:
     QString patientName; /** Attribute frepresenting the patient name used for query PACS */
     QString patientId; /** Attribute representing the patient id used for query PACS */
     QString patientSex;
+    QString patientBirthDate;
     QString modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
     QString date1; /** Attribute for the begin date of the query (usefull for date based queries) */
     QString date2; /** Attribute for the end date of the query (usefull for date based queries) */
@@ -106,7 +107,6 @@ public:
     QString studyDescription; /** Attibute representing the study description used for query PACS */
     QString mode; /** Mode that determine the type of media (CD or PACS) */
     QString dcm2nii; /** Absolute filename of the dcm2nii program */
-    QString dcm4che; /** Absolute filename of the dcm4che program */
     QByteArray query;
     QString previewImageUID;
 
@@ -146,6 +146,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 
     d->patientName = "*";
     d->patientId = "*";
+    d->patientBirthDate = "";
     d->modality = "*";
     d->date1 = "*";
     d->date2 = "*";
@@ -161,9 +162,8 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->importWidget = NULL;
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
-
+   
     d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
-
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
 }
@@ -177,7 +177,11 @@ void QtDcmManager::setQtDcmWidget ( QtDcm* widget )
 {
     d->mainWidget = widget;
     if ( d->mainWidget )
+    {
         QObject::connect ( QtDcmPreferences::instance(), SIGNAL ( preferencesUpdated() ), d->mainWidget, SLOT ( updatePacsComboBox() ) );
+        d->mainWidget->updatePacsComboBox();
+    }
+    
 }
 
 void QtDcmManager::setPatientsTreeWidget ( QTreeWidget * widget )
@@ -271,12 +275,15 @@ void QtDcmManager::displayMessage ( QString info )
 
 void QtDcmManager::findPatientsScu()
 {
-    d->seriesToImport.clear();
-    d->mode = "PACS";
+    if (d->mainWidget->pacsComboBox->count())
+    {
+        d->seriesToImport.clear();
+        d->mode = "PACS";
 
-    QtDcmFindScu * finder = new QtDcmFindScu ( this );
-    finder->findPatientsScu ( d->patientName, d->patientSex );
-    delete finder;
+        QtDcmFindScu * finder = new QtDcmFindScu ( this );
+        finder->findPatientsScu ( d->patientName, d->patientSex );
+        delete finder;
+    }
 }
 
 void QtDcmManager::findStudiesScu ( QString patientName )
@@ -764,6 +771,36 @@ QString QtDcmManager::getPatientId()
 void QtDcmManager::setPatientId ( QString patientId )
 {
     d->patientId = patientId;
+}
+
+QString QtDcmManager::getPatientBirthDate()
+{
+    QString birthdate;
+    if (d->patientsTreeWidget)
+        if (d->patientsTreeWidget->currentItem())
+            birthdate = d->patientsTreeWidget->currentItem()->data(2,0).toString();
+    qDebug() << birthdate;
+    return birthdate;
+}
+
+QString QtDcmManager::getPatientSex()
+{
+    QString sex("");
+    if (d->patientsTreeWidget)
+        if (d->patientsTreeWidget->currentItem())
+            sex = d->patientsTreeWidget->currentItem()->data(3,0).toString();
+    qDebug() << sex;
+    return sex;
+}
+
+QString QtDcmManager::getExamDate()
+{
+    QString examDate;
+    if (d->studiesTreeWidget)
+        if (d->studiesTreeWidget->currentItem())
+            examDate = d->studiesTreeWidget->currentItem()->data(1,0).toString();
+    qDebug() << examDate;
+    return examDate;
 }
 
 void QtDcmManager::setPatientSex ( QString sex )

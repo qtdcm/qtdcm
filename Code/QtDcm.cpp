@@ -81,7 +81,7 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
     QtDcmManager::instance()->setDate1 ( startDateEdit->date().toString ( "yyyyMMdd" ) );
     QtDcmManager::instance()->setDate2 ( endDateEdit->date().toString ( "yyyyMMdd" ) );
 
-    this->updatePacsComboBox();
+//     this->updatePacsComboBox();
     initConnections();
 }
 
@@ -132,6 +132,7 @@ void QtDcm::findSCU()
     treeWidgetPatients->clear();
     treeWidgetStudies->clear();
     treeWidgetSeries->clear();
+    QtDcmManager::instance()->setCurrentPacs(pacsComboBox->currentIndex());
     QtDcmManager::instance()->findPatientsScu();
 }
 

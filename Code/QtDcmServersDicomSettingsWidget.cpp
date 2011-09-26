@@ -240,7 +240,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
 
     T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
 
-    OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 5 /* timeout */, &net );
+    OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 1 /* timeout */, &net );
     if ( cond != EC_Normal )
     {
         QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
