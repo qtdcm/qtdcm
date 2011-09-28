@@ -20,7 +20,7 @@
 #ifndef QTDCM_H
 #define QTDCM_H
 
-#include "ui_qtdcmwidget.h"
+#include "ui_qtdcm.h"
 #include <QtGui>
 
 class QtDcmPrivate;
