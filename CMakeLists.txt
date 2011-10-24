@@ -38,7 +38,7 @@ mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
 #Configure doxygen documentation
 if(BUILD_DOCUMENTATION)
-  subdirs(Documentation/Doxygen)
+  add_subdirectory(Documentation/Doxygen)
 endif(BUILD_DOCUMENTATION)
 
 set (QTDCM_CMAKE_MODULE_PATH ${QTDCM_SOURCE_DIR}/CMake)

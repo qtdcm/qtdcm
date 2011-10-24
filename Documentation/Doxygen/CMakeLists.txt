@@ -19,6 +19,10 @@ if(BUILD_DOCUMENTATION)
     ${CMAKE_CURRENT_SOURCE_DIR}/doc_makeall.sh.in
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
 
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/qtdcm_dox.css
+    ${CMAKE_CURRENT_BINARY_DIR}/html/qtdcm_dox.css)
+
   add_custom_target(Documentation
     ${BASH}
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh
