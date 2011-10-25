@@ -64,6 +64,8 @@ MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES
 INCLUDE_PATH         =
 
+LAYOUT_FILE = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/DoxygenLayout.xml
+
 HTML_HEADER      = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/header.html
 HTML_FOOTER      = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/footer.html
 HTML_STYLESHEET  = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/qtdcm_dox.css

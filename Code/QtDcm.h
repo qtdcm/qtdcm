@@ -24,7 +24,6 @@
 #include <QtGui>
 
 class QtDcmPrivate;
-
 class QtDcmManager;
 
 /**

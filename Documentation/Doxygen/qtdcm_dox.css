@@ -11,10 +11,21 @@ body
   border-radius:10px;
 }
 
-table, div, p, dl {
+table, p, dl {
   text-align: left;
 	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
 	font-size: 12px;
+}
+
+div{
+  background: white;
+  text-align: left;
+  font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+  font-size: 12px;
+}
+
+img{
+  overflow:auto;
 }
 
 #pageHeader
@@ -227,9 +238,14 @@ div.groupText {
 }*/
 
 div.contents {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-right: 5px;
+  background:white;
+/* 	margin-top: 10px; */
+  padding-top:10px;
+  padding-bottom:10px;
+  margin-left: 0px;
+	margin-right: 0px;
+  padding-left: 10px;
+  padding-right: 5px;
 }
 
 td.indexkey {
@@ -264,14 +280,19 @@ img.formulaInl {
 }
 
 div.center {
+  background:white;
 	text-align: center;
-        margin-top: 0px;
-        margin-bottom: 0px;
-        padding: 0px;
+/*         margin-top: 0px; */
+        /*margin-bottom: 0px;*/
+  margin:0px;
+  padding: 0px;
+  overflow:auto;
 }
 
 div.center img {
 	border: 0px;
+  background:white;
+  overflow:auto;
 }
 
 address.footer {
@@ -843,15 +864,6 @@ dl.bug
 #projectname a:link{
   color: #5D7403;
   text-decoration: none;
-}
-
-#projectname a:hover, a:visited{
-  background-color:white;
-  background: #B2CF42;
-  color: #FFF;
-  border-radius:5px;
-  text-decoration: none;
-  border:0px;
 }
     
 #projectbrief
