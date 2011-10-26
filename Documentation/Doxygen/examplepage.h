@@ -1,9 +1,9 @@
 /**
  * \page examplepage A simple Qt example
  *
- * Here we describe the complete example available in the Example directory. The example use a gui generated with Qt Designer.
+ * Here we describe the complete example available in the Example directory. The example uses a gui generated with Qt Designer.
  *
- * We define a class called Dicom (why not ?)
+ * We define a class called Dicom (why not ?) that will embed QtDcm widgets.
  * 
  * \code
  *
@@ -55,7 +55,7 @@ Dicom::Dicom ( QWidget *parent ) : QMainWindow ( parent )
  * ui.setupUi(this);
  * \endcode
  *
- * Then we set the settings file of qtdcm that will initialize the QtDcmPreferences object.
+ * Then we set the settings file of qtdcm that will be used to initialize the QtDcmPreferences object.
  * \code
  * QtDcmPreferences::instance()->setIniFile("qtdcm.ini");
  * \endcode
@@ -99,7 +99,7 @@ Dicom::exportSerie()
  *
  *
  * Finally the Dicom::preferences() slot displays a QDialog for setting the application preferences. The called method is QtDcm::editPreferences().
- * It also possible to set the preferences from an embedded widget, see QtDcmPreferencesWidget, QtDcmLocalDicomSettingsWidget and
+ * It is also possible to set the preferences from an embedded widget, see QtDcmPreferencesWidget, QtDcmLocalDicomSettingsWidget and
  * QtDcmServersDicomSettingsWidget classes.
  * \code
 void
