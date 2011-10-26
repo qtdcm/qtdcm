@@ -1,0 +1,2 @@
+This is for updating the documentation on the website :
+make Documentation && rsync -ruz -e ssh /home/aabadie/Softs/builds/qtdcm/html abadie@scm.gforge.inria.fr:/home/groups/qtdcm/htdocs/

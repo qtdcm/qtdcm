@@ -24,6 +24,13 @@ div{
   font-size: 12px;
 }
 
+code{
+  padding:5px;
+  border:1px dashed;
+  background:#DFDBD3;
+  border-radius:3px;
+}
+
 img{
   overflow:auto;
 }
