@@ -3,7 +3,7 @@
 
 /*!
  * \file dicom.h
- * \brief Main class for the QtM3DViewer application
+ * \brief Main class for the example application
  * \author Alexandre Abadie
  * \version 0.1
  */

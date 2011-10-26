@@ -1,8 +1,8 @@
 /*!
  * \file main.cpp
- * \brief Main for the example QtM3d application
+ * \brief Main for the example application
  * \author Alexandre Abadie
- * \version 0.1
+ * \version 2.0
  */
 
 #include <QtGui>

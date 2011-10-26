@@ -5,11 +5,6 @@
  * Welcome to the <a href="http://qtdcm.gforge.inria.fr">QtDcm</a> online documentation. Here you will find the basic information to start
  * using and developing your application with <a href="http://qtdcm.gforge.inria.fr">QtDcm</a>.
  *
- * <ul>
- *  <li>\ref architecturepage </li>
- *  <li>\ref widgetspage </li>
- * </ul>
- *
  * \section install_sec Installation
  *
  * As there is no precompiled package of QtDcm, you will have to compile everything. Follow the 3 steps below to get the library compiled:
@@ -22,6 +17,7 @@
  * \section tutorial_sec Developer tutorial
  *
  * <ul>
+ *  <li>\ref widgetspage </li>
  *  <li>\ref integrationpage </li>
  *  <li>\ref examplepage </li>
  * </ul>

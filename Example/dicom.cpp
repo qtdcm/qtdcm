@@ -1,6 +1,6 @@
 /*!
  * \file dicom.cpp
- * \brief Main class for the QtDcm example
+ * \brief Main class for the example
  * \author Alexandre Abadie
  * \version 0.1
  */

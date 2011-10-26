@@ -55,12 +55,12 @@ Dicom::Dicom ( QWidget *parent ) : QMainWindow ( parent )
  * ui.setupUi(this);
  * \endcode
  *
- * Then we set the settings file of qtdcm. From this file QtDcmManager will instanciate the QtDcmPreferences class.
+ * Then we set the settings file of qtdcm that will initialize the QtDcmPreferences object.
  * \code
  * QtDcmPreferences::instance()->setIniFile("qtdcm.ini");
  * \endcode
  *
- * Then we give QtDcmManager the pointers to the specific widgets: QtDcm, QtDcmSerieInfoWidget, QtDcmPreviewWidget and QtDcmImportWidget 
+ * Then we give QtDcmManager the pointers to the specific widgets: QtDcm, QtDcmSerieInfoWidget, QtDcmPreviewWidget and QtDcmImportWidget.
  * \code  
  * QtDcmManager::instance()->setQtDcmWidget ( ui.qtdcm );
  * QtDcmManager::instance()->setSerieInfoWidget ( ui.serieInfoWidget );
@@ -109,6 +109,5 @@ Dicom::preferences()
 }
  * \endcode
  *
- *
- * To watch the full code, see dicom.h and dicom.cpp
+ * To watch the full code, see dicom.h, dicom.cpp and main.cpp
  */
