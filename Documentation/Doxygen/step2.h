@@ -31,6 +31,7 @@
  * \section config_sec Configuring QtDcm with CMake
  *
  *
- * Go to the \ref step3page step
+ * Go to the \ref step3page step<br>
+ * Back to \ref step1page step
  * 
  */
