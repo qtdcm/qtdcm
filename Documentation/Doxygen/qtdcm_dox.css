@@ -24,8 +24,10 @@ div{
   font-size: 12px;
 }
 
-code{
+#code {
+  font-family: Courier;
   padding:5px;
+  padding-left: 20px;
   border:1px dashed;
   background:#DFDBD3;
   border-radius:3px;
