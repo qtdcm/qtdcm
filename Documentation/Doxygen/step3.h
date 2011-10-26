@@ -6,6 +6,11 @@
  * $ make
  * </div>
  *
+ * If you want to build this documentation, type this command:
+ * <div id="code">
+ * $ make Documentation
+ * </div>
+ *
  * Back to \ref step2page step
  *
  */

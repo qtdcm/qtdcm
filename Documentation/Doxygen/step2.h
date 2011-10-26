@@ -27,9 +27,31 @@
  *
  * Download the 3.20 version of the Insight Toolkit from <a href="http://voxel.dl.sourceforge.net/sourceforge/itk/InsightToolkit-3.20.0.tar.gz">here</a>.
  *
- *
  * \section config_sec Configuring QtDcm with CMake
+ * Make sure to have CMake 2.8.5 minimum and then go to your local QtDcm source directory. We will perform an out of source build, so you have to create
+ * a "build" directory and launch cmake from this place:
+ * <div id="code">
+ * $ cd qtdcm_source_dir<br>
+ * $ mkdir build<br>
+ * $ cd build<br>
+ * $ cmake ..<br>
+ * </div>
  *
+ * Now you have ton configure some CMake variables before compiling the project:
+ * <div id="code">
+ * ITK_DIR : /path/to/your/itk/build/directory<br>
+ * DCMTK_DIR : /usr/local<br>
+ * CMAKE_BUILD_TYPE : release<br>
+ * BUILD_SHARED_LIBS : ON<br>
+ * </div>
+ *
+ * If you want to play with the example or build this documentation, you can the following variables:
+ * <div id="code">
+ * BUILD_EXAMPLE : ON<br>
+ * BUILD_DOCUMENTATION : ON<br>
+ * </div>
+ *
+ * Then you are ready to compile the library.
  *
  * Go to the \ref step3page step<br>
  * Back to \ref step1page step
