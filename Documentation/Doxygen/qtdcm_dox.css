@@ -133,8 +133,6 @@ div.qindex, div.navtab{
 }
 
 div.qindex, div.navpath {
-/* 	width: 100%; */
-/*   float:center; */
   width: 770px;
 	line-height: 140%;
 }
