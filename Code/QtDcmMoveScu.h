@@ -132,7 +132,6 @@ protected:
 private:
     QtDcmMoveScuPrivate * d;
 
-    //For dcmtk stuff
     T_ASC_Network*        net;              /* the global DICOM network */
     T_ASC_Parameters*     params;
     T_ASC_Association*  assoc;

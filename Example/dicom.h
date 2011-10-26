@@ -2,7 +2,7 @@
 #define DICOM_H
 
 /*!
- * \file QtM3d.h
+ * \file dicom.h
  * \brief Main class for the QtM3DViewer application
  * \author Alexandre Abadie
  * \version 0.1
