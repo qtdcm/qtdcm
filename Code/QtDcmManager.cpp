@@ -162,8 +162,9 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->importWidget = NULL;
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
-   
-    d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
+    d->currentPacs = NULL;
+    qDebug()<< QtDcmPreferences::instance()->getServers();
+//    d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
 }
@@ -181,7 +182,7 @@ void QtDcmManager::setQtDcmWidget ( QtDcm* widget )
         QObject::connect ( QtDcmPreferences::instance(), SIGNAL ( preferencesUpdated() ), d->mainWidget, SLOT ( updatePacsComboBox() ) );
         d->mainWidget->updatePacsComboBox();
     }
-    
+
 }
 
 void QtDcmManager::setPatientsTreeWidget ( QTreeWidget * widget )
