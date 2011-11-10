@@ -14,7 +14,9 @@ if(ITK_FOUND)
   include(${ITK_USE_FILE})
 endif(ITK_FOUND)
 
-add_definitions(-DHAVE_CONFIG_H -fPIC)
+if(NOT MSVC)
+  add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )
+endif()
 
 set(QTDCM_RCCS
     ${QTDCM_SOURCE_DIR}/Resources/qtdcm.qrc

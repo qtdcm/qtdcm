@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 project(QTDCMEXAMPLE)
 
-if(!MSVC)
-  add_definitions( -Wno-deprecated -g -DHAVE_CONFIG_H -fPIC )
+if(NOT MSVC)
+  add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )
 endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QTDCMEXAMPLE_SOURCE_DIR}")
@@ -21,8 +21,6 @@ find_package(ITK REQUIRED)
 if(ITK_FOUND)
   include(${ITK_USE_FILE})
 endif(ITK_FOUND)
-
-add_definitions(-DHAVE_CONFIG_H -fPIC)
 
 set(SAMPLE_SRCS
   ${QTDCMEXAMPLE_SOURCE_DIR}/main.cpp
