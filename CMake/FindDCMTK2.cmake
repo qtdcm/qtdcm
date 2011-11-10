@@ -29,12 +29,14 @@ SET(DCMTK_SOURCE_DIR $ENV{DCMTK_SOURCE_DIR})
 FIND_PATH( DCMTK_root_INCLUDE_DIR dcmtk/config/osconfig.h
   PATHS
   ${DCMTK_DIR}/include
+  ${DCMTK_DIR}/config/include
 )
 
 FIND_PATH( DCMTK_config_INCLUDE_DIR osconfig.h
   ${DCMTK_DIR}/config/include
   ${DCMTK_DIR}/include/config
   ${DCMTK_DIR}/include/dcmtk/config
+  ${DCMTK_DIR}/config/include/dcmtk/config
 )
 
 FIND_PATH( DCMTK_ofstd_INCLUDE_DIR ofstdinc.h
@@ -49,17 +51,29 @@ IF(NOT DCMTK_ofstd_INCLUDE_DIR)
   )
 ENDIF(NOT DCMTK_ofstd_INCLUDE_DIR)
 
+get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+
+set(LIBSUFFIX
+)
+if (DEFINED LIB64)
+  if (${LIB64} STREQUAL "TRUE")
+    set(LIBSUFFIX 64)
+  endif()
+endif()
+
 FIND_LIBRARY( DCMTK_ofstd_LIBRARY ofstd
   ${DCMTK_DIR}/ofstd/libsrc
   ${DCMTK_DIR}/ofstd/libsrc/Release
   ${DCMTK_DIR}/ofstd/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ofstd_LIBRARY_DEBUG ofstd
   ${DCMTK_DIR}/ofstd/libsrc/Debug
   ${DCMTK_DIR}/ofstd/Debug
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_PATH( DCMTK_oflog_INCLUDE_DIR logger.h
@@ -78,12 +92,15 @@ FIND_LIBRARY( DCMTK_oflog_LIBRARY oflog
   ${DCMTK_DIR}/oflog/libsrc
   ${DCMTK_DIR}/oflog/libsrc/Release
   ${DCMTK_DIR}/oflog/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_oflog_LIBRARY_DEBUG oflog
   ${DCMTK_DIR}/oflog/libsrc/Debug
   ${DCMTK_DIR}/oflog/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_PATH( DCMTK_dcmdata_INCLUDE_DIR dctypes.h
@@ -102,12 +119,42 @@ FIND_LIBRARY( DCMTK_dcmdata_LIBRARY dcmdata
   ${DCMTK_DIR}/dcmdata/libsrc
   ${DCMTK_DIR}/dcmdata/libsrc/Release
   ${DCMTK_DIR}/dcmdata/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_dcmdata_LIBRARY_DEBUG dcmdata
   ${DCMTK_DIR}/dcmdata/libsrc/Debug
   ${DCMTK_DIR}/dcmdata/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
+)
+
+FIND_PATH( DCMTK_dcmimage_INCLUDE_DIR diregist.h
+  ${DCMTK_DIR}/dcmimage/include
+  ${DCMTK_DIR}/include/dcmimage
+  ${DCMTK_DIR}/include/dcmtk/dcmimage
+)
+
+IF(NOT DCMTK_dcmimage_INCLUDE_DIR) 
+  FIND_PATH( DCMTK_dcmimage_INCLUDE_DIR dcmtk/dcmimage/diregist.h
+    ${DCMTK_SOURCE_DIR}/dcmimage/include
+  )
+ENDIF(NOT DCMTK_dcmimage_INCLUDE_DIR)
+
+FIND_LIBRARY( DCMTK_dcmimage_LIBRARY dcmimage
+  ${DCMTK_DIR}/dcmimage/libsrc
+  ${DCMTK_DIR}/dcmimage/libsrc/Release
+  ${DCMTK_DIR}/dcmimage/Release
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
+)
+
+FIND_LIBRARY( DCMTK_dcmimage_LIBRARY_DEBUG dcmimage
+  ${DCMTK_DIR}/dcmimage/libsrc/Debug
+  ${DCMTK_DIR}/dcmimage/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_PATH( DCMTK_dcmimgle_INCLUDE_DIR dcmimage.h
@@ -126,12 +173,15 @@ FIND_LIBRARY( DCMTK_dcmimgle_LIBRARY dcmimgle
   ${DCMTK_DIR}/dcmimgle/libsrc
   ${DCMTK_DIR}/dcmimgle/libsrc/Release
   ${DCMTK_DIR}/dcmimgle/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_dcmimgle_LIBRARY_DEBUG dcmimgle
   ${DCMTK_DIR}/dcmimgle/libsrc/Debug
   ${DCMTK_DIR}/dcmimgle/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_PATH( DCMTK_dcmjpeg_INCLUDE_DIR djdecode.h
@@ -150,62 +200,80 @@ FIND_LIBRARY( DCMTK_dcmjpeg_LIBRARY dcmjpeg
   ${DCMTK_DIR}/dcmjpeg/libsrc
   ${DCMTK_DIR}/dcmjpeg/libsrc/Release
   ${DCMTK_DIR}/dcmjpeg/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_dcmjpeg_LIBRARY_DEBUG dcmjpeg
   ${DCMTK_DIR}/dcmjpeg/libsrc/Debug
   ${DCMTK_DIR}/dcmjpeg/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg8_LIBRARY ijg8
   ${DCMTK_DIR}/dcmjpeg/libijg8/
   ${DCMTK_DIR}/dcmjpeg/libijg8/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg8_LIBRARY_DEBUG ijg8
   ${DCMTK_DIR}/dcmjpeg/libijg8/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg12_LIBRARY ijg12
   ${DCMTK_DIR}/dcmjpeg/libijg12/
   ${DCMTK_DIR}/dcmjpeg/libijg12/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg12_LIBRARY_DEBUG ijg12
   ${DCMTK_DIR}/dcmjpeg/libijg12/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg16_LIBRARY ijg16
   ${DCMTK_DIR}/dcmjpeg/libijg16/
   ${DCMTK_DIR}/dcmjpeg/libijg16/Release
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY( DCMTK_ijg16_LIBRARY_DEBUG ijg16
   ${DCMTK_DIR}/dcmjpeg/libijg16/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY(DCMTK_dcmqrdb_LIBRARY dcmqrdb 
   ${DCMTK_DIR}/dcmqrdb/libsrc/Release
   ${DCMTK_DIR}/dcmqrdb/libsrc/
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY(DCMTK_dcmqrdb_LIBRARY_DEBUG dcmqrdb 
   ${DCMTK_DIR}/dcmqrdb/libsrc/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY(DCMTK_dcmnet_LIBRARY dcmnet 
   ${DCMTK_DIR}/dcmnet/libsrc/Release
   ${DCMTK_DIR}/dcmnet/libsrc/
-  ${DCMTK_DIR}/lib
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 FIND_LIBRARY(DCMTK_dcmnet_LIBRARY_DEBUG dcmnet 
   ${DCMTK_DIR}/dcmnet/libsrc/Debug
+  ${DCMTK_DIR}/lib${LIBSUFFIX}
+  ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
 
 
@@ -215,6 +283,8 @@ IF( DCMTK_root_INCLUDE_DIR
     AND DCMTK_ofstd_LIBRARY
     AND DCMTK_dcmdata_INCLUDE_DIR
     AND DCMTK_dcmdata_LIBRARY
+    AND DCMTK_dcmimage_INCLUDE_DIR
+    AND DCMTK_dcmimage_LIBRARY 
     AND DCMTK_dcmimgle_INCLUDE_DIR
     AND DCMTK_dcmimgle_LIBRARY 
     AND DCMTK_dcmjpeg_LIBRARY )
@@ -226,6 +296,7 @@ IF( DCMTK_root_INCLUDE_DIR
     ${DCMTK_config_INCLUDE_DIR}
     ${DCMTK_ofstd_INCLUDE_DIR}
     ${DCMTK_dcmdata_INCLUDE_DIR}
+    ${DCMTK_dcmimage_INCLUDE_DIR}
     ${DCMTK_dcmimgle_INCLUDE_DIR}
     ${DCMTK_dcmjpeg_INCLUDE_DIR}
   )
@@ -238,6 +309,7 @@ IF( DCMTK_root_INCLUDE_DIR
     ${OPTIMIZED} ${DCMTK_ijg8_LIBRARY}
     ${OPTIMIZED} ${DCMTK_ijg12_LIBRARY}
     ${OPTIMIZED} ${DCMTK_ijg16_LIBRARY}
+    ${OPTIMIZED} ${DCMTK_dcmimage_LIBRARY}
     ${OPTIMIZED} ${DCMTK_dcmimgle_LIBRARY}
     ${OPTIMIZED} ${DCMTK_dcmdata_LIBRARY}
   )
@@ -246,6 +318,7 @@ IF( DCMTK_root_INCLUDE_DIR
     debug     ${DCMTK_ijg8_LIBRARY_DEBUG}
     debug     ${DCMTK_ijg12_LIBRARY_DEBUG}
     debug     ${DCMTK_ijg16_LIBRARY_DEBUG}
+    debug     ${DCMTK_dcmimage_LIBRARY_DEBUG}
     debug     ${DCMTK_dcmimgle_LIBRARY_DEBUG}
     debug     ${DCMTK_dcmdata_LIBRARY_DEBUG}
   )
@@ -348,14 +421,15 @@ ENDIF( DCMTK_root_INCLUDE_DIR
     AND DCMTK_ofstd_LIBRARY
     AND DCMTK_dcmdata_INCLUDE_DIR
     AND DCMTK_dcmdata_LIBRARY
+    AND DCMTK_dcmimage_INCLUDE_DIR
+    AND DCMTK_dcmimage_LIBRARY
     AND DCMTK_dcmimgle_INCLUDE_DIR
     AND DCMTK_dcmimgle_LIBRARY
+
     AND DCMTK_dcmjpeg_LIBRARY )
 
 #-----------------------------------------------------------------------------
-IF(DCMTK_FOUND)
-  
-ELSE(DCMTK_FOUND)
+IF(NOT DCMTK_FOUND)
 
   SET( DCMTK_DIR "" CACHE PATH ${DCMTK_DIR_MESSAGE} )
   SET( DCMTK_SOURCE_DIR "" CACHE PATH ${DCMTK_SOURCE_DIR_MESSAGE} )
@@ -370,4 +444,4 @@ ELSE(DCMTK_FOUND)
   ENDIF(DCMTK2_FIND_REQUIRED)
   
 
-ENDIF(DCMTK_FOUND)
+ENDIF()

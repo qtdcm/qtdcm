@@ -23,7 +23,6 @@
 #include <QtGui>
 
 class QtDcmSerie;
-
 class QtDcmImagePrivate;
 
 /**

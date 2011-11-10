@@ -15,7 +15,9 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
-add_definitions(-g -Wno-deprecated -DPACKAGE_DATE="" -DPACKAGE_VERSION="" -DPACKAGE_VERSION_NUMBER="")
+if(!MSVC)
+  add_definitions( -Wno-deprecated -g -DHAVE_CONFIG_H -fPIC )
+endif()
 
 option(BUILD_EXAMPLE "Build qtdcm example application" OFF)
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
@@ -24,7 +26,7 @@ option(BUILD_PACKAGE "Configure QtDcm packaging" OFF)
 
 option(BUILD_SHARED_LIBS "Build Qtdcm with shared libraries." ON)
 
-if (BUILD_PACKAGE)
+if(BUILD_PACKAGE)
   include (${QTDCM_SOURCE_DIR}/CMake/CPackConfig.cmake)
 endif(BUILD_PACKAGE)
 

@@ -725,7 +725,7 @@ OFCondition QtDcmMoveScu::storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *
     if ( OFFalse )
     {
 #ifdef _WIN32
-        tmpnam ( imageFileName );
+        tmpnam ( imageFile );
 #else
         strcpy ( imageFile, NULL_DEVICE_NAME );
 #endif

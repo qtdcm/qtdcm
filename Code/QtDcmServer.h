@@ -53,7 +53,7 @@ public:
      *
      * @return _aetitle a QString
      */
-    QString getAetitle() const
+    inline QString getAetitle() const
     {
         return _aetitle;
     }
@@ -63,7 +63,7 @@ public:
      *
      * @return _name a QString
      */
-    QString getName() const
+    inline QString getName() const
     {
         return _name;
     }
@@ -73,7 +73,7 @@ public:
      *
      * @return _port as a QString
      */
-    QString getPort() const
+    inline QString getPort() const
     {
         return _port;
     }
@@ -83,7 +83,7 @@ public:
      *
      * @return _server as a QString
      */
-    QString getServer() const
+    inline QString getServer() const
     {
         return _server;
     }
@@ -93,7 +93,7 @@ public:
      *
      * @param _aetitle as a QString
      */
-    void setAetitle ( QString _aetitle )
+    inline void setAetitle ( QString _aetitle )
     {
         this->_aetitle = _aetitle;
     }
@@ -103,7 +103,7 @@ public:
      *
      * @param _name as a QString
      */
-    void setName ( QString _name )
+    inline void setName ( QString _name )
     {
         this->_name = _name;
     }
@@ -113,7 +113,7 @@ public:
      *
      * @param port as a QString
      */
-    void setPort ( QString port )
+    inline void setPort ( QString port )
     {
         this->_port = port;
     }
@@ -123,7 +123,7 @@ public:
      *
      * @param _server as a QString
      */
-    void setServer ( QString _server )
+    inline void setServer ( QString _server )
     {
         this->_server = _server;
     }
