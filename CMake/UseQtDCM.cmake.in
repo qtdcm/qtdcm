@@ -10,10 +10,10 @@ IF(QTDCM_BUILD_SETTINGS_FILE)
   CMAKE_IMPORT_BUILD_SETTINGS("${QTDCM_BUILD_SETTINGS_FILE}")
 ENDIF(QTDCM_BUILD_SETTINGS_FILE)
 
-# Add include directories needed to use Vistal.
-INCLUDE_DIRECTORIES(${QTDCM_INCLUDE_DIRS})
+# Add include directories needed to use QtDcm.
+INCLUDE_DIRECTORIES(${QTDCM_INCLUDE_DIRS} ${QTDCM_BINARY_DIR}/Code)
 
-# Add link directories needed to use Vistal.
+# Add link directories needed to use QtDcm.
 LINK_DIRECTORIES(${QTDCM_LIBRARY_DIRS})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QTDCM_CMAKE_MODULE_PATH}")
 

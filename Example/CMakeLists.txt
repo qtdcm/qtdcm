@@ -16,6 +16,11 @@ endif (QTDCM_FOUND)
 find_package(DCMTK2 REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIR})
 
+find_package(ITK REQUIRED)
+if(ITK_FOUND)
+  include(${ITK_USE_FILE})
+endif(ITK_FOUND)
+
 add_definitions(-DHAVE_CONFIG_H -fPIC)
 
 set(SAMPLE_SRCS
@@ -39,4 +44,4 @@ qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_INCLUDE_DIR} ${QTDCM_DIR} ${QTDCMEXAMPLE_BINARY_DIR} ${DCMTK_INCLUDE_DIR})
 
 add_executable( dicom ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})# ${qm_files})
-target_link_libraries( dicom ${QTDCM_LIBS} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} dcmimage tiff jpeg ijg12 ijg16 ijg8)
+target_link_libraries( dicom ${QTDCM_LIBS} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage tiff jpeg ijg12 ijg16 ijg8)
