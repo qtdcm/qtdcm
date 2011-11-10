@@ -15,7 +15,10 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
-add_definitions(-g -Wno-deprecated -DPACKAGE_DATE="" -DPACKAGE_VERSION="" -DPACKAGE_VERSION_NUMBER="")
+add_definitions(-g )
+if(!MSVC)
+  add_definitions( -Wno-deprecated )
+endif()
 
 option(BUILD_EXAMPLE "Build qtdcm example application" OFF)
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
@@ -24,7 +27,7 @@ option(BUILD_PACKAGE "Configure QtDcm packaging" OFF)
 
 option(BUILD_SHARED_LIBS "Build Qtdcm with shared libraries." ON)
 
-if (BUILD_PACKAGE)
+if(BUILD_PACKAGE)
   include (${QTDCM_SOURCE_DIR}/CMake/CPackConfig.cmake)
 endif(BUILD_PACKAGE)
 
@@ -73,7 +76,7 @@ set(QTDCM_RCCS
     ${QTDCM_SOURCE_DIR}/Resources/qtdcm.qrc
 )
 
-set(SAMPLE_SRCS 
+set(SAMPLE_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcm.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmImportWidget.cpp
   ${QTDCM_SOURCE_DIR}/Code/QtDcmPreviewWidget.cpp
@@ -160,7 +163,7 @@ link_directories(${DCMTK_DIR}/lib/)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})# ${qm_files})
-target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage jpeg ijg12 ijg16 ijg8 tiff)# /lib/libwrap.so.0)
+target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO jpeg tiff)# /lib/libwrap.so.0)
 
 if (BUILD_EXAMPLE)
   add_subdirectory(Example)
