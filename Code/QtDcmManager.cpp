@@ -34,20 +34,6 @@
 #include <QtDcmPreferences.h>
 #include <QtDcmFindCallback.h>
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
@@ -55,15 +41,6 @@
 #include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
 // For color images
 #include <dcmtk/dcmimage/diregist.h>
-
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
-
-#ifdef WITH_OPENSSL
-#include "dcmtk/dcmtls/tlstrans.h"
-#include "dcmtk/dcmtls/tlslayer.h"
-#endif
 
 #include <QtDcmFindScu.h>
 #include <QtDcmFindDicomdir.h>
