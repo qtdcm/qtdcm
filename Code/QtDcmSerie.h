@@ -24,9 +24,7 @@
 #include <QtGui>
 
 class QtDcmSeriePrivate;
-
 class QtDcmStudy;
-
 class QtDcmImage;
 
 /**

@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(QTDCMEXAMPLE)
 
-add_definitions(-g -Wno-deprecated)
-add_definitions(-DHAVE_CONFIG_H)
+if(!MSVC)
+  add_definitions( -Wno-deprecated -g -DHAVE_CONFIG_H -fPIC )
+endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QTDCMEXAMPLE_SOURCE_DIR}")
 set (QTDCM_DIR "${QTDCM_BINARY_DIR}")
@@ -16,7 +17,7 @@ endif (QTDCM_FOUND)
 find_package(DCMTK2 REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIR})
 
-add_definitions(-DHAVE_CONFIG_H -fPIC)
+
 
 set(SAMPLE_SRCS
   ${QTDCMEXAMPLE_SOURCE_DIR}/main.cpp

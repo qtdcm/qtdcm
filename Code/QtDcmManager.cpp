@@ -710,8 +710,13 @@ void QtDcmManager::makePreview ( QString filename )
 
                 if ( d->previewWidget )
                     d->previewWidget->imageLabel->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
+
+                delete colored;
+
             }
         }
+
+        delete dcimage;
     }
 }
 

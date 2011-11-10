@@ -37,74 +37,62 @@ class QtDcmPatientPrivate
 QtDcmPatient::QtDcmPatient() : d(new QtDcmPatientPrivate)
 {}
 
-QString
-QtDcmPatient::getId()
+QString QtDcmPatient::getId()
 {
     return d->id;
 }
 
-void
-QtDcmPatient::setId(QString id)
+void QtDcmPatient::setId(QString id)
 {
     d->id = id;
 }
 
-QString
-QtDcmPatient::getName()
+QString QtDcmPatient::getName()
 {
     return d->name;
 }
 
-void
-QtDcmPatient::setName(QString name)
+void QtDcmPatient::setName(QString name)
 {
     d->name = name;
 }
 
-QString
-QtDcmPatient::getBirthdate()
+QString QtDcmPatient::getBirthdate()
 {
     return d->birthdate;
 }
 
-void
-QtDcmPatient::setBirthdate(QString birthdate)
+void QtDcmPatient::setBirthdate(QString birthdate)
 {
     d->birthdate = birthdate;
 }
 
-QString
-QtDcmPatient::getSex()
+QString QtDcmPatient::getSex()
 {
     return d->sex;
 }
 
-void
-QtDcmPatient::setSex(QString sex)
+void QtDcmPatient::setSex(QString sex)
 {
     d->sex = sex;
 }
 
-QList<QtDcmStudy *>
-QtDcmPatient::getStudies()
+QList<QtDcmStudy *> QtDcmPatient::getStudies()
 {
     return d->studies;
 }
 
-void
-QtDcmPatient::setStudies(QList<QtDcmStudy *> studies)
+void QtDcmPatient::setStudies(QList<QtDcmStudy *> studies)
 {
     d->studies = studies;
 }
 
-void
-QtDcmPatient::addStudy(QtDcmStudy * study)
+void QtDcmPatient::addStudy(QtDcmStudy * study)
 {
     d->studies.append(study);
 }
 
-void
-QtDcmPatient::removeStudy(int index)
+void QtDcmPatient::removeStudy(int index)
 {
     d->studies.removeAt(index);
 }
