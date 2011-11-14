@@ -243,7 +243,6 @@ void QtDcmFindDicomdir::findStudies ( QString patientName )
                     lelt->getOFStringArray ( strDate );
                     infosMap.insert ( "Date", QString ( strDate.c_str() ) );
                 }
-
                 d->manager->foundStudy ( infosMap );
             }
 

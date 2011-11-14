@@ -89,7 +89,7 @@ public:
      */
     void findPatientsScu();
     void findStudiesScu ( QString patientName );
-    void findSeriesScu ( QString patientName, QString studyDescription );
+    void findSeriesScu ( QString patientName, QString studyUID );
     void findImagesScu ( QString uid );
     void foundPatient ( QMap<QString, QString> infosMap );
     void foundStudy ( QMap<QString, QString> infosMap );

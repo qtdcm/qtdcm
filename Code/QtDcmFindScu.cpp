@@ -57,6 +57,8 @@
 #include "dcmtk/dcmtls/tlslayer.h"
 #endif
 
+#include <QTcpSocket>
+
 #include <QtDcmFindCallback.h>
 #include <QtDcmManager.h>
 #include <QtDcmPreferences.h>
@@ -98,6 +100,16 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     OFString temp_str;
     DcmFindSCU findscu;
 
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        return;
+    }
+
     QtDcmFindCallback * callback = new QtDcmFindCallback();
     callback->setManager ( d->manager );
 
@@ -136,6 +148,16 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
+
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        return;
+    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::STUDY );
     callback->setManager ( d->manager );
@@ -186,6 +208,16 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     OFString temp_str;
     DcmFindSCU findscu;
 
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        return;
+    }
+
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::SERIE );
     callback->setManager ( d->manager );
 
@@ -207,11 +239,21 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
 
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
-    
+
 
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
+
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        return;
+    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGES );
     callback->setManager ( d->manager );
@@ -239,6 +281,16 @@ void QtDcmFindScu::findImageScu ( QString imageUID)
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
+
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        return;
+    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
     callback->setManager ( d->manager );

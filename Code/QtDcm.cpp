@@ -81,19 +81,10 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
     QtDcmManager::instance()->setDate1 ( startDateEdit->date().toString ( "yyyyMMdd" ) );
     QtDcmManager::instance()->setDate2 ( endDateEdit->date().toString ( "yyyyMMdd" ) );
 
-//     this->updatePacsComboBox();
     initConnections();
 }
 
-QtDcm::~QtDcm()
-{
-//     delete QtDcmManager::instance();
-}
-
-// QtDcmManager * QtDcm::getManager()
-// {
-//     return QtDcmManager::instance();
-// }
+QtDcm::~QtDcm() {}
 
 void QtDcm::initConnections()
 {
@@ -120,9 +111,7 @@ void QtDcm::updatePacsComboBox()
     pacsComboBox->clear();
 
     for ( int i = 0; i < QtDcmPreferences::instance()->getServers().size(); i++ )
-    {
         pacsComboBox->addItem ( QtDcmPreferences::instance()->getServers().at ( i )->getName() );
-    }
     pacsComboBox->blockSignals ( false );
 }
 
@@ -172,10 +161,6 @@ void QtDcm::studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
             QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
         else
             QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
-//         if ( d->mode == QtDcm::PACS )
-//             QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
-//         else
-//             QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
     }
 }
 
@@ -194,9 +179,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
 
         int elementCount = current->data ( 4, 0 ).toInt();
         QtDcmManager::instance()->clearPreview();
-//         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
-
     }
 }
 
@@ -250,15 +233,15 @@ void QtDcm::updateModality ( int index )
     switch ( index )
     {
 
-    case 0://MR
+    case 0://*
         QtDcmManager::instance()->setModality ( "*" );
         break;
 
-    case 1://CT
+    case 1://MR
         QtDcmManager::instance()->setModality ( "MR" );
         break;
 
-    case 2://US
+    case 2://CT
         QtDcmManager::instance()->setModality ( "CT" );
         break;
 

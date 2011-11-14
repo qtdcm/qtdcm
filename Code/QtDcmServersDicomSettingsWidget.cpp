@@ -57,8 +57,11 @@
 #include "dcmtk/dcmtls/tlslayer.h"
 #endif
 
+#include <QTcpSocket>
+
 #include <QtDcmPreferences.h>
 #include <QtDcmServer.h>
+#include <qtcpsocket.h>
 
 class QtDcmServersDicomSettingsWidgetPrivate
 {
@@ -246,6 +249,20 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
         QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
         msgBox->setIcon ( QMessageBox::Critical );
         msgBox->setText ( "Cannot initialize network" );
+        msgBox->exec();
+        delete msgBox;
+        return;
+    }
+
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(serverHostname, serverPort.toInt());
+    if (socket->waitForConnected(1000))
+        socket->disconnectFromHost();
+    else
+    {
+        QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
+        msgBox->setIcon ( QMessageBox::Information );
+        msgBox->setText ( "Cannot connect to server " + serverHostname + " on port " + serverPort + " !" );
         msgBox->exec();
         delete msgBox;
         return;

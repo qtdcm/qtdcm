@@ -41,7 +41,7 @@ public:
 
     void findStudies ( QString patientName );
 
-    void findSeries ( QString patientName, QString studyDescription );
+    void findSeries ( QString patientName, QString studyUid );
 
     void findImages ( QString seriesUID );
 
