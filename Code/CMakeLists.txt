@@ -86,30 +86,18 @@ set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})
 
 set(QTDCM_SRCS
   ${QTDCM_SOURCE_DIR}/Code/QtDcmFindCallback.cpp
-#     ${QTDCM_SOURCE_DIR}/Code/QtDcmConvert.cpp
 )
 
 qt4_add_resources(QTDCM_RCC_SRCS ${QTDCM_RCCS})
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
-#set(LANGUAGES fr_FR en_US)
-
-#set(LANGUAGE_TS_FILES)
-#foreach(LANGUAGE ${LANGUAGES})
-#set(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/qtdcm_${LANGUAGE}.ts")
-#set(LANGUAGE_TS_FILES ${LANGUAGE_TS_FILES} ${TS_FILE})
-#endforeach(LANGUAGE ${LANGUAGES})
-#IF(LANGUAGE_TS_FILES)
-#  qt4_create_translation(qm_files ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_HDRS} ${SAMPLE_UI_HDRS} ${SAMPLE_MOC_SRCS} ${LANGUAGE_TS_FILES})
-#ENDIF(LANGUAGE_TS_FILES)
-
 message(STATUS ${DCMTK_LIBRARIES})
 link_directories(${DCMTK_DIR}/lib/)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR}/Code ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
-add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})# ${qm_files})
-target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ITKIO dcmimage jpeg ijg12 ijg16 ijg8 tiff)# /lib/libwrap.so.0)
+add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})
+target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ${ITK_LIBRARIES} tiff)
 
 
 
