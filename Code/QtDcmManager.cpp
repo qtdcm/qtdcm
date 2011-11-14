@@ -68,7 +68,7 @@ public:
     QList<QtDcmPatient *> patients; /** List that contains patients resulting of a query or read from a CD */
     QList<QString> images; /** List of image filename to export from a CD */
     QMap<QString, QList<QString> > seriesToExport;
-    QList<QImage> listImages;
+    QList<QString> listImages;
     QList<QString> seriesToImport;
     QString serieId; /** Id of the serie to export from the PACS */
     QProcess * process; /** This attribute launch the reconstruction process */
@@ -283,7 +283,7 @@ void QtDcmManager::findSeriesScu ( QString patientName, QString studyDescription
 }
 
 void QtDcmManager::findImagesScu ( QString serieInstanceUID )
-{
+{ 
     QtDcmFindScu * finder = new QtDcmFindScu ( this );
     finder->findImagesScu ( serieInstanceUID );
     delete finder;
@@ -328,13 +328,17 @@ void QtDcmManager::foundSerie ( QMap<QString, QString> infosMap )
     }
 }
 
-void QtDcmManager::foundImage ( QMap<QString, QString> infosMap )
+void QtDcmManager::foundImage ( QString image )
 {
-    if ( d->seriesTreeWidget )
-    {
-        if ( infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data ( 4, 0 ).toInt() )
-            d->seriesTreeWidget->currentItem()->setData ( 4, 0, QVariant ( infosMap["InstanceCount"] ) );
-    }
+
+//   qDebug() << "in found image";
+//   qDebug() << image;
+  d->listImages.append(image);
+//     if ( d->seriesTreeWidget )
+//     {
+//         if ( infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data ( 4, 0 ).toInt() )
+//             d->seriesTreeWidget->currentItem()->setData ( 4, 0, QVariant ( infosMap["InstanceCount"] ) );
+//     }
 }
 
 void QtDcmManager::loadDicomdir()
@@ -422,10 +426,46 @@ void QtDcmManager::moveSelectedSeries()
     }
 }
 
-void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
+// void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
+// {
+//     if ( !d->tempDir.exists() )
+//         return;
+// 
+//     if ( d->mode == "CD" )
+//     {
+//         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
+//         mover->setMode ( QtDcmMoveDicomdir::PREVIEW );
+//         mover->setDcmItem ( d->dfile.getDataset() );
+//         mover->setOutputDir ( d->tempDir.absolutePath() );
+//         mover->setSeries ( QStringList() << uid );
+//         mover->setIndex ( elementIndex );
+//         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
+//         mover->start();
+//     }
+//     else // mode PACS
+//     {
+//         QtDcmFindScu * find = new QtDcmFindScu ( this );
+//         find->findImageScu ( uid, QString::number ( elementIndex ) );
+//         delete find;
+//         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
+//         mover->setMode ( QtDcmMoveScu::PREVIEW );
+//         mover->setOutputDir ( d->tempDir.absolutePath() );
+//         mover->setSeries ( QStringList() << uid );
+//         mover->setImageId ( d->previewImageUID );
+//         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
+//         mover->start();
+//     }
+// 
+//     return;
+// }
+
+void QtDcmManager::getPreviewFromSelectedSerie(QString uid, int elementIndex)
 {
     if ( !d->tempDir.exists() )
         return;
+
+    if ( !d->listImages.size() )
+      return;
 
     if ( d->mode == "CD" )
     {
@@ -434,26 +474,29 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         mover->setDcmItem ( d->dfile.getDataset() );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
-        mover->setIndex ( elementIndex );
+//         mover->setIndex ( elementIndex );
+        mover->setImageId ( d->listImages[elementIndex] );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
     }
     else // mode PACS
     {
-        QtDcmFindScu * find = new QtDcmFindScu ( this );
-        find->findImageScu ( uid, QString::number ( elementIndex ) );
-        delete find;
+//         QtDcmFindScu * find = new QtDcmFindScu ( this );
+//         find->findImageScu ( uid, QString::number ( elementIndex ) );
+//         delete find;
         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
         mover->setMode ( QtDcmMoveScu::PREVIEW );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
-        mover->setImageId ( d->previewImageUID );
+//         mover->setImageId ( d->previewImageUID );
+        mover->setImageId ( d->listImages[elementIndex] );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
     }
 
     return;
 }
+
 
 void QtDcmManager::importSelectedSeries()
 {
@@ -857,10 +900,16 @@ void QtDcmManager::setImagesList ( QList<QString> images )
     d->images = images;
 }
 
-QList<QImage> QtDcmManager::getListImages()
+QList<QString> QtDcmManager::getListImages()
 {
     return d->listImages;
 }
+
+void QtDcmManager::clearListImages()
+{
+  d->listImages.clear();
+}
+
 
 void QtDcmManager::setSerieId ( QString id )
 {

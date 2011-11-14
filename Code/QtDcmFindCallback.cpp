@@ -107,9 +107,7 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         infosMap.insert ( "Birthdate", QString ( info.c_str() ) );
 
         if ( d->manager )
-        {
             d->manager->foundPatient ( infosMap );
-        }
 
         break;
 
@@ -120,11 +118,11 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         infosMap.insert ( "Date", QString ( info.c_str() ) );
         responseIdentifiers->findAndGetOFString ( DCM_StudyID, info );
         infosMap.insert ( "ID", QString ( info.c_str() ) );
+        responseIdentifiers->findAndGetOFString ( DCM_StudyInstanceUID, info );
+        infosMap.insert ( "UID", QString ( info.c_str() ) );
 
         if ( d->manager )
-        {
             d->manager->foundStudy ( infosMap );
-        }
 
         break;
 
@@ -145,22 +143,25 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         infosMap.insert ( "InstanceCount", QString ( info.c_str() ) );
 
         if ( d->manager )
-        {
             d->manager->foundSerie ( infosMap );
-        }
-
         break;
 
     case QtDcmFindCallback::IMAGE:
         responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
 
         if ( d->manager )
-        {
             d->manager->setPreviewImageUID ( QString ( info.c_str() ) );
-        }
+        break;
 
-        responseIdentifiers->print ( std::cout );
+    case QtDcmFindCallback::IMAGES:
+        responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
+
+        if ( d->manager )
+            d->manager->foundImage ( QString ( info.c_str() ) );
+
+//         responseIdentifiers->print ( std::cout );
 
         break;
+        
     }
 }

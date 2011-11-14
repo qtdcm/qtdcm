@@ -52,8 +52,7 @@ public:
 
     void findImagesScu ( QString seriesUID );
 
-    void
-    findImageScu ( QString seriesUID, QString instanceNumber );
+    void findImageScu ( QString imageUID);
 
 private:
     QtDcmFindScuPrivate * d;

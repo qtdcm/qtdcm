@@ -64,6 +64,7 @@ public:
     QList<QString> series;
     QtDcmMoveDicomdir::mode mode;
     int index;
+    QString uid;
 };
 
 QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) : d ( new QtDcmMoveDicomdirPrivate )
@@ -97,6 +98,11 @@ void QtDcmMoveDicomdir::setSeries ( QList<QString> series )
 void QtDcmMoveDicomdir::setIndex ( int index )
 {
     d->index = index;
+}
+
+void QtDcmMoveDicomdir::setImageId ( QString uid)
+{
+    d->uid = uid;
 }
 
 
@@ -207,14 +213,23 @@ void QtDcmMoveDicomdir::run()
                 {
                     DcmElement* lelt;
 
-                    if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() )
+                    if ( lobj->findAndGetElement ( DCM_ReferencedSOPInstanceUIDInFile, lelt ).good() )
                     {
                         OFString strNumber;
                         lelt->getOFStringArray ( strNumber );
 
                         if ( d->mode == QtDcmMoveDicomdir::PREVIEW )
-                            proceedIndex = ( QString ( strNumber.c_str() ).toInt() == d->index );
+                            proceedIndex = ( QString ( strNumber.c_str() ) == d->uid );
                     }
+
+//                     if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() )
+//                     {
+//                         OFString strNumber;
+//                         lelt->getOFStringArray ( strNumber );
+// 
+//                         if ( d->mode == QtDcmMoveDicomdir::PREVIEW )
+//                             proceedIndex = ( QString ( strNumber.c_str() ).toInt() == d->index );
+//                     }
 
                     if ( lobj->findAndGetElement ( DCM_ReferencedFileID, lelt ).good() )
                     {

@@ -205,13 +205,14 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
 
     //Image level
-    overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
+    
 
     OFList<OFString> fileNameList;
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGES );
     callback->setManager ( d->manager );
 
     if ( findscu.initializeNetwork ( 30 ).bad() )
@@ -224,15 +225,15 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void QtDcmFindScu::findImageScu ( QString seriesUID, QString instanceNumber )
+void QtDcmFindScu::findImageScu ( QString imageUID)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
-    overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
-    overrideKeys.push_back ( QString ( "InstanceNumber=" + instanceNumber ).toUtf8().data() );
+//     overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
+//     overrideKeys.push_back ( QString ( "InstanceNumber=" + instanceNumber ).toUtf8().data() );
 
     //Image level
-    overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "SOPInstanceUID="+ imageUID ).toUtf8().data() );
 
     OFList<OFString> fileNameList;
     OFString temp_str;

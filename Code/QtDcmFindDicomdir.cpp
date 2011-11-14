@@ -440,14 +440,21 @@ void QtDcmFindDicomdir::findImages ( QString seriesUID )
                 DcmElement* lelt;
                 QMap<QString, QString> infosMapImage;
 
-                if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() )
+//                 if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() )
+//                 {
+//                     OFString strNumber;
+//                     lelt->getOFStringArray ( strNumber );
+//                     infosMapImage.insert ( "InstanceCount", QString ( strNumber.c_str() ) );
+//                 }
+                if ( lobj->findAndGetElement ( DCM_ReferencedSOPInstanceUIDInFile, lelt ).good() )
                 {
                     OFString strNumber;
                     lelt->getOFStringArray ( strNumber );
-                    infosMapImage.insert ( "InstanceCount", QString ( strNumber.c_str() ) );
+//                     infosMapImage.insert ( "SOPInstanceUID", QString ( strNumber.c_str() ) );
+                    d->manager->foundImage ( QString ( strNumber.c_str() ) );
                 }
 
-                d->manager->foundImage ( infosMapImage );
+//                 d->manager->foundImage ( infosMapImage );
             }
 
             dirent.pop();

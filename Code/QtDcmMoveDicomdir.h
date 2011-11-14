@@ -53,6 +53,8 @@ public:
 
     void setIndex ( int index );
 
+    void setImageId ( QString uid );
+
     void run();
 
 signals:

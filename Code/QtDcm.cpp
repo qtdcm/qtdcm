@@ -179,17 +179,21 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
 {
     if ( current != 0 )   // Avoid crash when clearDisplay is called
     {
+        QtDcmManager::instance()->clearListImages();
+        
         if ( d->mode == QtDcm::CD )
             QtDcmManager::instance()->findImagesDicomdir ( current->text ( 3 ) );
+        else
+            QtDcmManager::instance()->findImagesScu( current->text ( 3 ) );
 
-        QtDcmManager::instance()->updateSerieInfo(current->data ( 4, 0 ).toString(), current->data ( 5, 0 ).toString(), current->data ( 6, 0 ).toString());
+        QtDcmManager::instance()->updateSerieInfo(QString::number(QtDcmManager::instance()->getListImages().size()), current->data ( 5, 0 ).toString(), current->data ( 6, 0 ).toString());
 
         int elementCount = current->data ( 4, 0 ).toInt();
         QtDcmManager::instance()->clearPreview();
+//         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
+        
     }
-
-//     detailsFrame->show();
 }
 
 void QtDcm::serieItemClicked ( QTreeWidgetItem * item, int column )

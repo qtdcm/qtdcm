@@ -42,7 +42,7 @@ public:
 
     enum cbType
     {
-        PATIENT, STUDY, SERIE, IMAGE
+        PATIENT, STUDY, SERIE, IMAGES, IMAGE
     };
 
     void setManager ( QtDcmManager * manager );

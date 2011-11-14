@@ -94,9 +94,12 @@ public:
     void foundPatient ( QMap<QString, QString> infosMap );
     void foundStudy ( QMap<QString, QString> infosMap );
     void foundSerie ( QMap<QString, QString> infosMap );
-    void foundImage ( QMap<QString, QString> infosMap );
+//     void foundImage ( QMap<QString, QString> infosMap );
+    void foundImage ( QString image );
     void moveSelectedSeries();
     void getPreviewFromSelectedSerie ( QString uid, int elementCount );
+//     void getPreviewFromSelectedSerie ( int elementIndex );
+    
     void findPatientsDicomdir();
     void findStudiesDicomdir ( QString patientName );
     void findSeriesDicomdir ( QString patientName, QString studyDescription );
@@ -297,7 +300,8 @@ public:
 
     void setImagesList ( QList<QString> images );
 
-    QList<QImage> getListImages();
+    QList<QString> getListImages();
+    void clearListImages();
 
     void setSerieId ( QString id );
 
