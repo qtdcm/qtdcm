@@ -33,6 +33,8 @@ class QtDcmLocalDicomSettingsWidget : public QWidget, public Ui::QtDcmLocalDicom
 public:
     QtDcmLocalDicomSettingsWidget ( QWidget * parent = 0 );
 
+    virtual ~QtDcmLocalDicomSettingsWidget();
+
     QtDcmPreferences * getPreferences();
 
     void setPreferences ( QtDcmPreferences * prefs );

@@ -60,3 +60,10 @@ void QtDcmLocalDicomSettingsWidget::updatePreferences()
     }
 }
 
+QtDcmLocalDicomSettingsWidget::~QtDcmLocalDicomSettingsWidget()
+{
+    delete d;
+    d = NULL;
+}
+
+
