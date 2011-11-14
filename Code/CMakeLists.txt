@@ -101,7 +101,7 @@ add_library( qtdcm ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_H
 if(MSVC)
     target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ${ITK_LIBRARIES} )
 else(MSVC) 
-    target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} tiff)
+    target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ${ITK_LIBRARIES} tiff)
 endif(MSVC)
 
 
