@@ -635,12 +635,13 @@ void QtDcmManager::makePreview ( QString filename )
     DcmDataset * dset = file.getDataset();
     DicomImage* dcimage = new DicomImage ( dset, file.getDataset()->getOriginalXfer(), CIF_MayDetachPixelData );
 
-    dcimage->setNoDisplayFunction();
-    dcimage->hideAllOverlays();
-    dcimage->setNoVoiTransformation();
 
     if ( dcimage != NULL )
     {
+        dcimage->setNoDisplayFunction();
+        dcimage->hideAllOverlays();
+        dcimage->setNoVoiTransformation();
+
         if ( dcimage->getStatus() == EIS_Normal )
         {
             Uint32 *pixelData = ( Uint32 * ) ( dcimage->getOutputData ( 32 /* bits per sample */ ) );
@@ -688,7 +689,7 @@ void QtDcmManager::makePreview ( QString filename )
                 if ( d->previewWidget )
                     d->previewWidget->imageLabel->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
 
-                delete colored;
+                delete[] colored;
 
             }
         }
