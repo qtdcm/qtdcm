@@ -169,9 +169,13 @@ void QtDcm::studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
     if ( current != 0 )   // Avoid crash when clearDisplay is called
     {
         if ( d->mode == QtDcm::PACS )
-            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
+            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
         else
-            QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
+            QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
+//         if ( d->mode == QtDcm::PACS )
+//             QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
+//         else
+//             QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->text ( 0 ) );
     }
 }
 
@@ -180,7 +184,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
     if ( current != 0 )   // Avoid crash when clearDisplay is called
     {
         QtDcmManager::instance()->clearListImages();
-        
+
         if ( d->mode == QtDcm::CD )
             QtDcmManager::instance()->findImagesDicomdir ( current->text ( 3 ) );
         else
@@ -192,7 +196,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
         QtDcmManager::instance()->clearPreview();
 //         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
-        
+
     }
 }
 
@@ -268,9 +272,9 @@ void QtDcm::updateModality ( int index )
     if ( treeWidgetPatients->currentItem() && treeWidgetStudies->currentItem() )
     {
         if ( d->mode == QtDcm::PACS )
-            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->text ( 0 ) );
+            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->data ( 2, 0 ).toString() );
         else
-            qDebug() << "recherche sur le cd";
+            QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->data ( 2, 0 ).toString() );
     }
 }
 
@@ -409,6 +413,6 @@ void QtDcm::serieDescriptionTextChanged ( QString desc )
     if ( treeWidgetPatients->currentItem() && treeWidgetStudies->currentItem() )
     {
         if ( d->mode == QtDcm::PACS )
-            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->text ( 0 ) );
+            QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), treeWidgetStudies->currentItem()->data ( 2, 0 ).toString() );
     }
 }

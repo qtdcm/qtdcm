@@ -140,7 +140,7 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
     d->currentPacs = NULL;
-    qDebug()<< QtDcmPreferences::instance()->getServers();
+//     qDebug()<< QtDcmPreferences::instance()->getServers();
 //    d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
@@ -273,12 +273,12 @@ void QtDcmManager::findStudiesScu ( QString patientName )
     delete finder;
 }
 
-void QtDcmManager::findSeriesScu ( QString patientName, QString studyDescription )
+void QtDcmManager::findSeriesScu ( QString patientName, QString studyUid )
 {
     d->seriesToImport.clear();
 
     QtDcmFindScu * finder = new QtDcmFindScu ( this );
-    finder->findSeriesScu ( patientName, studyDescription, d->serieDescription, d->modality );
+    finder->findSeriesScu ( patientName, studyUid, d->studyDescription, d->serieDescription, d->modality );
     delete finder;
 }
 
@@ -308,7 +308,9 @@ void QtDcmManager::foundStudy ( QMap<QString, QString> infosMap )
         QTreeWidgetItem * studyItem = new QTreeWidgetItem ( d->studiesTreeWidget->invisibleRootItem() );
         studyItem->setText ( 0, infosMap["Description"] );
         studyItem->setText ( 1, QDate::fromString ( infosMap["Date"], "yyyyMMdd" ).toString ( "dd/MM/yyyy" ) );
-        studyItem->setText ( 2, infosMap["ID"] );
+        studyItem->setData ( 2, 0, infosMap["UID"] );
+        studyItem->setText ( 2, infosMap["UID"] );
+        studyItem->setData ( 3, 0, infosMap["ID"] );
     }
 }
 
@@ -377,12 +379,12 @@ void QtDcmManager::findStudiesDicomdir ( QString patientName )
     delete finder;
 }
 
-void QtDcmManager::findSeriesDicomdir ( QString patientName, QString studyDescription )
+void QtDcmManager::findSeriesDicomdir ( QString patientName, QString studyUID )
 {
     d->seriesToImport.clear();
     QtDcmFindDicomdir * finder = new QtDcmFindDicomdir ( this );
     finder->setDcmItem ( d->dfile.getDataset() );
-    finder->findSeries ( patientName, studyDescription );
+    finder->findSeries ( patientName, studyUID );
     delete finder;
 }
 

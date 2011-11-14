@@ -218,6 +218,13 @@ void QtDcmFindDicomdir::findStudies ( QString patientName )
 
                 if ( lobj->findAndGetElement ( DCM_StudyInstanceUID, lelt ).good() )
                 {
+                    OFString strUID;
+                    lelt->getOFStringArray ( strUID );
+                    infosMap.insert ( "UID", QString ( strUID.c_str() ) );
+                }
+
+                if ( lobj->findAndGetElement ( DCM_StudyID, lelt ).good() )
+                {
                     OFString strID;
                     lelt->getOFStringArray ( strID );
                     infosMap.insert ( "ID", QString ( strID.c_str() ) );
@@ -249,7 +256,7 @@ void QtDcmFindDicomdir::findStudies ( QString patientName )
     d->dicomdirItems.clear();
 }
 
-void QtDcmFindDicomdir::findSeries ( QString patientName, QString studyDescription )
+void QtDcmFindDicomdir::findSeries ( QString patientName, QString studyUID )
 {
     bool proceed = false;
     static const OFString Patient ( "PATIENT" );
@@ -304,11 +311,11 @@ void QtDcmFindDicomdir::findSeries ( QString patientName, QString studyDescripti
             {
                 DcmElement* lelt;
 
-                if ( lobj->findAndGetElement ( DCM_StudyDescription, lelt ).good() )
+                if ( lobj->findAndGetElement ( DCM_StudyInstanceUID, lelt ).good() )
                 {
-                    OFString strDesc;
-                    lelt->getOFStringArray ( strDesc );
-                    proceed = ( ( QString ( strName.c_str() ) == patientName ) && ( QString ( strDesc.c_str() ) == studyDescription ) );
+                    OFString strUid;
+                    lelt->getOFStringArray ( strUid );
+                    proceed = ( ( QString ( strName.c_str() ) == patientName ) && ( QString ( strUid.c_str() ) == studyUID ) );
                 }
 
                 if ( lobj->findAndGetElement ( DCM_StudyDate, lelt ).good() )

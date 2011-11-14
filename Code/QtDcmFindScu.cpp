@@ -150,21 +150,22 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription )
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID)
 {
-    this->findSeriesScu ( patientName, studyDescription, "*", "*" );
+    this->findSeriesScu ( patientName, studyUID, "*", "*", "*" );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription, QString modality )
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString modality )
 {
-    this->findSeriesScu ( patientName, studyDescription, "*", modality );
+    this->findSeriesScu ( patientName, studyUID, studyDescription, "*", modality );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyDescription, QString serieDescription, QString modality )
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString serieDescription, QString modality )
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) ).toUtf8().data() );
     overrideKeys.push_back ( ( QString ( "PatientName=" ) + patientName ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "StudyInstanceUID=" + studyUID ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "StudyDescription=" + studyDescription ).toUtf8().data() );
     overrideKeys.push_back ( ( QString ( "SeriesDescription=" ) + serieDescription ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "Modality=" + modality ).toUtf8().data() );

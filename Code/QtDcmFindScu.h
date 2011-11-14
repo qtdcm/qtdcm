@@ -44,11 +44,13 @@ public:
 
     void findStudiesScu ( QString patientName, QString studyDescription, QString startDate, QString endDate );
 
-    void findSeriesScu ( QString patientName, QString studyDescription );
+    void findSeriesScu ( QString patientName, QString studyUID );
 
-    void findSeriesScu ( QString patientName, QString studyDescription, QString modality );
+    void findSeriesScu ( QString patientName, QString studyUID, QString modality );
 
-    void findSeriesScu ( QString patientName, QString studyDescription, QString serieDescription, QString modality );
+    void findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString modality );
+
+    void findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString serieDescription, QString modality );
 
     void findImagesScu ( QString seriesUID );
 
