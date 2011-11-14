@@ -1,5 +1,5 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
+    QtDcm is a C++ Qt based library for communication and conversion of Dicom images.
     Copyright (C) 2011  Alexandre Abadie <Alexandre.Abadie@univ-rennes1.fr>
 
     This library is free software; you can redistribute it and/or
