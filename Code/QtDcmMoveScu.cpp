@@ -909,7 +909,8 @@ void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int resp
 
     QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
 
-    self->progressSerie = 0;
+    if (responseCount == 1)
+      self->progressSerie = 0;
 
     self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
 
