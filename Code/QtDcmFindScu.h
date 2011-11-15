@@ -54,6 +54,14 @@ public:
 
     void findImageScu ( QString imageUID);
 
+protected:
+
+    /**
+     * test if the current selected pacs is available
+     * returns false if timeout (1sec) is reached
+     */
+    bool checkServerConnection(int timeout = 1000);
+
 private:
     QtDcmFindScuPrivate * d;
 };

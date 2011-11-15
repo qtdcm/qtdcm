@@ -100,15 +100,9 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    // test connection
+    if (!this->checkServerConnection())
         return;
-    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback();
     callback->setManager ( d->manager );
@@ -149,15 +143,9 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    // test connection
+    if (!this->checkServerConnection())
         return;
-    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::STUDY );
     callback->setManager ( d->manager );
@@ -208,15 +196,9 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    // test connection
+    if (!this->checkServerConnection())
         return;
-    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::SERIE );
     callback->setManager ( d->manager );
@@ -245,15 +227,9 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    // test connection
+    if (!this->checkServerConnection())
         return;
-    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGES );
     callback->setManager ( d->manager );
@@ -282,15 +258,6 @@ void QtDcmFindScu::findImageScu ( QString imageUID)
     OFString temp_str;
     DcmFindSCU findscu;
 
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
-        return;
-    }
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
     callback->setManager ( d->manager );
@@ -303,4 +270,20 @@ void QtDcmFindScu::findImageScu ( QString imageUID)
 
     if ( findscu.dropNetwork().bad() )
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
+}
+
+bool QtDcmFindScu::checkServerConnection(int timeout)
+{
+    bool result = true;
+
+    QTcpSocket * socket = new QTcpSocket;
+    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (socket->waitForConnected(timeout)) {
+        socket->disconnectFromHost();
+    } else  {
+        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        result = false;
+    }
+    delete socket;
+    return result;
 }
