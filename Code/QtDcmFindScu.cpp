@@ -221,6 +221,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
 
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
 
 
     OFList<OFString> fileNameList;

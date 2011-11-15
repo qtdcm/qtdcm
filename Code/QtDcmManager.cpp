@@ -69,6 +69,7 @@ public:
     QList<QString> images; /** List of image filename to export from a CD */
     QMap<QString, QList<QString> > seriesToExport;
     QList<QString> listImages;
+    QMap<int, QString> mapImages;
     QList<QString> seriesToImport;
     QString serieId; /** Id of the serie to export from the PACS */
     QProcess * process; /** This attribute launch the reconstruction process */
@@ -253,7 +254,7 @@ void QtDcmManager::displayMessage ( QString info )
 
 void QtDcmManager::findPatientsScu()
 {
-    if (d->mainWidget->pacsComboBox->count())
+    if ( d->mainWidget->pacsComboBox->count() )
     {
         d->seriesToImport.clear();
         d->mode = "PACS";
@@ -283,7 +284,7 @@ void QtDcmManager::findSeriesScu ( QString patientName, QString studyUid )
 }
 
 void QtDcmManager::findImagesScu ( QString serieInstanceUID )
-{ 
+{
     QtDcmFindScu * finder = new QtDcmFindScu ( this );
     finder->findImagesScu ( serieInstanceUID );
     delete finder;
@@ -330,17 +331,11 @@ void QtDcmManager::foundSerie ( QMap<QString, QString> infosMap )
     }
 }
 
-void QtDcmManager::foundImage ( QString image )
+void QtDcmManager::foundImage ( QString image, int number )
 {
-
-//   qDebug() << "in found image";
-//   qDebug() << image;
-  d->listImages.append(image);
-//     if ( d->seriesTreeWidget )
-//     {
-//         if ( infosMap["InstanceCount"].toInt() > d->seriesTreeWidget->currentItem()->data ( 4, 0 ).toInt() )
-//             d->seriesTreeWidget->currentItem()->setData ( 4, 0, QVariant ( infosMap["InstanceCount"] ) );
-//     }
+    d->listImages.append ( image );
+    if ( number )
+        d->mapImages.insert ( number, image );
 }
 
 void QtDcmManager::loadDicomdir()
@@ -428,47 +423,19 @@ void QtDcmManager::moveSelectedSeries()
     }
 }
 
-// void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
-// {
-//     if ( !d->tempDir.exists() )
-//         return;
-// 
-//     if ( d->mode == "CD" )
-//     {
-//         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
-//         mover->setMode ( QtDcmMoveDicomdir::PREVIEW );
-//         mover->setDcmItem ( d->dfile.getDataset() );
-//         mover->setOutputDir ( d->tempDir.absolutePath() );
-//         mover->setSeries ( QStringList() << uid );
-//         mover->setIndex ( elementIndex );
-//         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-//         mover->start();
-//     }
-//     else // mode PACS
-//     {
-//         QtDcmFindScu * find = new QtDcmFindScu ( this );
-//         find->findImageScu ( uid, QString::number ( elementIndex ) );
-//         delete find;
-//         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
-//         mover->setMode ( QtDcmMoveScu::PREVIEW );
-//         mover->setOutputDir ( d->tempDir.absolutePath() );
-//         mover->setSeries ( QStringList() << uid );
-//         mover->setImageId ( d->previewImageUID );
-//         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-//         mover->start();
-//     }
-// 
-//     return;
-// }
-
-void QtDcmManager::getPreviewFromSelectedSerie(QString uid, int elementIndex)
+void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
 {
     if ( !d->tempDir.exists() )
         return;
 
     if ( !d->listImages.size() )
-      return;
+        return;
 
+    QString imageId = d->listImages[elementIndex];
+    
+    if ( d->mapImages.size() && d->mapImages.contains(elementIndex))
+      imageId = d->mapImages[elementIndex];  
+    
     if ( d->mode == "CD" )
     {
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
@@ -476,22 +443,17 @@ void QtDcmManager::getPreviewFromSelectedSerie(QString uid, int elementIndex)
         mover->setDcmItem ( d->dfile.getDataset() );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
-//         mover->setIndex ( elementIndex );
-        mover->setImageId ( d->listImages[elementIndex] );
+        mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
     }
     else // mode PACS
     {
-//         QtDcmFindScu * find = new QtDcmFindScu ( this );
-//         find->findImageScu ( uid, QString::number ( elementIndex ) );
-//         delete find;
         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
         mover->setMode ( QtDcmMoveScu::PREVIEW );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
-//         mover->setImageId ( d->previewImageUID );
-        mover->setImageId ( d->listImages[elementIndex] );
+        mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
     }
@@ -805,19 +767,19 @@ void QtDcmManager::setPatientId ( QString patientId )
 QString QtDcmManager::getPatientBirthDate()
 {
     QString birthdate;
-    if (d->patientsTreeWidget)
-        if (d->patientsTreeWidget->currentItem())
-            birthdate = d->patientsTreeWidget->currentItem()->data(2,0).toString();
+    if ( d->patientsTreeWidget )
+        if ( d->patientsTreeWidget->currentItem() )
+            birthdate = d->patientsTreeWidget->currentItem()->data ( 2,0 ).toString();
     qDebug() << birthdate;
     return birthdate;
 }
 
 QString QtDcmManager::getPatientSex()
 {
-    QString sex("");
-    if (d->patientsTreeWidget)
-        if (d->patientsTreeWidget->currentItem())
-            sex = d->patientsTreeWidget->currentItem()->data(3,0).toString();
+    QString sex ( "" );
+    if ( d->patientsTreeWidget )
+        if ( d->patientsTreeWidget->currentItem() )
+            sex = d->patientsTreeWidget->currentItem()->data ( 3,0 ).toString();
     qDebug() << sex;
     return sex;
 }
@@ -825,9 +787,9 @@ QString QtDcmManager::getPatientSex()
 QString QtDcmManager::getExamDate()
 {
     QString examDate;
-    if (d->studiesTreeWidget)
-        if (d->studiesTreeWidget->currentItem())
-            examDate = d->studiesTreeWidget->currentItem()->data(1,0).toString();
+    if ( d->studiesTreeWidget )
+        if ( d->studiesTreeWidget->currentItem() )
+            examDate = d->studiesTreeWidget->currentItem()->data ( 1,0 ).toString();
     qDebug() << examDate;
     return examDate;
 }
@@ -909,9 +871,9 @@ QList<QString> QtDcmManager::getListImages()
 
 void QtDcmManager::clearListImages()
 {
-  d->listImages.clear();
+    d->listImages.clear();
+    d->mapImages.clear();
 }
-
 
 void QtDcmManager::setSerieId ( QString id )
 {

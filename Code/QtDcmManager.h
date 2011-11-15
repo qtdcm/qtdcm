@@ -95,7 +95,7 @@ public:
     void foundStudy ( QMap<QString, QString> infosMap );
     void foundSerie ( QMap<QString, QString> infosMap );
 //     void foundImage ( QMap<QString, QString> infosMap );
-    void foundImage ( QString image );
+    void foundImage ( QString image, int number );
     void moveSelectedSeries();
     void getPreviewFromSelectedSerie ( QString uid, int elementCount );
 //     void getPreviewFromSelectedSerie ( int elementIndex );
