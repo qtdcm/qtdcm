@@ -223,7 +223,7 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
     DcmFindSCU findscu;
 
     // test connection
-    if ( !this->checkServerConnection() )
+    if ( !this->checkServerConnection(10000) )
         return false;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
