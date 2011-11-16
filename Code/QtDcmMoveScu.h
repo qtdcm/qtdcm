@@ -77,6 +77,9 @@ public:
 
     void run();
 
+public slots:
+    void onStopMove();
+    
 signals:
     void updateProgress ( int i );
     void previewSlice ( QString filename );

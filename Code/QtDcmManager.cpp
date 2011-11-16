@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-
 #define QT_NO_CAST_TO_ASCII
 
 #include <algorithm>
@@ -463,7 +461,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         mover->setSeries ( QStringList() << uid );
         mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-//         QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( terminate() ) );
+        QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ));
         mover->start();
       }
     }

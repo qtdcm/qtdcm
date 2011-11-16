@@ -141,6 +141,19 @@ void QtDcmMoveScu::setImportDir ( QString dir )
     d->importDir = dir;
 }
 
+void QtDcmMoveScu::onStopMove()
+{
+    qDebug() << "Stopping thread";
+
+    //Aborting association and dropping network
+    qDebug() << "Aborting Association";
+    OFCondition cond = ASC_abortAssociation ( assoc );
+    qDebug() << cond.text();
+    ASC_dropNetwork ( &net );
+    this->exit();
+}
+
+
 void QtDcmMoveScu::run()
 {
     OFCondition cond;
@@ -160,7 +173,7 @@ void QtDcmMoveScu::run()
         if ( d->mode == IMPORT )
         {
             cond = this->move ( d->series.at ( i ) );
-            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i);
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i );
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             progressTotal += step;
         }
@@ -909,8 +922,8 @@ void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int resp
 
     QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
 
-    if (responseCount == 1)
-      self->progressSerie = 0;
+    if ( responseCount == 1 )
+        self->progressSerie = 0;
 
     self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
 
