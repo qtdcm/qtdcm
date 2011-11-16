@@ -82,7 +82,7 @@ QtDcmFindScu::QtDcmFindScu ( QObject * parent ) : d ( new QtDcmFindScuPrivate )
     d->networkTimeout = 30;
 }
 
-QtDcmFindScu::~QtDcmFindScu() 
+QtDcmFindScu::~QtDcmFindScu()
 {
     delete d->socket;
     delete d;
@@ -106,7 +106,7 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     overrideKeys.push_back ( QString ( "PatientSex=" + patientSex ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "PatientBirthDate" ).toUtf8().data() );
 
-    doQuery(overrideKeys, QtDcmFindCallback::PATIENT);
+    doQuery ( overrideKeys, QtDcmFindCallback::PATIENT );
 
 }
 
@@ -131,7 +131,7 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     //Study level
     overrideKeys.push_back ( QString ( "StudyInstanceUID" ).toUtf8().data() );
 
-    doQuery(overrideKeys, QtDcmFindCallback::STUDY);
+    doQuery ( overrideKeys, QtDcmFindCallback::STUDY );
 
 }
 
@@ -166,7 +166,7 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     overrideKeys.push_back ( QString ( "AcquisitionNumber" ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "NumberOfSeriesRelatedInstances" ).toUtf8().data() );
 
-    doQuery(overrideKeys, QtDcmFindCallback::SERIE);
+    doQuery ( overrideKeys, QtDcmFindCallback::SERIE );
 
 }
 
@@ -180,7 +180,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
 
-    doQuery(overrideKeys, QtDcmFindCallback::IMAGES);
+    doQuery ( overrideKeys, QtDcmFindCallback::IMAGES );
 
 }
 
@@ -194,26 +194,29 @@ void QtDcmFindScu::findImageScu ( QString imageUID )
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID="+ imageUID ).toUtf8().data() );
 
-    doQuery(overrideKeys, QtDcmFindCallback::IMAGE);
+    doQuery ( overrideKeys, QtDcmFindCallback::IMAGE );
 
 }
 
-bool QtDcmFindScu::checkServerConnection(int timeout)
+bool QtDcmFindScu::checkServerConnection ( int timeout )
 {
     bool result = true;
-    d->socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    d->socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (d->socket->waitForConnected(timeout)) {
+    d->socket->setSocketOption ( QAbstractSocket::LowDelayOption, 1 );
+    d->socket->connectToHost ( d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt() );
+    if ( d->socket->waitForConnected ( timeout ) )
+    {
         d->socket->disconnectFromHost();
-    } else  {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    }
+    else
+    {
+        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
         result = false;
     }
 
     return result;
 }
 
-bool QtDcmFindScu::doQuery( OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level )
+bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level )
 {
     //Image level
     OFList<OFString> fileNameList;
@@ -221,24 +224,26 @@ bool QtDcmFindScu::doQuery( OFList<OFString>& overrideKeys, QtDcmFindCallback::c
     DcmFindSCU findscu;
 
     // test connection
-    if (!this->checkServerConnection())
+    if ( !this->checkServerConnection() )
         return false;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
     callback->setManager ( d->manager );
 
-    if ( findscu.initializeNetwork ( d->networkTimeout ).bad() ) {
+    if ( findscu.initializeNetwork ( d->networkTimeout ).bad() )
+    {
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
         return false;
     }
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), 
-        d->manager->getCurrentPacs()->getPort().toInt(), 
-        QtDcmPreferences::instance()->getAetitle().toUtf8().data(), 
-        d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), 
-        UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, 
-        DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() ) {
-            d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(),
+                                d->manager->getCurrentPacs()->getPort().toInt(),
+                                QtDcmPreferences::instance()->getAetitle().toUtf8().data(),
+                                d->manager->getCurrentPacs()->getAetitle().toUtf8().data(),
+                                UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown,
+                                DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
+    {
+        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
     }
 
     if ( findscu.dropNetwork().bad() )
