@@ -447,8 +447,12 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     else // mode PACS
     {
       //Check if file has already been moved
-      QString filename(d->tempDir.absolutePath() + "/" + uid + "/" + imageId);
-      if (QFile().exists(filename))
+      QString modality("MR");
+      if (d->seriesTreeWidget->currentItem())
+        modality = d->seriesTreeWidget->currentItem()->text(1);
+      QString filename(d->tempDir.absolutePath() + "/" + uid + "/" + modality + "." + imageId);
+
+      if (QFile(filename).exists())
         makePreview(filename);
       else
       {
