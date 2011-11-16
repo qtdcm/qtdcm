@@ -101,7 +101,7 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     DcmFindSCU findscu;
 
     // test connection
-    if (!this->checkServerConnection())
+    if ( !this->checkServerConnection() )
         return;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback();
@@ -144,7 +144,7 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     DcmFindSCU findscu;
 
     // test connection
-    if (!this->checkServerConnection())
+    if ( !this->checkServerConnection() )
         return;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::STUDY );
@@ -160,7 +160,7 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID)
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID )
 {
     this->findSeriesScu ( patientName, studyUID, "*", "*", "*" );
 }
@@ -197,7 +197,7 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     DcmFindSCU findscu;
 
     // test connection
-    if (!this->checkServerConnection())
+    if ( !this->checkServerConnection() )
         return;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::SERIE );
@@ -229,7 +229,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     DcmFindSCU findscu;
 
     // test connection
-    if (!this->checkServerConnection())
+    if ( !this->checkServerConnection() )
         return;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGES );
@@ -245,7 +245,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-void QtDcmFindScu::findImageScu ( QString imageUID)
+void QtDcmFindScu::findImageScu ( QString imageUID )
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
@@ -273,16 +273,19 @@ void QtDcmFindScu::findImageScu ( QString imageUID)
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
-bool QtDcmFindScu::checkServerConnection(int timeout)
+bool QtDcmFindScu::checkServerConnection ( int timeout )
 {
     bool result = true;
 
     QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(timeout)) {
+    socket->connectToHost ( d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt() );
+    if ( socket->waitForConnected ( timeout ) )
+    {
         socket->disconnectFromHost();
-    } else  {
-        d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+    }
+    else
+    {
+        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
         result = false;
     }
     delete socket;

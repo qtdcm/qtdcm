@@ -284,17 +284,16 @@ void QtDcmMoveDicomdir::run()
             }
         }
     }
-
     exit();
 }
 
 QString QtDcmMoveDicomdir::fixFilename ( QString name )
 {
-    QString basename = QFileInfo ( d->manager->getDicomdir() ).path();
+    QString basename = QFileInfo ( QtDcmManager::instance()->getDicomdir() ).path();
     name.replace ( QChar ( '/' ), QDir::separator() ).replace ( QChar ( '\\' ), QDir::separator() );
     QString filename = basename + QDir::separator() + name.toUpper();
 
-    if ( !QFile ( filename ).exists() )
+    if ( ! QFile ( filename ).exists() )
         filename = basename + QDir::separator() + name.toLower();
 
     return filename;
