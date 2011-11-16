@@ -329,6 +329,7 @@ public slots:
 signals:
     void serieMoved ( QString directory );
     void importFinished();
+    void gettingPreview();
 
 private:
     static QtDcmManager * _instance;

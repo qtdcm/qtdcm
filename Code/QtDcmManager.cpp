@@ -431,7 +431,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     QString imageId = d->listImages[elementIndex];
     
     if ( d->mapImages.size() && d->mapImages.contains(elementIndex))
-      imageId = d->mapImages[elementIndex];  
+      imageId = d->mapImages[elementIndex];
     
     if ( d->mode == "CD" )
     {
@@ -456,12 +456,14 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         makePreview(filename);
       else
       {
+        emit gettingPreview();
         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
         mover->setMode ( QtDcmMoveScu::PREVIEW );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
         mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
+        QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( terminate() ) );
         mover->start();
       }
     }

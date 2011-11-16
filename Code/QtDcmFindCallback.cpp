@@ -157,11 +157,12 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         OFString number;
         responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
         responseIdentifiers->findAndGetOFString ( DCM_InstanceNumber, number );
+                
         if (!number.length())
           number = "0";
-
+        
         if ( d->manager )
-            d->manager->foundImage ( QString ( info.c_str() ), QString ( info.c_str() ).toInt() );
+            d->manager->foundImage ( QString ( info.c_str() ), QString ( number.c_str() ).toInt() );
 
 //         responseIdentifiers->print ( std::cout );
 
