@@ -8,7 +8,7 @@ project(QTDCM)
 
 set(${PROJECT_NAME}_VERSION_MAJOR 2 CACHE STRING "${PROJECT_NAME} major version number.")
 set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor version number.")
-set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number.")
+set(${PROJECT_NAME}_VERSION_BUILD 2 CACHE STRING "${PROJECT_NAME} build version number.")
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
 mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
@@ -21,7 +21,7 @@ endif()
 
 option(BUILD_EXAMPLE "Build qtdcm example application" OFF)
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
-option(BUILD_DOCUMENTATION "Build QtDcm Documentation" OFF)
+option(BUILD_DOCUMENTATION "Build QtDcm Documentation (add a Documentation target)" OFF)
 option(BUILD_PACKAGE "Configure QtDcm packaging" OFF)
 
 option(BUILD_SHARED_LIBS "Build Qtdcm with shared libraries." ON)
