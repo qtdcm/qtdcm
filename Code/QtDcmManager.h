@@ -54,12 +54,6 @@ private:
      */
     void createTemporaryDirs();
 
-    /**
-     * This method try to delete the temporary directory when closing the QtDcm widget
-     * (Doesn't work for the moment)
-     */
-    void deleteTemporaryDirs();
-
 public:
     enum outputdirmode
     {
@@ -95,7 +89,7 @@ public:
     void foundStudy ( QMap<QString, QString> infosMap );
     void foundSerie ( QMap<QString, QString> infosMap );
 //     void foundImage ( QMap<QString, QString> infosMap );
-    void foundImage ( QString image );
+    void foundImage ( QString image, int number );
     void moveSelectedSeries();
     void getPreviewFromSelectedSerie ( QString uid, int elementCount );
 //     void getPreviewFromSelectedSerie ( int elementIndex );
@@ -317,6 +311,12 @@ public:
 
     void useConverter ( bool use );
 
+    /**
+     * This method try to delete the temporary directory when closing the QtDcm widget
+     * (Doesn't work for the moment)
+     */
+    void deleteTemporaryDirs();
+
 public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
@@ -329,6 +329,7 @@ public slots:
 signals:
     void serieMoved ( QString directory );
     void importFinished();
+    void gettingPreview();
 
 private:
     static QtDcmManager * _instance;

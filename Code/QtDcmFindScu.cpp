@@ -135,7 +135,7 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
 
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID)
+void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID )
 {
     this->findSeriesScu ( patientName, studyUID, "*", "*", "*" );
 }
@@ -178,12 +178,13 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
 
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
+    overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
 
     doQuery(overrideKeys, QtDcmFindCallback::IMAGES);
 
 }
 
-void QtDcmFindScu::findImageScu ( QString imageUID)
+void QtDcmFindScu::findImageScu ( QString imageUID )
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );

@@ -61,7 +61,7 @@ protected:
 
     /**
      * test if the current selected pacs is available
-     * returns false if timeout (1sec) is reached
+     * returns false if timeout (10sec) is reached
      */
     bool checkServerConnection(int timeout = 10000);
 

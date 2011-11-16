@@ -84,7 +84,10 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
     initConnections();
 }
 
-QtDcm::~QtDcm() {}
+QtDcm::~QtDcm()
+{
+  QtDcmManager::instance()->deleteTemporaryDirs();
+}
 
 void QtDcm::initConnections()
 {
@@ -97,7 +100,7 @@ void QtDcm::initConnections()
     QObject::connect ( serieDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serieDescriptionTextChanged ( QString ) ) );
     QObject::connect ( studyDescriptionEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( studyDescriptionTextChanged ( QString ) ) );
     QObject::connect ( searchButton, SIGNAL ( clicked() ), this, SLOT ( findSCU() ) );
-    QObject::connect ( cdromButton, SIGNAL ( clicked() ), this, SLOT ( openDicomdir() ));
+    QObject::connect ( cdromButton, SIGNAL ( clicked() ), this, SLOT ( openDicomdir() ) );
     QObject::connect ( patientSexComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateSex ( int ) ) );
     QObject::connect ( serieModalityComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updateModality ( int ) ) );
     QObject::connect ( pacsComboBox, SIGNAL ( currentIndexChanged ( int ) ), this, SLOT ( updatePACS ( int ) ) );
@@ -121,7 +124,7 @@ void QtDcm::findSCU()
     treeWidgetPatients->clear();
     treeWidgetStudies->clear();
     treeWidgetSeries->clear();
-    QtDcmManager::instance()->setCurrentPacs(pacsComboBox->currentIndex());
+    QtDcmManager::instance()->setCurrentPacs ( pacsComboBox->currentIndex() );
     QtDcmManager::instance()->findPatientsScu();
 }
 
@@ -173,11 +176,13 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
         if ( d->mode == QtDcm::CD )
             QtDcmManager::instance()->findImagesDicomdir ( current->text ( 3 ) );
         else
-            QtDcmManager::instance()->findImagesScu( current->text ( 3 ) );
+            QtDcmManager::instance()->findImagesScu ( current->text ( 3 ) );
 
-        QtDcmManager::instance()->updateSerieInfo(QString::number(QtDcmManager::instance()->getListImages().size()), current->data ( 5, 0 ).toString(), current->data ( 6, 0 ).toString());
+        int elementCount = QtDcmManager::instance()->getListImages().size();
+        QString institution = current->data ( 5, 0 ).toString();
+        QString opName = current->data ( 6, 0 ).toString();
 
-        int elementCount = current->data ( 4, 0 ).toInt();
+        QtDcmManager::instance()->updateSerieInfo ( QString::number ( elementCount ), institution, opName );
         QtDcmManager::instance()->clearPreview();
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
     }
@@ -339,7 +344,7 @@ void QtDcm::editPreferences()
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog ( this );
     dialog->getWidget()->setPreferences ( QtDcmPreferences::instance() );
-    dialog->setPreferences(QtDcmPreferences::instance());
+    dialog->setPreferences ( QtDcmPreferences::instance() );
 
     if ( dialog->exec() )
     {
