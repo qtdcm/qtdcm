@@ -21,6 +21,7 @@
 #define QTDCMFINDSCU_H_
 
 #include <QtGui>
+#include "QtDcmFindCallback.h"
 
 class QtDcmFindScuPrivate;
 
@@ -56,11 +57,13 @@ public:
 
 protected:
 
+    bool doQuery(OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level);
+
     /**
      * test if the current selected pacs is available
      * returns false if timeout (1sec) is reached
      */
-    bool checkServerConnection(int timeout = 1000);
+    bool checkServerConnection(int timeout = 10000);
 
 private:
     QtDcmFindScuPrivate * d;

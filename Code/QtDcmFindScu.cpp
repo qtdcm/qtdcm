@@ -70,15 +70,25 @@ class QtDcmFindScuPrivate
 
 public:
     QtDcmManager * manager;
+    QTcpSocket * socket;
+    int networkTimeout;
 };
 
 QtDcmFindScu::QtDcmFindScu ( QObject * parent ) : d ( new QtDcmFindScuPrivate )
 {
 //     d->manager = dynamic_cast<QtDcmManager *> ( parent );
     d->manager = QtDcmManager::instance();
+    d->socket = new QTcpSocket();
+    d->networkTimeout = 30;
 }
 
-QtDcmFindScu::~QtDcmFindScu() {}
+QtDcmFindScu::~QtDcmFindScu() 
+{
+    delete d->socket;
+    delete d;
+    d = NULL;
+}
+
 
 void QtDcmFindScu::findPatientsScu ( QString patientName )
 {
@@ -96,25 +106,8 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
     overrideKeys.push_back ( QString ( "PatientSex=" + patientSex ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "PatientBirthDate" ).toUtf8().data() );
 
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
+    doQuery(overrideKeys, QtDcmFindCallback::PATIENT);
 
-    // test connection
-    if (!this->checkServerConnection())
-        return;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback();
-    callback->setManager ( d->manager );
-
-    if ( findscu.initializeNetwork ( 30 ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
-
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
-
-    if ( findscu.dropNetwork().bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
 void QtDcmFindScu::findStudiesScu ( QString patientName )
@@ -138,26 +131,8 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
     //Study level
     overrideKeys.push_back ( QString ( "StudyInstanceUID" ).toUtf8().data() );
 
-    //Image level
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
+    doQuery(overrideKeys, QtDcmFindCallback::STUDY);
 
-    // test connection
-    if (!this->checkServerConnection())
-        return;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::STUDY );
-    callback->setManager ( d->manager );
-
-    if ( findscu.initializeNetwork ( 30 ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
-
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
-
-    if ( findscu.dropNetwork().bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
 void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID)
@@ -191,26 +166,8 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     overrideKeys.push_back ( QString ( "AcquisitionNumber" ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "NumberOfSeriesRelatedInstances" ).toUtf8().data() );
 
-    //Image level
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
+    doQuery(overrideKeys, QtDcmFindCallback::SERIE);
 
-    // test connection
-    if (!this->checkServerConnection())
-        return;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::SERIE );
-    callback->setManager ( d->manager );
-
-    if ( findscu.initializeNetwork ( 30 ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
-
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
-
-    if ( findscu.dropNetwork().bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
 void QtDcmFindScu::findImagesScu ( QString seriesUID )
@@ -222,26 +179,8 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );
 
+    doQuery(overrideKeys, QtDcmFindCallback::IMAGES);
 
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
-
-    // test connection
-    if (!this->checkServerConnection())
-        return;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGES );
-    callback->setManager ( d->manager );
-
-    if ( findscu.initializeNetwork ( 30 ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
-
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
-
-    if ( findscu.dropNetwork().bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
 void QtDcmFindScu::findImageScu ( QString imageUID)
@@ -254,36 +193,55 @@ void QtDcmFindScu::findImageScu ( QString imageUID)
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID="+ imageUID ).toUtf8().data() );
 
-    OFList<OFString> fileNameList;
-    OFString temp_str;
-    DcmFindSCU findscu;
+    doQuery(overrideKeys, QtDcmFindCallback::IMAGE);
 
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( QtDcmFindCallback::IMAGE );
-    callback->setManager ( d->manager );
-
-    if ( findscu.initializeNetwork ( 30 ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
-
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toAscii().data(), d->manager->getCurrentPacs()->getPort().toInt(), QtDcmPreferences::instance()->getAetitle().toAscii().data(), d->manager->getCurrentPacs()->getAetitle().toAscii().data(), UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
-
-    if ( findscu.dropNetwork().bad() )
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
 }
 
 bool QtDcmFindScu::checkServerConnection(int timeout)
 {
     bool result = true;
-
-    QTcpSocket * socket = new QTcpSocket;
-    socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
-    if (socket->waitForConnected(timeout)) {
-        socket->disconnectFromHost();
+    d->socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
+    d->socket->connectToHost(d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt());
+    if (d->socket->waitForConnected(timeout)) {
+        d->socket->disconnectFromHost();
     } else  {
         d->manager->displayErrorMessage("Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
         result = false;
     }
-    delete socket;
+
     return result;
+}
+
+bool QtDcmFindScu::doQuery( OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level )
+{
+    //Image level
+    OFList<OFString> fileNameList;
+    OFString temp_str;
+    DcmFindSCU findscu;
+
+    // test connection
+    if (!this->checkServerConnection())
+        return false;
+
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
+    callback->setManager ( d->manager );
+
+    if ( findscu.initializeNetwork ( d->networkTimeout ).bad() ) {
+        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
+        return false;
+    }
+
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(), 
+        d->manager->getCurrentPacs()->getPort().toInt(), 
+        QtDcmPreferences::instance()->getAetitle().toUtf8().data(), 
+        d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), 
+        UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown, 
+        DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() ) {
+            d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
+    }
+
+    if ( findscu.dropNetwork().bad() )
+        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
+
+    return true;
 }
