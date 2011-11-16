@@ -463,7 +463,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         mover->setSeries ( QStringList() << uid );
         mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-        QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( terminate() ) );
+//         QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( terminate() ) );
         mover->start();
       }
     }
