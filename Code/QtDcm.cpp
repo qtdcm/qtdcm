@@ -87,6 +87,9 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
 QtDcm::~QtDcm()
 {
   QtDcmManager::instance()->deleteTemporaryDirs();
+
+  delete d;
+  d = NULL;
 }
 
 void QtDcm::initConnections()

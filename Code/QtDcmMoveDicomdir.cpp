@@ -55,7 +55,6 @@ class QtDcmMoveDicomdirPrivate
 {
 
 public:
-    QtDcmManager * manager;
     QString outputDir;
     QString importDir;
     DcmItem * dcmObject;
@@ -69,11 +68,14 @@ public:
 
 QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) : d ( new QtDcmMoveDicomdirPrivate )
 {
-    d->manager = dynamic_cast<QtDcmManager *> ( parent );
     d->mode = QtDcmMoveDicomdir::IMPORT;
 }
 
-QtDcmMoveDicomdir::~QtDcmMoveDicomdir() {}
+QtDcmMoveDicomdir::~QtDcmMoveDicomdir()
+{
+  delete d;
+  d = NULL;
+}
 
 void QtDcmMoveDicomdir::setMode ( QtDcmMoveDicomdir::mode mode )
 {

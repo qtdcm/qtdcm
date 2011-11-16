@@ -39,17 +39,20 @@ public:
     QString inputDirectory;
     QString outputDirectory;
     QString outputFilename;
-
-    QtDcmManager * manager;
 };
 
 QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
 {
     d->inputDirectory = "";
     d->outputFilename = "";
-
-    d->manager = dynamic_cast<QtDcmManager * > (parent);
 }
+
+QtDcmConvert::~QtDcmConvert()
+{
+  delete d;
+  d = NULL;
+}
+
 
 void QtDcmConvert::convert()
 {

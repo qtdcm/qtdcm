@@ -60,17 +60,18 @@ class QtDcmFindDicomdirPrivate
 
 public:
     DcmItem * dcmObject;
-    QtDcmManager * manager;
     DcmStack dicomdirItems;
 };
 
 QtDcmFindDicomdir::QtDcmFindDicomdir ( QObject * parent ) : d ( new QtDcmFindDicomdirPrivate )
 {
-    d->manager = dynamic_cast<QtDcmManager *> ( parent );
+  d->dcmObject = NULL;
 }
 
 QtDcmFindDicomdir::~QtDcmFindDicomdir()
 {
+  delete d;
+  d = NULL;
 }
 
 void QtDcmFindDicomdir::setDcmItem ( DcmItem * item )
@@ -149,7 +150,7 @@ void QtDcmFindDicomdir::findPatients()
                     infosMap.insert ( "Sex", QString ( strSex.c_str() ) );
                 }
 
-                d->manager->foundPatient ( infosMap );
+                QtDcmManager::instance()->foundPatient ( infosMap );
             }
 
             dirent.pop();
@@ -243,7 +244,7 @@ void QtDcmFindDicomdir::findStudies ( QString patientName )
                     lelt->getOFStringArray ( strDate );
                     infosMap.insert ( "Date", QString ( strDate.c_str() ) );
                 }
-                d->manager->foundStudy ( infosMap );
+                QtDcmManager::instance()->foundStudy ( infosMap );
             }
 
             dirent.pop();
@@ -372,7 +373,7 @@ void QtDcmFindDicomdir::findSeries ( QString patientName, QString studyUID )
 
                 infosMap.insert ( "Date", QString ( strDate.c_str() ) );
 
-                d->manager->foundSerie ( infosMap );
+                QtDcmManager::instance()->foundSerie ( infosMap );
             }
 
             dirent.pop();
@@ -454,7 +455,7 @@ void QtDcmFindDicomdir::findImages ( QString seriesUID )
                 {
                     lelt->getOFStringArray ( strUID );
                 }
-                d->manager->foundImage ( QString ( strUID.c_str() ), QString ( strNumber.c_str() ).toInt() );
+                QtDcmManager::instance()->foundImage ( QString ( strUID.c_str() ), QString ( strNumber.c_str() ).toInt() );
             }
 
             dirent.pop();

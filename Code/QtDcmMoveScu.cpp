@@ -63,7 +63,6 @@ class QtDcmMoveScuPrivate
 {
 
 public:
-    QtDcmManager * manager;
     QList<QString> series;
     QList<QString> filenames;
     QString outputDir;
@@ -76,7 +75,6 @@ public:
 
 QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
 {
-    d->manager = dynamic_cast<QtDcmManager *> ( parent );
     progressTotal = 0;
     progressSerie = 0;
     step = 0;
@@ -109,7 +107,11 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
     d->mode = QtDcmMoveScu::IMPORT;
 }
 
-QtDcmMoveScu::~QtDcmMoveScu() {}
+QtDcmMoveScu::~QtDcmMoveScu()
+{
+  delete d;
+  d = NULL;
+}
 
 void QtDcmMoveScu::setMode ( QtDcmMoveScu::mode mode )
 {
@@ -232,10 +234,10 @@ OFCondition QtDcmMoveScu::move ( QString uid )
         return cond;
     }
 
-    ASC_setAPTitles ( params, QtDcmPreferences::instance()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data(), d->manager->getCurrentPacs()->getAetitle().toUtf8().data() );
+    ASC_setAPTitles ( params, QtDcmPreferences::instance()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data() );
 
-    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( d->manager->getCurrentPacs()->getServer() + ":"
-                                   + d->manager->getCurrentPacs()->getPort() ).toUtf8().data() );
+    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( QtDcmManager::instance()->getCurrentPacs()->getServer() + ":"
+                                   + QtDcmManager::instance()->getCurrentPacs()->getPort() ).toUtf8().data() );
 
     cond = addPresentationContext ( params, 1, querySyntax[queryModel].findSyntax, networkTransferSyntax );
     cond = addPresentationContext ( params, 3, querySyntax[queryModel].moveSyntax, networkTransferSyntax );

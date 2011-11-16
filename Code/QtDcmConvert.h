@@ -32,6 +32,8 @@ class QtDcmConvert : public QObject
 public:
     QtDcmConvert ( QObject * parent );
 
+    ~QtDcmConvert();
+
     void convert();
     void setInputDirectory ( QString dir );
     void setOutputDirectory ( QString dir );

@@ -227,7 +227,6 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
         return false;
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
-    callback->setManager ( d->manager );
 
     if ( findscu.initializeNetwork ( d->networkTimeout ).bad() )
     {

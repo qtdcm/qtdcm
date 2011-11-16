@@ -38,14 +38,12 @@ public:
     QtDcmFindCallback();
     QtDcmFindCallback ( int type );
 
-    virtual ~QtDcmFindCallback() {};
+    virtual ~QtDcmFindCallback();
 
     enum cbType
     {
         PATIENT, STUDY, SERIE, IMAGES, IMAGE
     };
-
-    void setManager ( QtDcmManager * manager );
 
     virtual void callback ( T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers );
 

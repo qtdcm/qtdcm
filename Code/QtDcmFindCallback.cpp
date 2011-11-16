@@ -67,7 +67,6 @@ class QtDcmFindCallbackPrivate
 
 public:
     int type;
-    QtDcmManager * manager;
 };
 
 QtDcmFindCallback::QtDcmFindCallback() : d ( new QtDcmFindCallbackPrivate )
@@ -79,12 +78,12 @@ QtDcmFindCallback::QtDcmFindCallback ( int type ) :
         d ( new QtDcmFindCallbackPrivate )
 {
     d->type = type;
-    d->manager = NULL;
 }
 
-void QtDcmFindCallback::setManager ( QtDcmManager * manager )
+QtDcmFindCallback::~QtDcmFindCallback()
 {
-    d->manager = manager;
+  delete d;
+  d = NULL;
 }
 
 void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers )
@@ -106,8 +105,7 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         responseIdentifiers->findAndGetOFString ( DCM_PatientBirthDate, info );
         infosMap.insert ( "Birthdate", QString ( info.c_str() ) );
 
-        if ( d->manager )
-            d->manager->foundPatient ( infosMap );
+        QtDcmManager::instance()->foundPatient ( infosMap );
 
         break;
 
@@ -121,8 +119,7 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         responseIdentifiers->findAndGetOFString ( DCM_StudyInstanceUID, info );
         infosMap.insert ( "UID", QString ( info.c_str() ) );
 
-        if ( d->manager )
-            d->manager->foundStudy ( infosMap );
+        QtDcmManager::instance()->foundStudy ( infosMap );
 
         break;
 
@@ -142,31 +139,28 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
         responseIdentifiers->findAndGetOFString ( DCM_NumberOfSeriesRelatedInstances, info );
         infosMap.insert ( "InstanceCount", QString ( info.c_str() ) );
 
-        if ( d->manager )
-            d->manager->foundSerie ( infosMap );
+        QtDcmManager::instance()->foundSerie ( infosMap );
         break;
 
     case QtDcmFindCallback::IMAGE:
         responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
 
-        if ( d->manager )
-            d->manager->setPreviewImageUID ( QString ( info.c_str() ) );
+        QtDcmManager::instance()->setPreviewImageUID ( QString ( info.c_str() ) );
         break;
 
     case QtDcmFindCallback::IMAGES:
         OFString number;
         responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
         responseIdentifiers->findAndGetOFString ( DCM_InstanceNumber, number );
-                
-        if (!number.length())
-          number = "0";
-        
-        if ( d->manager )
-            d->manager->foundImage ( QString ( info.c_str() ), QString ( number.c_str() ).toInt() );
+
+        if ( !number.length() )
+            number = "0";
+
+        QtDcmManager::instance()->foundImage ( QString ( info.c_str() ), QString ( number.c_str() ).toInt() );
 
 //         responseIdentifiers->print ( std::cout );
 
         break;
-        
+
     }
 }
