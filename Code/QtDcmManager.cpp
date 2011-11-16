@@ -73,7 +73,6 @@ public:
     QList<QString> seriesToImport;
     QString serieId; /** Id of the serie to export from the PACS */
     QProcess * process; /** This attribute launch the reconstruction process */
-//     QtDcmPreferences * preferences; /** Attribute that give access to the Pacs settings */
     QString patientName; /** Attribute frepresenting the patient name used for query PACS */
     QString patientId; /** Attribute representing the patient id used for query PACS */
     QString patientSex;
@@ -141,8 +140,6 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
     d->previewWidget = NULL;
     d->serieInfoWidget = NULL;
     d->currentPacs = NULL;
-//     qDebug()<< QtDcmPreferences::instance()->getServers();
-//    d->currentPacs = QtDcmPreferences::instance()->getServers().at ( 0 );
     //Creation of the temporary directories (/tmp/qtdcm and /tmp/qtdcm/logs)
     this->createTemporaryDirs();
 }
@@ -449,6 +446,12 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     }
     else // mode PACS
     {
+      //Check if file has already been moved
+      QString filename(d->tempDir.absolutePath() + "/" + uid + "/" + imageId);
+      if (QFile().exists(filename))
+        makePreview(filename);
+      else
+      {
         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
         mover->setMode ( QtDcmMoveScu::PREVIEW );
         mover->setOutputDir ( d->tempDir.absolutePath() );
@@ -456,6 +459,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         mover->setImageId ( imageId );
         QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
         mover->start();
+      }
     }
 
     return;

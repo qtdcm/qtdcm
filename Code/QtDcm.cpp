@@ -84,7 +84,10 @@ QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
     initConnections();
 }
 
-QtDcm::~QtDcm() {}
+QtDcm::~QtDcm()
+{
+  QtDcmManager::instance()->deleteTemporaryDirs();
+}
 
 void QtDcm::initConnections()
 {
@@ -178,7 +181,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
         int elementCount = QtDcmManager::instance()->getListImages().size();
         QString institution = current->data ( 5, 0 ).toString();
         QString opName = current->data ( 6, 0 ).toString();
-        
+
         QtDcmManager::instance()->updateSerieInfo ( QString::number ( elementCount ), institution, opName );
         QtDcmManager::instance()->clearPreview();
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );

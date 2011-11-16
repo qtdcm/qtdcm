@@ -54,12 +54,6 @@ private:
      */
     void createTemporaryDirs();
 
-    /**
-     * This method try to delete the temporary directory when closing the QtDcm widget
-     * (Doesn't work for the moment)
-     */
-    void deleteTemporaryDirs();
-
 public:
     enum outputdirmode
     {
@@ -316,6 +310,12 @@ public:
     bool useConverter();
 
     void useConverter ( bool use );
+
+    /**
+     * This method try to delete the temporary directory when closing the QtDcm widget
+     * (Doesn't work for the moment)
+     */
+    void deleteTemporaryDirs();
 
 public slots:
     void updateProgressBar ( int i );
