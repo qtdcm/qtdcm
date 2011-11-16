@@ -561,20 +561,20 @@ void QtDcmManager::updateProgressBar ( int i )
 void QtDcmManager::createTemporaryDirs()
 {
     //Creation d'un répertoire temporaire pour la série
-    QDir tempDir = QDir ( QDir::tempPath() ); //tempDir = /tmp
+    QDir tempDir = QDir ( QDir::tempPath() );
 
-    //Generer un nom de répertoire aléatoire
-    QString acceptes = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
-    QString randName;
-    qsrand ( time ( NULL ) );
+    //Use Quuid to generate the temporary directory
+    QString randName = QUuid::createUuid().toString();
+    
+    if ( !tempDir.exists ( "qtdcm" ) )
+        tempDir.mkdir ( "qtdcm");
 
-    for ( int i = 0; i < 6; i++ )
-        randName += acceptes[qrand() % 59];
+    QDir qtdcmDir = QDir(QDir::tempPath() + QDir::separator() + "qtdcm");
+    
+    if( !qtdcmDir.exists(randName))
+      qtdcmDir.mkdir ( randName );
 
-    if ( !tempDir.exists ( "qtdcm" + randName ) )
-        tempDir.mkdir ( "qtdcm" + randName );
-
-    d->tempDir = QDir ( QDir::tempPath() + QDir::separator() + "qtdcm" + randName ); // tempDir = /tmp/qtdcm
+    d->tempDir = QDir ( qtdcmDir.absolutePath() + QDir::separator() + randName ); // tempDir = /tmp/qtdcm
 
     if ( !d->tempDir.exists ( "logs" ) )
     {
