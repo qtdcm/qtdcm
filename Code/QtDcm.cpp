@@ -151,6 +151,8 @@ void QtDcm::patientItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* pre
             QtDcmManager::instance()->findStudiesScu ( current->text ( 0 ) );
         else
             QtDcmManager::instance()->findStudiesDicomdir ( current->text ( 0 ) );
+
+        QtDcmManager::instance()->clearPreview();
     }
 }
 
@@ -167,6 +169,8 @@ void QtDcm::studyItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
             QtDcmManager::instance()->findSeriesScu ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
         else
             QtDcmManager::instance()->findSeriesDicomdir ( treeWidgetPatients->currentItem()->text ( 0 ), current->data ( 2, 0 ).toString() );
+
+        QtDcmManager::instance()->clearPreview();
     }
 }
 
