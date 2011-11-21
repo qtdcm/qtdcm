@@ -109,8 +109,8 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
 
 QtDcmMoveScu::~QtDcmMoveScu()
 {
-  delete d;
-  d = NULL;
+    delete d;
+    d = NULL;
 }
 
 void QtDcmMoveScu::setMode ( QtDcmMoveScu::mode mode )
@@ -151,8 +151,12 @@ void QtDcmMoveScu::onStopMove()
 //     qDebug() << "Aborting Association";
 //     OFCondition cond = ASC_abortAssociation ( assoc );
 //     qDebug() << cond.text();
-    ASC_dropNetwork ( &net );
-    this->exit();
+
+    if ( this->isRunning() )
+    {
+        ASC_dropNetwork ( &net );
+        this->exit();
+    }
 }
 
 

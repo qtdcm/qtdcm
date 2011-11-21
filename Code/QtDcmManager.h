@@ -114,8 +114,6 @@ public:
     void clearSerieInfo();
     void updateSerieInfo ( QString eltCount, QString institution, QString name );
 
-    void clearPreview();
-
     /**
      * This method read the dicomdir file and populate the patient treewidget
      *
@@ -320,6 +318,7 @@ public:
 public slots:
     void updateProgressBar ( int i );
     void moveSeriesFinished();
+    void clearPreview();
     void makePreview ( QString filename );
     void onSerieMoved ( QString directory, QString uid, int number );
 

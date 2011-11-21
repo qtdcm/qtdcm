@@ -427,10 +427,10 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
         return;
 
     QString imageId = d->listImages[elementIndex];
-    
-    if ( d->mapImages.size() && d->mapImages.contains(elementIndex))
-      imageId = d->mapImages[elementIndex];
-    
+
+    if ( d->mapImages.size() && d->mapImages.contains ( elementIndex ) )
+        imageId = d->mapImages[elementIndex];
+
     if ( d->mode == "CD" )
     {
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
@@ -444,26 +444,31 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     }
     else // mode PACS
     {
-      //Check if file has already been moved
-      QString modality("MR");
-      if (d->seriesTreeWidget->currentItem())
-        modality = d->seriesTreeWidget->currentItem()->text(1);
-      QString filename(d->tempDir.absolutePath() + "/" + uid + "/" + modality + "." + imageId);
+        //Check if file has already been moved
+        QString modality ( "MR" );
+        if ( d->seriesTreeWidget->currentItem() )
+            modality = d->seriesTreeWidget->currentItem()->text ( 1 );
+        QString filename ( d->tempDir.absolutePath() + "/" + uid + "/" + modality + "." + imageId );
 
-      if (QFile(filename).exists())
-        makePreview(filename);
-      else
-      {
-        emit gettingPreview();
-        QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
-        mover->setMode ( QtDcmMoveScu::PREVIEW );
-        mover->setOutputDir ( d->tempDir.absolutePath() );
-        mover->setSeries ( QStringList() << uid );
-        mover->setImageId ( imageId );
-        QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-        QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ));
-        mover->start();
-      }
+        if ( QFile ( filename ).exists() )
+        {
+            emit gettingPreview();
+            makePreview ( filename );
+        }
+        else
+        {
+            QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
+            mover->setMode ( QtDcmMoveScu::PREVIEW );
+            mover->setOutputDir ( d->tempDir.absolutePath() );
+            mover->setSeries ( QStringList() << uid );
+            mover->setImageId ( imageId );
+            QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
+            QObject::connect ( this, SIGNAL ( gettingPreview() ), this, SLOT ( clearPreview() ) );
+            QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ) );
+
+            emit gettingPreview();
+            mover->start();
+        }
     }
 
     return;
@@ -565,14 +570,14 @@ void QtDcmManager::createTemporaryDirs()
 
     //Use Quuid to generate the temporary directory
     QString randName = QUuid::createUuid().toString();
-    
-    if ( !tempDir.exists ( "qtdcm" ) )
-        tempDir.mkdir ( "qtdcm");
 
-    QDir qtdcmDir = QDir(QDir::tempPath() + QDir::separator() + "qtdcm");
-    
-    if( !qtdcmDir.exists(randName))
-      qtdcmDir.mkdir ( randName );
+    if ( !tempDir.exists ( "qtdcm" ) )
+        tempDir.mkdir ( "qtdcm" );
+
+    QDir qtdcmDir = QDir ( QDir::tempPath() + QDir::separator() + "qtdcm" );
+
+    if ( !qtdcmDir.exists ( randName ) )
+        qtdcmDir.mkdir ( randName );
 
     d->tempDir = QDir ( qtdcmDir.absolutePath() + QDir::separator() + randName ); // tempDir = /tmp/qtdcm
 

@@ -190,7 +190,7 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
         QString opName = current->data ( 6, 0 ).toString();
 
         QtDcmManager::instance()->updateSerieInfo ( QString::number ( elementCount ), institution, opName );
-        QtDcmManager::instance()->clearPreview();
+//         QtDcmManager::instance()->clearPreview();
         QtDcmManager::instance()->getPreviewFromSelectedSerie ( current->text ( 3 ), elementCount / 2 );
     }
 }
