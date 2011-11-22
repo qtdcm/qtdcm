@@ -57,33 +57,29 @@ class QtDcmManagerPrivate
 
 public:
     QtDcm * mainWidget;
-    QString dicomdir; /** Dicomdir absolute file path */
-    QString outputDir; /** Output directory for reconstructed serie absolute path */
-    QDir currentSerieDir; /** Directory containing current serie dicom slice */
-    QDir tempDir; /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
-    QDir logsDir; /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
-    DcmFileFormat dfile; /** This attribute is usefull for parsing the dicomdir */
-    QList<QtDcmPatient *> patients; /** List that contains patients resulting of a query or read from a CD */
-    QList<QString> images; /** List of image filename to export from a CD */
-    QMap<QString, QList<QString> > seriesToExport;
-    QList<QString> listImages;
-    QMap<int, QString> mapImages;
-    QList<QString> seriesToImport;
-    QString serieId; /** Id of the serie to export from the PACS */
-    QProcess * process; /** This attribute launch the reconstruction process */
-    QString patientName; /** Attribute frepresenting the patient name used for query PACS */
-    QString patientId; /** Attribute representing the patient id used for query PACS */
-    QString patientSex;
-    QString patientBirthDate;
-    QString modality; /** Attibute for the modality of the search (MR, US, CT, etc) */
-    QString date1; /** Attribute for the begin date of the query (usefull for date based queries) */
-    QString date2; /** Attribute for the end date of the query (usefull for date based queries) */
-    QString serieDescription; /** Attibute representing the serie description used for query PACS */
-    QString studyDescription; /** Attibute representing the study description used for query PACS */
-    QString mode; /** Mode that determine the type of media (CD or PACS) */
-    QString dcm2nii; /** Absolute filename of the dcm2nii program */
-    QByteArray query;
-    QString previewImageUID;
+    QString dicomdir;                                /** Dicomdir absolute file path */
+    QString outputDir;                               /** Output directory for reconstructed serie absolute path */
+    QDir currentSerieDir;                            /** Directory containing current serie dicom slice */
+    QDir tempDir;                                    /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
+    QDir logsDir;                                    /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
+    DcmFileFormat dfile;                             /** This attribute is usefull for parsing the dicomdir */
+    QList<QtDcmPatient *> patients;                  /** List that contains patients resulting of a query or read from a CD */
+    QList<QString> images;                           /** List of image filename to export from a CD */
+    QList<QString> listImages;                       /** List of images uid in the current selected serie */
+    QMap<int, QString> mapImages;                    /** Map of images (corresponding to listImages) with InstanceNumber tags used as keys */
+    QList<QString> seriesToImport;                   /** Selected series list in the treview */
+    QString serieId;                                 /** Current selected serie UID */
+    QString patientName;                             /** Attribute frepresenting the patient name used to query PACS */
+    QString patientId;                               /** Attribute representing the patient id used to query PACS */
+    QString patientSex;                              /** Attribute representing the patient sex used to query PACS */
+    QString patientBirthDate;                        /** Attribute representing the patient birthdate used to query PACS */
+    QString modality;                                /** Attibute for the modality of the search (MR, US, CT, etc) */
+    QString date1;                                   /** Attribute for the begin date of the query (usefull for date based queries) */
+    QString date2;                                   /** Attribute for the end date of the query (usefull for date based queries) */
+    QString serieDescription;                        /** Attibute representing the serie description used for query PACS */
+    QString studyDescription;                        /** Attibute representing the study description used for query PACS */
+    QString mode;                                    /** Mode that determine the type of media (CD or PACS) */
+    QString dcm2nii;                                 /** Absolute filename of the dcm2nii program */
 
     QtDcmManager::outputdirmode outputdirMode;
     QtDcmServer * currentPacs;
@@ -342,11 +338,8 @@ void QtDcmManager::loadDicomdir()
 
     //Load dicomdir in a DCMTK DicomFileFormat object
     OFCondition status;
-
     if ( ! ( status = d->dfile.loadFile ( d->dicomdir.toUtf8().data() ) ).good() )
-    {
         return;
-    }
 
     this->findPatientsDicomdir();
 }
@@ -426,6 +419,9 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     if ( !d->listImages.size() )
         return;
 
+    if ( d->listImages.size() < elementIndex )
+        return;
+
     QString imageId = d->listImages[elementIndex];
 
     if ( d->mapImages.size() && d->mapImages.contains ( elementIndex ) )
@@ -445,16 +441,16 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
     else // mode PACS
     {
         //Check if file has already been moved
+        this->clearPreview();
+        emit gettingPreview();
+
         QString modality ( "MR" );
         if ( d->seriesTreeWidget->currentItem() )
             modality = d->seriesTreeWidget->currentItem()->text ( 1 );
         QString filename ( d->tempDir.absolutePath() + "/" + uid + "/" + modality + "." + imageId );
 
         if ( QFile ( filename ).exists() )
-        {
-            emit gettingPreview();
             makePreview ( filename );
-        }
         else
         {
             QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
@@ -463,10 +459,8 @@ void QtDcmManager::getPreviewFromSelectedSerie ( QString uid, int elementIndex )
             mover->setSeries ( QStringList() << uid );
             mover->setImageId ( imageId );
             QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-            QObject::connect ( this, SIGNAL ( gettingPreview() ), this, SLOT ( clearPreview() ) );
             QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ) );
 
-            emit gettingPreview();
             mover->start();
         }
     }
@@ -898,21 +892,6 @@ QString QtDcmManager::getCurrentSerieDirectory()
     return d->currentSerieDir.absolutePath();
 }
 
-void QtDcmManager::setSeriesToExport ( QMap<QString, QList<QString> > seriesToExport )
-{
-    d->seriesToExport = seriesToExport;
-}
-
-void QtDcmManager::setQuery ( QByteArray query )
-{
-    d->query = query;
-}
-
-void QtDcmManager::setPreviewImageUID ( QString uid )
-{
-    d->previewImageUID = uid;
-}
-
 void QtDcmManager::addSerieToImport ( QString uid )
 {
     if ( !d->seriesToImport.contains ( uid ) )
@@ -944,5 +923,4 @@ void QtDcmManager::useConverter ( bool use )
 {
     d->useConverter = use;
 }
-
 

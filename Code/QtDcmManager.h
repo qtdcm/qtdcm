@@ -299,11 +299,7 @@ public:
 
     QString getCurrentSerieDirectory();
 
-    void setSeriesToExport ( QMap<QString, QList<QString> > seriesToExport );
-
-    void setQuery ( QByteArray query );
-
-    void setPreviewImageUID ( QString uid );
+//     void setPreviewImageUID ( QString uid );
 
     bool useConverter();
 

@@ -145,13 +145,6 @@ void QtDcmMoveScu::setImportDir ( QString dir )
 
 void QtDcmMoveScu::onStopMove()
 {
-//     qDebug() << "Stopping thread";
-
-    //Aborting association and dropping network
-//     qDebug() << "Aborting Association";
-//     OFCondition cond = ASC_abortAssociation ( assoc );
-//     qDebug() << cond.text();
-
     if ( this->isRunning() )
     {
         ASC_dropNetwork ( &net );

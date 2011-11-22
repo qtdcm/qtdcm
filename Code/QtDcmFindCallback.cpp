@@ -145,7 +145,7 @@ void QtDcmFindCallback::callback ( T_DIMSE_C_FindRQ *request, int responseCount,
     case QtDcmFindCallback::IMAGE:
         responseIdentifiers->findAndGetOFString ( DCM_SOPInstanceUID, info );
 
-        QtDcmManager::instance()->setPreviewImageUID ( QString ( info.c_str() ) );
+//         QtDcmManager::instance()->setPreviewImageUID ( QString ( info.c_str() ) );
         break;
 
     case QtDcmFindCallback::IMAGES:
