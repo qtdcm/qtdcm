@@ -22,8 +22,7 @@
 #define QTDCMPREFERENCES_H_
 
 #include <QtGui>
-
-class QtDcmServer;
+#include <QtDcmServer.h>
 
 class QtDcmPreferencesPrivate;
 /**
@@ -157,6 +156,16 @@ public:
 
 signals:
     void preferencesUpdated();
+
+public slots:
+    void onUpdatePreferences();
+    void onUseDcm2niiSet(bool use);
+    void onDcm2niiPathSet(QString path);
+    void onLocalPortSet(QString port);
+    void onLocalHostnameSet(QString host);
+    void onLocalAetSet(QString aet);
+    void onPacsAdded();
+    void onPacsRemoved(int index);
 
 private:
     /**

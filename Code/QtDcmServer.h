@@ -33,7 +33,7 @@ class QtDcmServer : public QObject
 
 private:
     QString _aetitle; /** Application entity title (AETitle) of the PACS server */
-    QString _server; /** The hostname of the server */
+    QString _hostname; /** The hostname of the server */
     QString _port; /** TCP port the application is listening on */
     QString _name; /** Description name of the PACS */
 
@@ -83,9 +83,9 @@ public:
      *
      * @return _server as a QString
      */
-    inline QString getServer() const
+    inline QString getHostname() const
     {
-        return _server;
+        return _hostname;
     }
 
     /**
@@ -123,9 +123,9 @@ public:
      *
      * @param _server as a QString
      */
-    inline void setServer ( QString _server )
+    inline void setHostname ( QString _server )
     {
-        this->_server = _server;
+        this->_hostname = _server;
     }
 };
 

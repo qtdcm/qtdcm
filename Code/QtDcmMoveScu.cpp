@@ -240,7 +240,7 @@ OFCondition QtDcmMoveScu::move ( QString uid )
 
     ASC_setAPTitles ( params, QtDcmPreferences::instance()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data() );
 
-    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( QtDcmManager::instance()->getCurrentPacs()->getServer() + ":"
+    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( QtDcmManager::instance()->getCurrentPacs()->getHostname() + ":"
                                    + QtDcmManager::instance()->getCurrentPacs()->getPort() ).toUtf8().data() );
 
     cond = addPresentationContext ( params, 1, querySyntax[queryModel].findSyntax, networkTransferSyntax );

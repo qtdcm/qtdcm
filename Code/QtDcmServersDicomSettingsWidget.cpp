@@ -121,8 +121,8 @@ void QtDcmServersDicomSettingsWidget::setPreferences ( QtDcmPreferences* prefs )
         item->setData ( 1, 1, QVariant ( d->preferences->getServers().at ( i )->getAetitle() ) );
         item->setText ( 2, d->preferences->getServers().at ( i )->getPort() );
         item->setData ( 2, 1, QVariant ( d->preferences->getServers().at ( i )->getPort() ) );
-        item->setText ( 3, d->preferences->getServers().at ( i )->getServer() );
-        item->setData ( 3, 1, QVariant ( d->preferences->getServers().at ( i )->getServer() ) );
+        item->setText ( 3, d->preferences->getServers().at ( i )->getHostname() );
+        item->setData ( 3, 1, QVariant ( d->preferences->getServers().at ( i )->getHostname() ) );
     }
 }
 
@@ -137,7 +137,7 @@ void QtDcmServersDicomSettingsWidget::updatePreferences()
             d->preferences->getServers().at ( i )->setName ( root->child ( i )->data ( 0, 1 ).toString() );
             d->preferences->getServers().at ( i )->setAetitle ( root->child ( i )->data ( 1, 1 ).toString() );
             d->preferences->getServers().at ( i )->setPort ( root->child ( i )->data ( 2, 1 ).toString() );
-            d->preferences->getServers().at ( i )->setServer ( root->child ( i )->data ( 3, 1 ).toString() );
+            d->preferences->getServers().at ( i )->setHostname ( root->child ( i )->data ( 3, 1 ).toString() );
         }
 
         d->preferences->writeSettings();
@@ -160,7 +160,7 @@ void QtDcmServersDicomSettingsWidget::addServer()
     item->setText ( 3, "hostname" );
     item->setData ( 3, 1, QVariant ( "hostname" ) );
     item->setData ( 4, 1, QVariant ( d->preferences->getServers().size() - 1 ) );
-    d->preferences->getServers().last()->setServer ( "hostname" );
+    d->preferences->getServers().last()->setHostname ( "hostname" );
 }
 
 void QtDcmServersDicomSettingsWidget::removeServer()

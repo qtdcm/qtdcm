@@ -201,14 +201,14 @@ bool QtDcmFindScu::checkServerConnection ( int timeout )
 {
     bool result = true;
     d->socket->setSocketOption ( QAbstractSocket::LowDelayOption, 1 );
-    d->socket->connectToHost ( d->manager->getCurrentPacs()->getServer(),  d->manager->getCurrentPacs()->getPort().toInt() );
+    d->socket->connectToHost ( d->manager->getCurrentPacs()->getHostname(),  d->manager->getCurrentPacs()->getPort().toInt() );
     if ( d->socket->waitForConnected ( timeout ) )
     {
         d->socket->disconnectFromHost();
     }
     else
     {
-        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getServer() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getHostname() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
         result = false;
     }
 
@@ -234,7 +234,7 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
         return false;
     }
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getServer().toUtf8().data(),
+    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getHostname().toUtf8().data(),
                                 d->manager->getCurrentPacs()->getPort().toInt(),
                                 QtDcmPreferences::instance()->getAetitle().toUtf8().data(),
                                 d->manager->getCurrentPacs()->getAetitle().toUtf8().data(),
