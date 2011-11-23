@@ -81,24 +81,24 @@ public:
     QString mode;                                    /** Mode that determine the type of media (CD or PACS) */
     QString dcm2nii;                                 /** Absolute filename of the dcm2nii program */
 
-    QtDcmManager::outputdirmode outputdirMode;
-    QtDcmServer * currentPacs;
+    QtDcmManager::outputdirmode outputdirMode;       /** Output directory mode DIALOG or CUSTOM */
+    QtDcmServer * currentPacs;                       /** Current pacs index in the pacs list */
 
-    QTreeWidget * patientsTreeWidget;
-    QTreeWidget * studiesTreeWidget;
-    QTreeWidget * seriesTreeWidget;
+    QTreeWidget * patientsTreeWidget;                /** The pointer to the patients tree widget */
+    QTreeWidget * studiesTreeWidget;                 /** The pointer to the studies tree widget */
+    QTreeWidget * seriesTreeWidget;                  /** The pointer to the series tree widget */
 
-    QtDcmPreviewWidget * previewWidget;
-    QtDcmImportWidget * importWidget;
-    QtDcmSerieInfoWidget * serieInfoWidget;
+    QtDcmPreviewWidget * previewWidget;              /** The pointer to the preview widget */
+    QtDcmImportWidget * importWidget;                /** The pointer to the import widget */
+    QtDcmSerieInfoWidget * serieInfoWidget;          /** The pointer to the serie info widget */
 
-    bool useConverter;
+    bool useConverter;                               /** Use a converter ? */
 };
 
 QtDcmManager * QtDcmManager::_instance = 0;
 
-QtDcmManager *
-QtDcmManager ::instance()
+
+QtDcmManager * QtDcmManager::instance()
 {
     if ( _instance == 0 )
         _instance = new QtDcmManager();
