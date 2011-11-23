@@ -19,7 +19,7 @@
  *
  * On Linux, configure the code, compile and install using the following commands (from the source directory):
  * <div id="code">
- * $ CFLAGS="-fPIC" CXXFLAGS="-fPIC" AR="gcc" ARFLAGS="-shared -o" LIBEXT="so" RANLIB=":" ./configure<br>
+ * $ CFLAGS="-fPIC" CXXFLAGS="-fPIC" AR="gcc" ARFLAGS="-shared -o" LIBEXT="so" RANLIB=":" ./configure -disable-threads --without-openssl --without-libtiff --without-libpng<br>
  * $ make && sudo make install-all
  * </div>
  *
