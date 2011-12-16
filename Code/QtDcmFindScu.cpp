@@ -43,8 +43,6 @@
 // For color images
 #include <dcmtk/dcmimage/diregist.h>
 
-//#define INCLUDEd->CSTDLIB
-//#define INCLUDEd->CSTRING
 #include "dcmtk/ofstd/ofstdinc.h"
 
 #include "dcmtk/dcmnet/dimse.h"

@@ -117,7 +117,15 @@ cmake_export_build_settings(${QTDCM_BINARY_DIR}/QtDCMBuildSettings.cmake)
 export_library_dependencies(${QTDCM_BINARY_DIR}/QtDCMLibraryDepends.cmake)
 
 # Create the QtDCMConfig.cmake file containing the QtDCM configuration used with make install and CPack.
-include (${QTDCM_SOURCE_DIR}/CMake/QtDCMGenerateInstall.cmake)
-if ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
-  install_targets(${INSTALL_LIB} qtdcm)
-endif ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
+# include (${QTDCM_SOURCE_DIR}/CMake/QtDCMGenerateInstall.cmake)
+# if ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
+#   install_targets(${INSTALL_LIB} qtdcm)
+# endif ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
+
+set(${PROJECT_NAME}_HEADERS
+  ${SAMPLE_HDRS}
+  ${SAMPLE_UI_HDRS}
+)
+
+install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/qtdcm)
+install(TARGETS qtdcm LIBRARY DESTINATION lib)
