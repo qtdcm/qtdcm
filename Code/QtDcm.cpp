@@ -208,23 +208,23 @@ void QtDcm::openDicomdir()
     this->clearDisplay();
     d->mode = QtDcm::CD;
     // Open a QFileDialog for choosing a Dicomdir
-    QFileDialog dialog ( this );
-    dialog.setFileMode ( QFileDialog::ExistingFile );
-    dialog.setDirectory ( QDir::home().dirName() );
-    dialog.setWindowTitle ( tr ( "Open dicomdir" ) );
+    QFileDialog * dialog = new QFileDialog( this );
+    dialog->setFileMode ( QFileDialog::ExistingFile );
+    dialog->setDirectory ( QDir::home().dirName() );
+    dialog->setWindowTitle ( tr ( "Open dicomdir" ) );
     QStringList filters;
-    filters << "Dicomdir (dicomdir DICOMDIR)";
+    filters << "Dicomdir files (dicomdir* DICOMDIR*)";
     filters << "Any files (*)";
-    dialog.setNameFilters(filters);
+    dialog->setNameFilters(filters);
 
     QString fileName;
 
-    if ( dialog.exec() )
+    if ( dialog->exec() )
     {
-        fileName = dialog.selectedFiles() [0];
+        fileName = dialog->selectedFiles() [0];
     }
 
-    dialog.close();
+    dialog->close();
 
     if ( !fileName.isEmpty() )   // A file has been chosen
     {
@@ -234,6 +234,8 @@ void QtDcm::openDicomdir()
             this->loadPatientsFromDicomdir();
         }
     }
+
+    dialog->deleteLater();
 }
 
 void QtDcm::loadPatientsFromDicomdir()
