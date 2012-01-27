@@ -73,6 +73,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="addButton">
+          <property name="toolTip">
+           <string>Add a new PACS server</string>
+          </property>
           <property name="text">
            <string>Add</string>
           </property>
@@ -80,6 +83,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="removeButton">
+          <property name="toolTip">
+           <string>Remove selected PACS server</string>
+          </property>
           <property name="text">
            <string>Remove</string>
           </property>
@@ -168,6 +174,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>PACS Server IP address (or hostname) </string>
+            </property>
            </widget>
           </item>
           <item>
@@ -177,6 +186,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>PACS Server Application Entity Title</string>
             </property>
            </widget>
           </item>
@@ -188,6 +200,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>PACS Server TCP port</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -197,6 +212,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Name this PACS Server</string>
             </property>
            </widget>
           </item>
@@ -234,6 +252,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="echoButton">
+          <property name="toolTip">
+           <string>Send an echo request to the selected server</string>
+          </property>
           <property name="text">
            <string>Send echo</string>
           </property>

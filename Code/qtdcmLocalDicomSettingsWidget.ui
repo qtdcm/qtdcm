@@ -65,13 +65,25 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLineEdit" name="localAetitleEdit"/>
+           <widget class="QLineEdit" name="localAetitleEdit">
+            <property name="toolTip">
+             <string>Dicom Application Entity Title</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="localPortEdit"/>
+           <widget class="QLineEdit" name="localPortEdit">
+            <property name="toolTip">
+             <string>Local TCP Port</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="localHostnameEdit"/>
+           <widget class="QLineEdit" name="localHostnameEdit">
+            <property name="toolTip">
+             <string>Hostname or IP Address</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
