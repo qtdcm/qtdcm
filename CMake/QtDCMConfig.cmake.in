@@ -46,28 +46,7 @@ SET(USE_VISTAL "@USE_VISTAL@")
 
 if (QTDCM_FOUND)
 	set(DCMTK_INCLUDE_DIR "@DCMTK_INCLUDE_DIR@")
-	set(DCMTK_LIBRARIES 
-	dcmimgle
-	dcmjpeg
-	#dcmpstat
-	dcmimage
-	dcmdata
-	#dcmdsig
-	#dcmnet
-	#dcmsr
-	#dcmtls
-	#dcmwlm
-	ofstd
-	#dcmqrdb
-	)
+	set(DCMTK_DIR "@DCMTK_DIR@/lib")
+	set(DCMTK_LIBRARIES "@DCMTK_LIBRARIES@")
 endif (QTDCM_FOUND)
-#	set(DCMTK_config_INCLUDE_DIR "@DCMTK_config_INCLUDE_DIR@")
-#	set(DCMTK_dcmdata_INCLUDE_DIR "@DCMTK_dcmdata_INCLUDE_DIR@")
-#	set(DCMTK_dcmdata_LIBRARY "@DCMTK_dcmdata_LIBRARY@")
-#	set(DCMTK_dcmimgle_INCLUDE_DIR "@DCMTK_dcmimgle_INCLUDE_DIR@")
-#	set(DCMTK_dcmimgle_LIBRARY "@DCMTK_dcmimgle_LIBRARY@")
-#	set(DCMTK_dcmnet_LIBRARY "@DCMTK_dcmnet_LIBRARY@")
-#	set(DCMTK_imagedb_LIBRARY @DCMTK_imagedb_LIBRARY@)
-#	set(DCMTK_ofstd_INCLUDE_DIR @DCMTK_ofstd_INCLUDE_DIR@)
-#	set(DCMTK_ofstd_LIBRARY @DCMTK_ofstd_LIBRARY@)
 

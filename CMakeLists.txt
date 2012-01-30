@@ -11,10 +11,6 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
-if(!MSVC)
-  add_definitions( -Wno-deprecated -g -DHAVE_CONFIG_H -fPIC )
-endif()
-
 option(BUILD_EXAMPLE "Build qtdcm example application" OFF)
 option(BUILD_SHARED_LIBS "Build QtDcm with shared libraries." OFF)
 option(BUILD_DOCUMENTATION "Build QtDcm Documentation (add a Documentation target)" OFF)

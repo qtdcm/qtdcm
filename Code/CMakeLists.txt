@@ -14,10 +14,6 @@ if(ITK_FOUND)
   include(${ITK_USE_FILE})
 endif(ITK_FOUND)
 
-if(NOT MSVC)
-  add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )
-endif(NOT MSVC)
-
 set(QTDCM_RCCS
     ${QTDCM_SOURCE_DIR}/Resources/qtdcm.qrc
 )
@@ -91,9 +87,6 @@ set(QTDCM_SRCS
 qt4_add_resources(QTDCM_RCC_SRCS ${QTDCM_RCCS})
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
-
-message(STATUS ${DCMTK_LIBRARIES})
-link_directories(${DCMTK_DIR}/lib/)
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR}/Code ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 
