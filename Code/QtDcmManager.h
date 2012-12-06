@@ -20,6 +20,7 @@
 #ifndef QTDCMMANAGER_H_
 #define QTDCMMANAGER_H_
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include <QtNetwork>
 
@@ -39,7 +40,7 @@ class QtDcmManagerPrivate;
  *
  */
 
-class QtDcmManager : public QObject
+class  QTDCM_EXPORT QtDcmManager : public QObject
 {
     Q_OBJECT
 

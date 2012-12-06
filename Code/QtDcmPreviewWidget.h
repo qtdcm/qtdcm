@@ -21,10 +21,11 @@
 #ifndef QTDCMPREVIEWWIDGET_H
 #define QTDCMPREVIEWWIDGET_H
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include "ui_qtdcmPreviewWidget.h"
 
-class QtDcmPreviewWidget : public QWidget, public Ui::QtDcmPreviewWidget
+class QTDCM_EXPORT QtDcmPreviewWidget : public QWidget, public Ui::QtDcmPreviewWidget
 {
     Q_OBJECT
 public:

@@ -20,6 +20,7 @@
 #ifndef QTDCM_H
 #define QTDCM_H
 
+#include "qtdcmExports.h"
 #include "ui_qtdcm.h"
 #include <QtGui>
 
@@ -32,7 +33,7 @@ class QtDcmManager;
  * Once read/retrieve, each serie can be reconstructed, using the QtDcmManager.
  */
 
-class QtDcm : public QWidget, public Ui::QtDcmWidget
+class QTDCM_EXPORT QtDcm : public QWidget, public Ui::QtDcmWidget
 {
     Q_OBJECT
 
