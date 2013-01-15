@@ -23,20 +23,26 @@ SET(DCMTK_SOURCE_DIR_DESCRIPTION "directory containing DCMTK source files.  This
 SET(DCMTK_DIR_MESSAGE "DCMTK not found.  Set the DCMTK_DIR cmake cache entry to the ${DCMTK_DIR_DESCRIPTION}")
 SET(DCMTK_SOURCE_DIR_MESSAGE "DCMTK not found.  Set the DCMTK_SOURCE_DIR cmake cache entry to the ${DCMTK_SOURCE_DIR_DESCRIPTION}")
 
-SET(DCMTK_DIR $ENV{DCMTK_DIR})
-SET(DCMTK_SOURCE_DIR $ENV{DCMTK_SOURCE_DIR})
+IF (NOT DCMTK_DIR)
+    SET(DCMTK_DIR $ENV{DCMTK_DIR})
+ENDIF()
+
+IF (NOT DCMTK_SOURCE_DIR)
+    SET(DCMTK_SOURCE_DIR $ENV{DCMTK_SOURCE_DIR})
+ENDIF()
 
 FIND_PATH( DCMTK_root_INCLUDE_DIR dcmtk/config/osconfig.h
   PATHS
   ${DCMTK_DIR}/include
   ${DCMTK_DIR}/config/include
+  ${DCMTK_DIR}/config/include/include
+  PATH_SUFFIXES dcmtk/config
 )
 
 FIND_PATH( DCMTK_config_INCLUDE_DIR osconfig.h
   ${DCMTK_DIR}/config/include
-  ${DCMTK_DIR}/include/config
-  ${DCMTK_DIR}/include/dcmtk/config
-  ${DCMTK_DIR}/config/include/dcmtk/config
+  ${DCMTK_DIR}/include/
+  /usr/include/dcmtk/config
 )
 
 FIND_PATH( DCMTK_ofstd_INCLUDE_DIR ofstdinc.h
@@ -275,7 +281,6 @@ FIND_LIBRARY(DCMTK_dcmnet_LIBRARY_DEBUG dcmnet
   ${DCMTK_DIR}/lib${LIBSUFFIX}
   ${DCMTK_DIR}/lib${LIBSUFFIX}/dcmtk
 )
-
 
 IF( DCMTK_root_INCLUDE_DIR
     AND DCMTK_config_INCLUDE_DIR 
