@@ -42,7 +42,11 @@ FIND_PATH( DCMTK_root_INCLUDE_DIR dcmtk/config/osconfig.h
 FIND_PATH( DCMTK_config_INCLUDE_DIR osconfig.h
   ${DCMTK_DIR}/config/include
   ${DCMTK_DIR}/include/
+  ${DCMTK_DIR}/include/config
+  ${DCMTK_DIR}/include/dcmtk/config
+  ${DCMTK_DIR}/config/include/dcmtk/config
   /usr/include/dcmtk/config
+  /usr/local/include/dcmtk/config
 )
 
 FIND_PATH( DCMTK_ofstd_INCLUDE_DIR ofstdinc.h
