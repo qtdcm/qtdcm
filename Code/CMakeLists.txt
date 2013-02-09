@@ -6,8 +6,8 @@ if(QT4_FOUND)
   include(${QT_USE_FILE})
 endif(QT4_FOUND)
 
-find_package(DCMTK2 REQUIRED)
-include_directories(${DCMTK_INCLUDE_DIR})
+find_package(DCMTK REQUIRED)
+include_directories(${DCMTK_INCLUDE_DIRS})
 
 find_package(ITK REQUIRED)
 if(ITK_FOUND)
