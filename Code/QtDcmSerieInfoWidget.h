@@ -21,10 +21,11 @@
 #ifndef QTDCMSERIEINFOWIDGET_H
 #define QTDCMSERIEINFOWIDGET_H
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include "ui_qtdcmSerieInfoWidget.h"
 
-class QtDcmSerieInfoWidget : public QWidget, public Ui::QtDcmSerieInfoWidget
+class QTDCM_EXPORT QtDcmSerieInfoWidget : public QWidget, public Ui::QtDcmSerieInfoWidget
 {
     Q_OBJECT
 public:

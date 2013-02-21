@@ -21,10 +21,11 @@
 #ifndef QTDCMIMPORTWIDGET_H
 #define QTDCMIMPORTWIDGET_H
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include "ui_qtdcmImportWidget.h"
 
-class QtDcmImportWidget : public QWidget, public Ui::QtDcmImportWidget
+class QTDCM_EXPORT QtDcmImportWidget : public QWidget, public Ui::QtDcmImportWidget
 {
     Q_OBJECT
 public:

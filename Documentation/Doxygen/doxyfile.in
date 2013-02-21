@@ -19,6 +19,7 @@ GENERATE_RTF         = NO
 
 HAVE_DOT             = YES
 #HAVE_DOT            = NO
+DOT_IMAGE_FORMAT     = svg dot
 DOT_PATH             = "@DOT_PATH@"
 CLASS_GRAPH          = YES
 COLLABORATION_GRAPH  = YES

@@ -21,13 +21,14 @@
 #ifndef QTDCMLOCALDICOMSETTINGSWIDGET_H
 #define QTDCMLOCALDICOMSETTINGSWIDGET_H
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include "ui_qtdcmLocalDicomSettingsWidget.h"
 
 class QtDcmPreferences;
 class QtDcmLocalDicomSettingsWidgetPrivate;
 
-class QtDcmLocalDicomSettingsWidget : public QWidget, public Ui::QtDcmLocalDicomSettingsWidget
+class QTDCM_EXPORT QtDcmLocalDicomSettingsWidget : public QWidget, public Ui::QtDcmLocalDicomSettingsWidget
 {
     Q_OBJECT
 public:

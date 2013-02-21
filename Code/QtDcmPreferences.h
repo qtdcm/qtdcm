@@ -21,6 +21,7 @@
 #ifndef QTDCMPREFERENCES_H_
 #define QTDCMPREFERENCES_H_
 
+#include "qtdcmExports.h"
 #include <QtGui>
 #include <QtDcmServer.h>
 
@@ -46,7 +47,7 @@ class QtDcmPreferencesPrivate;
  * @todo Add path to dcm2nii and dcm4che in the preferences
  */
 
-class QtDcmPreferences : public QObject
+class QTDCM_EXPORT QtDcmPreferences : public QObject
 {
     Q_OBJECT
 

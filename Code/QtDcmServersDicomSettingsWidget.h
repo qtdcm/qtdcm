@@ -21,6 +21,7 @@
 #ifndef QTDCMSERVERSDICOMSETTINGSWIDGET_H
 #define QTDCMSERVERSDICOMSETTINGSWIDGET_H
 
+#include "qtdcmExports.h"
 #include <QtGui>
 
 #include "ui_qtdcmServersDicomSettingsWidget.h"
@@ -30,7 +31,7 @@ class QtDcmPreferences;
 class QtDcmServersDicomSettingsWidgetPrivate;
 
 
-class QtDcmServersDicomSettingsWidget : public QWidget, public Ui::QtDcmServersDicomSettingsWidget
+class  QTDCM_EXPORT QtDcmServersDicomSettingsWidget : public QWidget, public Ui::QtDcmServersDicomSettingsWidget
 {
     Q_OBJECT
 public:
