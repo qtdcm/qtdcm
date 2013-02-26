@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
+project(QTDCMEXAMPLE)
+
 if(NOT MSVC)
   add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )
 endif()
