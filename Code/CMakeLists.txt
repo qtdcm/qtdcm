@@ -8,6 +8,10 @@ endif(QT4_FOUND)
 
 find_package(DCMTK REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIRS})
+IF(APPLE)
+  include(FixDCMTKMacInstall)
+  FixDCMTKMacInstall()
+ENDIF(APPLE)
 
 find_package(ITK REQUIRED)
 if(ITK_FOUND)
@@ -93,6 +97,10 @@ include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY
 add_library(qtdcm SHARED ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})
 target_link_libraries( qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} ${DCMTK_LIBRARIES} ${ITK_LIBRARIES})
 
+if(APPLE)
+  include(FixDCMTKMacLink)
+  FixDCMTKMacLibLink(qtdcm)
+endif(APPLE)
 
 # External inclusion stuff :
 set(QTDCM_USE_FILE ${QTDCM_BINARY_DIR}/UseQtDCM.cmake)
