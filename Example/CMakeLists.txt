@@ -14,9 +14,6 @@ if (QTDCM_FOUND)
   include(${QTDCM_USE_FILE})
 endif (QTDCM_FOUND)
 
-find_package(DCMTK2 REQUIRED)
-include_directories(${DCMTK_INCLUDE_DIR})
-
 find_package(ITK REQUIRED)
 if(ITK_FOUND)
   include(${ITK_USE_FILE})
@@ -40,7 +37,14 @@ set(SAMPLE_MOC_HDRS ${SAMPLE_HDRS})
 qt4_wrap_ui( SAMPLE_UI_HDRS ${SAMPLE_UIS})
 qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
-include_directories(${CMAKE_BINARY_DIR} ${QTDCM_INCLUDE_DIR} ${QTDCM_DIR} ${QTDCMEXAMPLE_BINARY_DIR} ${DCMTK_INCLUDE_DIR})
+include_directories(${CMAKE_BINARY_DIR} ${QTDCM_INCLUDE_DIR} ${QTDCM_DIR} ${QTDCMEXAMPLE_BINARY_DIR})
 
 add_executable( dicom ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS})
-target_link_libraries( dicom ${QTDCM_LIBS} ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} )
+target_link_libraries( dicom qtdcm ${QT_LIBRARIES} ${QT_QTNETWORK_LIBRARY} )
+
+if(APPLE)
+  include(FixDCMTKMacLink)
+  message("${QTDCM_DIR}")
+  FixDCMTKMacExeLink(dicom ${QTDCM_BINARY_DIR})
+endif(APPLE)
+
