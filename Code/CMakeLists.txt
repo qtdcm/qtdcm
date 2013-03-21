@@ -129,4 +129,8 @@ set(${PROJECT_NAME}_HEADERS
 )
 
 install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/qtdcm)
-install(TARGETS qtdcm LIBRARY DESTINATION lib)
+if (WIN32 AND BUILD_SHARED_LIBS)
+  install(TARGETS qtdcm RUNTIME DESTINATION lib)
+else ()
+  install(TARGETS qtdcm LIBRARY DESTINATION lib)
+endif ()
