@@ -2,8 +2,8 @@
  *
  * \section intro_sec Introduction
  *
- * Welcome to the <a href="http://qtdcm.gforge.inria.fr">QtDcm</a> online documentation. Here you will find the basic information to start
- * using and developing your application with <a href="http://qtdcm.gforge.inria.fr">QtDcm</a>.
+ * Welcome to the <a href="https://github.com/aabadie/qtdcm">QtDcm</a> online documentation. Here you will find the basic information to start
+ * using and developing your application with <a href="https://github.com/aabadie/qtdcm">QtDcm</a>.
  *
  * \section install_sec Installation
  *
