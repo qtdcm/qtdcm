@@ -27,3 +27,5 @@ QtDcm requires :
 The conversion of Dicom data to Nifti format is based (for the moment) on a command line tool
 <<dcm2nii>>. This tool can be downloaded from the mricron website
 (http://www.cabiatl.com/mricro/mricron/dcm2nii.html).
+
+
