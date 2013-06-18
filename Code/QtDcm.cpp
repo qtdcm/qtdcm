@@ -38,7 +38,8 @@ public:
     QMap<QString, QList<QString> > selectedSeries;
 };
 
-QtDcm::QtDcm ( QWidget *parent ) : QWidget ( parent ), d ( new QtDcmPrivate )
+QtDcm::QtDcm ( QWidget *parent ) 
+    : QWidget ( parent ), d ( new QtDcmPrivate )
 {
     QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "iso" ) );
     setupUi ( this );

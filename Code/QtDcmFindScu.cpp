@@ -200,16 +200,14 @@ bool QtDcmFindScu::checkServerConnection ( int timeout )
     bool result = true;
     d->socket->setSocketOption ( QAbstractSocket::LowDelayOption, 1 );
     d->socket->connectToHost ( d->manager->getCurrentPacs()->getHostname(),  d->manager->getCurrentPacs()->getPort().toInt() );
-    if ( d->socket->waitForConnected ( timeout ) )
-    {
+    if ( d->socket->waitForConnected ( timeout ) ) {
         d->socket->disconnectFromHost();
     }
-    else
-    {
+    else {
         d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getHostname() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
         result = false;
     }
-
+    
     return result;
 }
 
@@ -226,8 +224,7 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
 
     QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
 
-    if ( findscu.initializeNetwork ( d->networkTimeout ).bad() )
-    {
+    if ( findscu.initializeNetwork ( d->networkTimeout ).bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
         return false;
     }
@@ -237,8 +234,7 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
                                 QtDcmPreferences::instance()->getAetitle().toUtf8().data(),
                                 d->manager->getCurrentPacs()->getAetitle().toUtf8().data(),
                                 UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown,
-                                DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() )
-    {
+                                DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
     }
 

@@ -40,9 +40,12 @@ public:
 
     virtual ~QtDcmFindCallback();
 
-    enum cbType
-    {
-        PATIENT, STUDY, SERIE, IMAGES, IMAGE
+    enum cbType {
+        PATIENT, 
+        STUDY, 
+        SERIE, 
+        IMAGES,
+        IMAGE
     };
 
     virtual void callback ( T_DIMSE_C_FindRQ *request, int responseCount, T_DIMSE_C_FindRSP *rsp, DcmDataset *responseIdentifiers );
