@@ -21,7 +21,7 @@
 #include <QtDcmManager.h>
 #include <QtDcmPreferences.h>
 
-#include <itkOrientedImage.h>
+#include <itkImage.h>
 #include <itkGDCMImageIO.h>
 #include <itkGDCMSeriesFileNames.h>
 #include <itkImageSeriesReader.h>
@@ -76,7 +76,7 @@ void QtDcmConvert::convert()
     {
         typedef signed short                                PixelType;
         const unsigned int Dimension = 3;
-        typedef itk::OrientedImage< PixelType, Dimension >  ImageType;
+        typedef itk::Image< PixelType, Dimension >          ImageType;
         typedef itk::ImageSeriesReader< ImageType >         ReaderType;
         typedef ImageType::RegionType                       RegionType;
         typedef ImageType::SpacingType                      SpacingType;
