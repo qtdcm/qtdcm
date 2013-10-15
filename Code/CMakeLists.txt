@@ -94,8 +94,7 @@ qt4_wrap_cpp( SAMPLE_MOC_SRCS ${SAMPLE_MOC_HDRS})
 
 include_directories(${CMAKE_BINARY_DIR} ${QTDCM_SOURCE_DIR}/Code/ ${QTDCM_BINARY_DIR}/Code ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
 
-add_library(qtdcm SHARED ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})
-target_link_libraries(qtdcm
+set(QTDCM_LIBRARIES
   ${QT_LIBRARIES} 
   ${QT_QTNETWORK_LIBRARY}
   ${DCMTK_LIBRARIES}
@@ -113,7 +112,18 @@ target_link_libraries(qtdcm
   ITKIOPNG
   ITKIOStimulate
   ITKIOVTK
-  ITKReview
+)
+
+if (ITK_USE_REVIEW)
+  set(QTDCM_LIBRARIES
+    ${QTDCM_LIBRARIES}
+    ITKReview
+  )
+endif()
+
+add_library(qtdcm SHARED ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})
+target_link_libraries(qtdcm
+  ${QTDCM_LIBRARIES}
 )
 
 if(APPLE)
