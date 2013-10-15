@@ -113,6 +113,7 @@ target_link_libraries(qtdcm
   ITKIOPNG
   ITKIOStimulate
   ITKIOVTK
+  ITKReview
 )
 
 if(APPLE)
