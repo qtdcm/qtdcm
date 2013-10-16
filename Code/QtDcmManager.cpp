@@ -668,8 +668,11 @@ void QtDcmManager::makePreview ( QString filename )
                 Uint32 *p = pixelData;
                 //get the highest values for RGBA, then use them to scale the pixel luminosity
                 Uint32 p_max = 0;
-                
+#ifdef WIN32                
                 Uint32 p_min = UINT_LEAST32_MAX;
+#else
+                Uint32 p_min = std::numeric_limits<Uint32>::max();
+#endif                
 
                 for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
                     for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p )
