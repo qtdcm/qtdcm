@@ -112,14 +112,8 @@ set(QTDCM_LIBRARIES
   ITKIOPNG
   ITKIOStimulate
   ITKIOVTK
+  ITKReview
 )
-
-if (ITK_USE_REVIEW)
-  set(QTDCM_LIBRARIES
-    ${QTDCM_LIBRARIES}
-    ITKReview
-  )
-endif()
 
 add_library(qtdcm SHARED ${QTDCM_SRCS} ${SAMPLE_SRCS} ${SAMPLE_MOC_SRCS} ${SAMPLE_UI_HDRS} ${QTDCM_RCC_SRCS})
 target_link_libraries(qtdcm
