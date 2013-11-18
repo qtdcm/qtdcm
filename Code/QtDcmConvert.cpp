@@ -78,12 +78,6 @@ void QtDcmConvert::convert()
         const unsigned int Dimension = 3;
         typedef itk::Image< PixelType, Dimension >          ImageType;
         typedef itk::ImageSeriesReader< ImageType >         ReaderType;
-        typedef ImageType::RegionType                       RegionType;
-        typedef ImageType::SpacingType                      SpacingType;
-        typedef ImageType::PointType                        PointType;
-        typedef ImageType::DirectionType                    DirectionType;
-        typedef itk::ImageRegionIterator<ImageType>         IteratorType;
-        typedef IteratorType::IndexType                     IndexType;
         typedef itk::ImageFileWriter<ImageType>             WriterType;
         typedef itk::GDCMImageIO                            ImageIOType;
         typedef itk::GDCMSeriesFileNames                    NamesGeneratorType;
