@@ -22,20 +22,20 @@
 #define QTDCMMOVESCU_H_
 
 #include <QtGui>
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include "dcmtk/dcmnet/dicom.h"
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcfilefo.h"
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/cmdlnarg.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
-#include "dcmtk/dcmdata/dcdicent.h"
-#include "dcmtk/dcmdata/dcostrmz.h"   /* for dcmZlibCompressionLevel */
+#include <dcmtk/ofstd/ofstd.h>
+#include <dcmtk/ofstd/ofconapp.h>
+#include <dcmtk/dcmnet/dicom.h>
+#include <dcmtk/dcmnet/dimse.h>
+#include <dcmtk/dcmnet/diutil.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcuid.h>
+#include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/dcmdata/cmdlnarg.h>
+#include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcmetinf.h>
+#include <dcmtk/dcmdata/dcuid.h>      /* for dcmtk version name */
+#include <dcmtk/dcmdata/dcdicent.h>
+#include <dcmtk/dcmdata/dcostrmz.h>   /* for dcmZlibCompressionLevel */
 
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTDIO
@@ -128,7 +128,7 @@ protected:
 
     static void moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp );
 
-    void substituteOverrideKeys ( DcmDataset *dset );
+    void substituteOverrideKeys ( DcmDataset &dset );
 
     OFCondition moveSCU ( T_ASC_Association * assoc, const char *fname );
 
@@ -165,7 +165,7 @@ private:
     OFCmdSignedInt cancelAfterNResponses;
     OFBool ignorePendingDatasets;
     OFBool useStoreSCP;
-    DcmDataset *overrideKeys;
+    DcmDataset overrideKeys;
     OFString outputDirectory;
 
     int slicesCount;

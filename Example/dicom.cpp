@@ -21,31 +21,29 @@ Dicom::Dicom ( QWidget *parent ) : QMainWindow ( parent )
     QtDcmManager::instance()->setImportWidget ( ui.importWidget );
     QtDcmManager::instance()->setOutputdirMode ( QtDcmManager::DIALOG );
 
-    initConnections();
+    QObject::connect ( ui.actionOpenDicomdir, &QAction::triggered, 
+                       this,                  &Dicom::openDicomdir);
+    QObject::connect ( ui.actionExport,       &QAction::triggered, 
+                       this,                  &Dicom::exportSerie);
+    QObject::connect ( ui.actionPreferences,  &QAction::triggered, 
+                       this,                  &Dicom::preferences);
 }
 
-void
-Dicom::initConnections()
+Dicom::~Dicom()
 {
-    QObject::connect ( ui.actionOpenDicomdir, SIGNAL ( triggered() ), this, SLOT ( openDicomdir() ) );
-    QObject::connect ( ui.actionExport, SIGNAL ( triggered() ), this, SLOT ( exportSerie() ) );
-    QObject::connect ( ui.actionPreferences, SIGNAL ( triggered() ), this, SLOT ( preferences() ) );
 }
 
-void
-Dicom::openDicomdir()
+void Dicom::openDicomdir()
 {
     ui.qtdcm->openDicomdir();
 }
 
-void
-Dicom::exportSerie()
+void Dicom::exportSerie()
 {
     QtDcmManager::instance()->importSelectedSeries();
 }
 
-void
-Dicom::preferences()
+void Dicom::preferences()
 {
     ui.qtdcm->editPreferences();
 }

@@ -35,7 +35,8 @@ class  QTDCM_EXPORT QtDcmServersDicomSettingsWidget : public QWidget, public Ui:
 {
     Q_OBJECT
 public:
-    QtDcmServersDicomSettingsWidget ( QWidget* parent = 0 );
+    explicit QtDcmServersDicomSettingsWidget ( QWidget* parent = 0 );
+    virtual ~QtDcmServersDicomSettingsWidget();
 
     QtDcmPreferences * getPreferences();
 
@@ -54,6 +55,7 @@ public slots:
 
 private:
     void initConnections();
+    void populate();
 
     QtDcmServersDicomSettingsWidgetPrivate * d;
 };

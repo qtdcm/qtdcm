@@ -7,6 +7,7 @@
 
 #include <QtGui>
 #include "dicom.h"
+#include <QtDcmManager.h>
 
 int
 main( int argc , char *argv[] )
@@ -16,5 +17,10 @@ main( int argc , char *argv[] )
     Dicom dcm;
     dcm.setWindowIcon(QIcon(":Images/dicom.xpm"));
     dcm.show();
-    return app.exec();
+    
+    int ret = app.exec();
+    
+    delete QtDcmManager::instance();
+    
+    return ret;
   }

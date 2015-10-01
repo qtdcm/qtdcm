@@ -31,13 +31,8 @@ class QtDcmImage;
  * This class is a representation of a dicom serie
  */
 
-class QtDcmSerie : public QObject
+class QtDcmSerie
 {
-    Q_OBJECT
-
-private:
-    QtDcmSeriePrivate * d;
-
 public:
     /**
      * Default constructor
@@ -47,49 +42,49 @@ public:
     /**
      * Default destructor
      */
-    virtual ~QtDcmSerie() {};
+    virtual ~QtDcmSerie();
 
     /**
      * Serie Id getter
      *
      * @return _id a QString
      */
-    QString getId();
+    QString id() const;
 
     /**
      * Serie Id setter
      *
      * @param id is a QString
      */
-    void setId ( QString id );
+    void setId ( const QString & id );
 
     /**
      * Serie date getter
      *
      * @return _date a QString
      */
-    QString getDate();
+    QString date() const;
 
     /**
      * Serie date setter
      *
      * @param date is a QString
      */
-    void setDate ( QString date );
+    void setDate ( const QString & date );
 
     /**
      * Serie description getter
      *
      * @return _description a QString
      */
-    QString getDescription();
+    QString description() const;
 
     /**
      * Serie description setter
      *
      * @param description a QString
      */
-    void setDescription ( QString description );
+    void setDescription ( const QString & description );
 
     /**
      * Image list getter
@@ -97,7 +92,7 @@ public:
      * @return _images a QList of images
      * @see QtDcmImage
      */
-    QList<QtDcmImage *> getImages();
+    QList<QtDcmImage> images() const;
 
     /**
      * Image list setter
@@ -105,7 +100,7 @@ public:
      * @param images a QList of images
      * @see QtDcmImage
      */
-    void setImages ( QList<QtDcmImage *> images );
+    void setImages ( const QList<QtDcmImage> & images );
 
     /**
      * Parent study getter
@@ -113,7 +108,7 @@ public:
      * @return _p_study a pointer on the parent study
      * @see QtDcmStudy
      */
-    QtDcmStudy * getStudy();
+    QtDcmStudy study() const;
 
     /**
      * Parent study setter
@@ -121,7 +116,11 @@ public:
      * @param study a pointer on the parent study
      * @see QtDcmStudy
      */
-    void setStudy ( QtDcmStudy * study );
+    void setStudy ( const QtDcmStudy & study );
+    
+private:
+    class Private;
+    Private * d;
 };
 
 #endif /* QTDCMSERIE_H_ */

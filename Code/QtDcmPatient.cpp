@@ -23,7 +23,7 @@
 #include <QtDcmStudy.h>
 #include <QtDcmPatient.h>
 
-class QtDcmPatientPrivate
+class QtDcmPatient::Private
 {
     public:
         QString id; /** Patient dicom identificator */
@@ -31,63 +31,68 @@ class QtDcmPatientPrivate
         QString birthdate; /** Patient birth date */
         QString sex; /** Patient sex */
 
-        QList<QtDcmStudy *> studies; /** List of a study for this patient */
+        QList<QtDcmStudy> studies; /** List of a study for this patient */
 };
 
-QtDcmPatient::QtDcmPatient() : d(new QtDcmPatientPrivate)
+QtDcmPatient::QtDcmPatient() : d(new QtDcmPatient::Private)
 {}
 
-QString QtDcmPatient::getId()
+QtDcmPatient::~QtDcmPatient()
+{
+    delete d;
+}
+
+QString QtDcmPatient::id() const
 {
     return d->id;
 }
 
-void QtDcmPatient::setId(QString id)
+void QtDcmPatient::setId(const QString &id)
 {
     d->id = id;
 }
 
-QString QtDcmPatient::getName()
+QString QtDcmPatient::name() const
 {
     return d->name;
 }
 
-void QtDcmPatient::setName(QString name)
+void QtDcmPatient::setName(const QString &name)
 {
     d->name = name;
 }
 
-QString QtDcmPatient::getBirthdate()
+QString QtDcmPatient::birthdate() const
 {
     return d->birthdate;
 }
 
-void QtDcmPatient::setBirthdate(QString birthdate)
+void QtDcmPatient::setBirthdate(const QString &birthdate)
 {
     d->birthdate = birthdate;
 }
 
-QString QtDcmPatient::getSex()
+QString QtDcmPatient::gender() const
 {
     return d->sex;
 }
 
-void QtDcmPatient::setSex(QString sex)
+void QtDcmPatient::setGender(const QString &sex)
 {
     d->sex = sex;
 }
 
-QList<QtDcmStudy *> QtDcmPatient::getStudies()
+QList<QtDcmStudy> QtDcmPatient::studies() const
 {
     return d->studies;
 }
 
-void QtDcmPatient::setStudies(QList<QtDcmStudy *> studies)
+void QtDcmPatient::setStudies(const QList<QtDcmStudy> &studies)
 {
     d->studies = studies;
 }
 
-void QtDcmPatient::addStudy(QtDcmStudy * study)
+void QtDcmPatient::addStudy(const QtDcmStudy &study)
 {
     d->studies.append(study);
 }

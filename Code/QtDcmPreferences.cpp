@@ -41,10 +41,17 @@ QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
 {
 }
 
+QtDcmPreferences::~QtDcmPreferences()
+{   
+    delete d;
+}
+
 QtDcmPreferences* QtDcmPreferences::instance()
 {
-    if ( _instance == 0 )
+    if ( _instance == 0 ) {
         _instance = new QtDcmPreferences();
+    }
+    
     return _instance;
 }
 
@@ -60,8 +67,10 @@ void QtDcmPreferences::removeServer ( int index )
 
 void QtDcmPreferences::readSettings()
 {
-    if ( !d->iniFile.exists() )
+    if ( !d->iniFile.exists() ) {
         this->setDefaultIniFile();
+    }
+    
     //Instantiate a QSettings object from the ini file.
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
     //Load local settings

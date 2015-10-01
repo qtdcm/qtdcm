@@ -40,6 +40,15 @@ if(NOT DCMTK_FOUND AND NOT DCMTK_DIR)
   mark_as_advanced(DCMTK_DIR)
 endif()
 
+if(NOT DCMTK_SOURCE_DIR)
+  set(DCMTK_SOURCE_DIR
+    "/usr"
+    CACHE
+    PATH
+    "Root of DCMTK source or installation tree")
+  mark_as_advanced(DCMTK_SOURCE_DIR)
+endif()
+
 foreach(lib
     dcmdata
     dcmimage
@@ -94,6 +103,7 @@ set(DCMTK_dcmsign_TEST_HEADER sicert.h)
 set(DCMTK_dcmsr_TEST_HEADER dsrtree.h)
 set(DCMTK_dcmtls_TEST_HEADER tlslayer.h)
 set(DCMTK_ofstd_TEST_HEADER ofstdinc.h)
+set(DCMTK_oflog_TEST_HEADER oflog.h)
 
 set(DCMTK_TOP_INCLUDE_DIR "")
 
@@ -109,15 +119,18 @@ foreach(dir
     dcmsign
     dcmsr
     dcmtls
-    ofstd)
+    ofstd
+    oflog)
   find_path(DCMTK_${dir}_INCLUDE_DIR
     ${DCMTK_${dir}_TEST_HEADER}
     PATHS
+    ${DCMTK_SOURCE_DIR}/${dir}/include/dcmtk/${dir}
     ${DCMTK_DIR}/${dir}/include
     ${DCMTK_DIR}/${dir}
     ${DCMTK_DIR}/include/${dir}
     ${DCMTK_DIR}/include/dcmtk/${dir}
     ${DCMTK_DIR}/${dir}/include/dcmtk/${dir}
+
     )
   mark_as_advanced(DCMTK_${dir}_INCLUDE_DIR)
 
@@ -134,7 +147,7 @@ foreach(dir
     endif()
     list(APPEND
       DCMTK_INCLUDE_DIRS
-      ${DCMTK_${dir}_INCLUDE_DIR})
+      ${DCMTK_${dir}_INCLUDE_DIR}/../..)
   endif()
 endforeach()
 

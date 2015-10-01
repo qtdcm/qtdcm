@@ -29,7 +29,8 @@ class QTDCM_EXPORT QtDcmPreviewWidget : public QWidget, public Ui::QtDcmPreviewW
 {
     Q_OBJECT
 public:
-    QtDcmPreviewWidget ( QWidget * parent = 0 );
+    explicit QtDcmPreviewWidget ( QWidget * parent = 0 );
+    virtual ~QtDcmPreviewWidget() {}
 };
 
 #endif // QTDCMPREVIEWWIDGET_H

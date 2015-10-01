@@ -39,7 +39,7 @@ class QtDcmPreferencesDialog : public QDialog, public Ui::PreferencesDialog
 
 public:
     QtDcmPreferencesDialog ( QWidget * parent );
-    virtual ~QtDcmPreferencesDialog() {};
+    virtual ~QtDcmPreferencesDialog();
 
     QtDcmPreferencesWidget * getWidget();
 

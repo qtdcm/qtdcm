@@ -29,7 +29,8 @@ class QTDCM_EXPORT QtDcmSerieInfoWidget : public QWidget, public Ui::QtDcmSerieI
 {
     Q_OBJECT
 public:
-    QtDcmSerieInfoWidget ( QWidget * parent = 0 );
+    explicit QtDcmSerieInfoWidget ( QWidget * parent = 0 );
+    virtual ~QtDcmSerieInfoWidget() {}
 };
 
 #endif // QTDCMSERIEINFOWIDGET_H

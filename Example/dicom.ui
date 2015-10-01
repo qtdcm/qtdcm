@@ -128,7 +128,7 @@
      <x>0</x>
      <y>0</y>
      <width>779</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -241,7 +241,7 @@
  <connections>
   <connection>
    <sender>actionQuit</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>Dicom</receiver>
    <slot>close()</slot>
    <hints>

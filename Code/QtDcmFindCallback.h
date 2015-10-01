@@ -21,7 +21,7 @@
 #define QTDCMFINDCALLBACK_H_
 
 #include <QtGui>
-#include "dcmtk/dcmnet/dfindscu.h"
+#include <dcmtk/dcmnet/dfindscu.h>
 
 struct T_DIMSE_C_FindRQ;
 

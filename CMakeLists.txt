@@ -47,14 +47,10 @@ endif()
 ## ###################################################################
 ## INSTALL RULES
 ## ###################################################################
-if( EXISTS ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake
-AND EXISTS ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
-
-install(FILES
-  ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake
-  ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake
-  DESTINATION
-  share/qtdcm)
-
-endif( EXISTS ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake
-   AND EXISTS ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
+if( EXISTS ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake AND EXISTS ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
+  install(FILES
+    ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake
+    ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake
+    DESTINATION
+    share/qtdcm)
+endif()

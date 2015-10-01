@@ -63,7 +63,7 @@ public:
      * Default destructor
      */
     virtual
-    ~QtDcmPreferences() {};
+    ~QtDcmPreferences();
 
     /**
      * Read the settings from the ini file.

@@ -19,18 +19,12 @@ class Dicom : public QMainWindow
 
   public:
     Ui::Dicom ui;
-
     Dicom( QWidget *parent = 0 );
-
-    void
-    initConnections();
+    ~Dicom();
 
   public slots:
-    void
-    openDicomdir();
-    void
-    exportSerie();
-    void
-    preferences();
+    void openDicomdir();
+    void exportSerie();
+    void preferences();
   };
 #endif

@@ -34,7 +34,8 @@ class QtDcmPreferencesWidget : public QWidget, public Ui::PreferencesWidget
     Q_OBJECT
 
 public:
-    QtDcmPreferencesWidget ( QWidget * parent = 0 );
+    explicit QtDcmPreferencesWidget ( QWidget * parent = 0 );
+    virtual ~QtDcmPreferencesWidget();
 
     QtDcmPreferences * getPreferences();
 

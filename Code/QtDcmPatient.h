@@ -23,20 +23,13 @@
 
 #include <QtGui>
 
-class QtDcmPatientPrivate;
 class QtDcmStudy;
 
 /**
  * This class is a representation of a dicom patient
  */
-class QtDcmPatient : public QObject
+class QtDcmPatient
 {
-
-  Q_OBJECT
-
-private:
-    QtDcmPatientPrivate *d;
-
 public:
     /**
      * Default constructor
@@ -46,63 +39,63 @@ public:
     /**
      * Default destructor
      */
-    virtual ~QtDcmPatient() {};
+    virtual ~QtDcmPatient();
 
     /**
      * Id getter
      *
      * @return _id a QString
      */
-    QString getId();
+    QString id() const;
 
     /**
      * Id setter
      *
      * @param id a QString
      */
-    void setId( QString id );
+    void setId( const QString& id );
 
     /**
      * Patient name getter
      *
      * @return _name a QString
      */
-    QString getName();
+    QString name() const;
 
     /**
      * Patient name setter
      *
      * @param name a QString
      */
-    void setName( QString name );
+    void setName( const QString& name );
 
     /**
      * Patient birthdate getter
      *
      * @return _birthdate
      */
-    QString getBirthdate();
+    QString birthdate() const;
 
     /**
      * Patient birthdate setter
      *
      * @param birthdate
      */
-    void setBirthdate( QString birthdate );
+    void setBirthdate( const QString & birthdate );
 
     /**
      * Patient sex getter
      *
      * @return _sex a QString
      */
-    QString getSex();
+    QString gender() const;
 
     /**
      * Patient sex setter
      *
      * @param sex a QString
      */
-    void setSex( QString sex );
+    void setGender( const QString& sex );
 
     /**
      * Patient studies list getter
@@ -110,7 +103,7 @@ public:
      * @return _studies a QList of studies
      * @see QtDcmStudy
      */
-    QList<QtDcmStudy *> getStudies();
+    QList<QtDcmStudy> studies() const;
 
     /**
      * Patient studies list setter
@@ -118,17 +111,22 @@ public:
      * @param studies a QList of studies
      * @see QtDcmStudy
      */
-    void setStudies( QList<QtDcmStudy *> studies );
+    void setStudies( const QList<QtDcmStudy>& studies );
 
     /**
      * Add study in the list
      */
-    void addStudy(QtDcmStudy * study);
+    void addStudy(const QtDcmStudy & study);
 
     /**
      * Remove study at position index
      */
     void removeStudy(int index);
+    
+    
+private:
+    class Private;
+    Private *d;
   };
 
 #endif /* QTDCMPATIENT_H_ */

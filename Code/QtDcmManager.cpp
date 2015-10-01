@@ -21,8 +21,11 @@
 
 #include <algorithm>
 #include <iostream>
-#include <limits>
+#include <limits.h>
 #include <stdint.h>
+
+#include <QMessageBox>
+#include <QFileDialog>
 
 #include <QtDcm.h>
 #include <QtDcmPatient.h>
@@ -35,9 +38,9 @@
 
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
+#include <dcmtk/dcmdata/dcrledrg.h>      /* for DcmRLEDecoderRegistration */
+#include <dcmtk/dcmjpeg/djdecode.h>     /* for dcmjpeg decoders */
+#include <dcmtk/dcmjpeg/dipijpeg.h>     /* for dcmimage JPEG plugin */
 // For color images
 #include <dcmtk/dcmimage/diregist.h>
 
@@ -142,6 +145,10 @@ QtDcmManager::QtDcmManager() : d ( new QtDcmManagerPrivate )
 QtDcmManager::~QtDcmManager()
 {
     this->deleteTemporaryDirs();
+    
+    delete QtDcmPreferences::instance();
+    
+    delete d;
 }
 
 void QtDcmManager::setQtDcmWidget ( QtDcm* widget )
@@ -222,7 +229,7 @@ void QtDcmManager::updateSerieInfo ( const QString &eltCount,
 void QtDcmManager::clearPreview()
 {
     if ( d->previewWidget )
-        d->previewWidget->imageLabel->setPixmap ( NULL );
+        d->previewWidget->imageLabel->setPixmap ( QPixmap() );
 }
 
 
@@ -464,6 +471,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
             mover->setImageId ( imageId );
             QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
             QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ) );
+            QObject::connect(mover, SIGNAL(finished()), mover, SLOT(deleteLater()));
 
             mover->start();
         }

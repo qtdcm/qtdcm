@@ -18,6 +18,9 @@
 */
 
 #include "QtDcm.h"
+
+#include <QFileDialog>
+
 #include <QtDcmPatient.h>
 #include <QtDcmStudy.h>
 #include <QtDcmSerie.h>
@@ -41,7 +44,7 @@ public:
 QtDcm::QtDcm ( QWidget *parent ) 
     : QWidget ( parent ), d ( new QtDcmPrivate )
 {
-    QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "iso" ) );
+    QTextCodec::setCodecForLocale( QTextCodec::codecForName ( "iso" ) );
     setupUi ( this );
     d->mode = QtDcm::CD;
 

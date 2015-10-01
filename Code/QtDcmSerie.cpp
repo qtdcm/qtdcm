@@ -23,67 +23,71 @@
 
 #include <QtDcmSerie.h>
 
-class QtDcmSeriePrivate
+class QtDcmSerie::Private
 {
-
 public:
     QString id; /** Serie dicom identificator */
     QString description; /** Serie description */
     QString date; /** Study date */
-    QList<QtDcmImage *> images; /** List of images in the serie */
-    QtDcmStudy * p_study; /** Pointer on the parent study */
+    QList<QtDcmImage> images; /** List of images in the serie */
+    QtDcmStudy study; /** Pointer on the parent study */
 };
 
-QtDcmSerie::QtDcmSerie() : d ( new QtDcmSeriePrivate ) {}
+QtDcmSerie::QtDcmSerie() : d ( new QtDcmSerie::Private ) {}
 
-QString QtDcmSerie::getId()
+QtDcmSerie::~QtDcmSerie()
+{
+    delete d;
+}
+
+QString QtDcmSerie::id() const
 {
     return d->id;
 }
 
-void QtDcmSerie::setId ( QString id )
+void QtDcmSerie::setId (const QString &id)
 {
     d->id = id;
 }
 
-QString QtDcmSerie::getDate()
+QString QtDcmSerie::date() const
 {
     return d->date;
 }
 
-void QtDcmSerie::setDate ( QString date )
+void QtDcmSerie::setDate (const QString &date)
 {
     d->date = date;
 }
 
-QString QtDcmSerie::getDescription()
+QString QtDcmSerie::description() const
 {
     return d->description;
 }
 
-void QtDcmSerie::setDescription ( QString description )
+void QtDcmSerie::setDescription (const QString &description)
 {
     d->description = description;
 }
 
-QList<QtDcmImage *> QtDcmSerie::getImages()
+QList<QtDcmImage> QtDcmSerie::images() const
 {
     return d->images;
 }
 
-void QtDcmSerie::setImages ( QList<QtDcmImage *> images )
+void QtDcmSerie::setImages ( const QList<QtDcmImage> & images )
 {
     d->images = images;
 }
 
-QtDcmStudy * QtDcmSerie::getStudy()
+QtDcmStudy QtDcmSerie::study() const
 {
-    return d->p_study;
+    return d->study;
 }
 
-void QtDcmSerie::setStudy ( QtDcmStudy * study )
+void QtDcmSerie::setStudy ( const QtDcmStudy & study )
 {
-    d->p_study = study;
+    d->study = study;
 }
 
 

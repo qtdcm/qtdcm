@@ -23,7 +23,6 @@
 #include <QtGui>
 #include <QList>
 
-class QtDcmStudyPrivate;
 class QtDcmPatient;
 class QtDcmSerie;
 
@@ -31,13 +30,8 @@ class QtDcmSerie;
  * This class is representation of a Dicom study.
  */
 
-class QtDcmStudy : public QObject
+class QtDcmStudy
 {
-    Q_OBJECT
-
-private:
-    QtDcmStudyPrivate * d;
-
 public:
     /**
      * Default constructor
@@ -47,63 +41,63 @@ public:
     /**
      * Default destructor
      */
-    virtual ~QtDcmStudy() {};
+    virtual ~QtDcmStudy();
 
     /**
      * Study Id getter
      *
      * @return _id as a QString
      */
-    QString getId();
+    QString id() const;
 
     /**
      * Study Id setter
      *
      * @param id as a QString
      */
-    void setId ( QString id );
+    void setId ( const QString & id );
 
     /**
      * Study description getter
      *
      * @return _description as a QString
      */
-    QString getDescription();
+    QString description() const;
 
     /**
      * Study description setter
      *
      * @param description as a QString
      */
-    void setDescription ( QString description );
+    void setDescription ( const QString & description );
 
     /**
      * Study date getter
      *
      * @return _date as a QString
      */
-    QDate getDate();
+    QDate date() const;
 
     /**
      * Study date setter
      *
      * @param date as a QString
      */
-    void setDate ( QDate date );
+    void setDate ( const QDate & date );
 
     /**
      * Study time getter
      *
      * @return _time as a QString
      */
-    QString getTime();
+    QString time() const;
 
     /**
      * Study time setter
      *
      * @param time as a QString
      */
-    void setTime ( QString time );
+    void setTime ( const QString & time );
 
     /**
      * List of series in the study getter
@@ -111,7 +105,7 @@ public:
      * @return _series as a QList of series
      * @see QtDcmSerie
      */
-    QList<QtDcmSerie *> getSeries();
+    QList<QtDcmSerie> series() const;
 
     /**
      * List of series in the study setter
@@ -119,7 +113,7 @@ public:
      * @param series as a QList of series
      * @see QtDcmSerie
      */
-    void setSeries ( QList<QtDcmSerie *> series );
+    void setSeries ( const QList<QtDcmSerie> & series );
 
     /**
      * Patient getter
@@ -127,7 +121,7 @@ public:
      * @return _p_patient as a patient
      * @see QtDcmPatient
      */
-    QtDcmPatient * getPatient();
+    QtDcmPatient  patient() const;
 
     /**
      * Patient setter
@@ -135,17 +129,21 @@ public:
      * @param patient
      * @see QtDcmPatient
      */
-    void setPatient ( QtDcmPatient * patient );
+    void setPatient ( const QtDcmPatient & patient );
 
     /**
      * Add serie in the list
      */
-    void addSerie ( QtDcmSerie * serie );
+    void addSerie ( const QtDcmSerie & serie );
 
     /**
      * Remove serie at position index
      */
     void removeSerie ( int index );
+    
+private:
+    class Private;
+    Private * d;
 };
 
 #endif /* QTDCMSTUDY_H_ */

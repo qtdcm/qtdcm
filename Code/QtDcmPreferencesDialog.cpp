@@ -28,13 +28,20 @@ public:
     QtDcmPreferences * preferences;
 };
 
-QtDcmPreferencesDialog::QtDcmPreferencesDialog ( QWidget * parent ) : d(new QtDcmPreferencesDialogPrivate)
+QtDcmPreferencesDialog::QtDcmPreferencesDialog ( QWidget * parent ) 
+    : QDialog(parent),
+      d(new QtDcmPreferencesDialogPrivate)
 {
     d->preferences = NULL;
 
     setupUi ( this );
     this->setModal ( true );
     this->setParent ( parent, Qt::Dialog );
+}
+
+QtDcmPreferencesDialog::~QtDcmPreferencesDialog()
+{
+    delete d;
 }
 
 QtDcmPreferencesWidget* QtDcmPreferencesDialog::getWidget()

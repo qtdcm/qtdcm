@@ -73,7 +73,9 @@ public:
     QString imageId;
 };
 
-QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
+QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) 
+    : QThread(parent), 
+      d ( new QtDcmMoveScuPrivate )
 {
     progressTotal = 0;
     progressSerie = 0;
@@ -99,16 +101,14 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) : d ( new QtDcmMoveScuPrivate )
     ignorePendingDatasets = OFTrue;
     outputDirectory = ".";
     acseTimeout = 30;
-    overrideKeys = NULL;
     useStoreSCP = true;
-    overrideKeys = NULL;
     blockMode = DIMSE_BLOCKING;
 
     d->mode = QtDcmMoveScu::IMPORT;
 }
 
 QtDcmMoveScu::~QtDcmMoveScu()
-{
+{   
     delete d;
     d = NULL;
 }
@@ -162,7 +162,7 @@ void QtDcmMoveScu::run()
     for ( int i = 0; i < d->series.size(); i++ )
     {
         d->currentSerie = d->series.at ( i );
-        QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( i ) );
+        const QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( i ) );
 
         if ( !serieDir.exists() )
             QDir ( d->outputDir ).mkdir ( d->series.at ( i ) );
@@ -274,7 +274,7 @@ OFCondition QtDcmMoveScu::move ( QString uid )
 
     cond = this->cmove ( assoc, NULL );
 
-    overrideKeys->clear();
+    overrideKeys.clear();
     this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "STUDY" "" ) );
 
     if ( cond == EC_Normal )
@@ -427,10 +427,7 @@ void QtDcmMoveScu::addOverrideKey ( QString key )
         }
     }
 
-    if ( overrideKeys == NULL )
-        overrideKeys = new DcmDataset;
-
-    if ( overrideKeys->insert ( elem, OFTrue ).bad() )
+    if ( overrideKeys.insert ( elem, OFTrue ).bad() )
     {
         sprintf ( msg2, "cannot insert tag: (%04x,%04x)", g, e );
         qDebug() << QString ( msg2 );
@@ -534,7 +531,7 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
             numTransferSyntaxes = 3;
             break;
 
-        case EXS_JPEGProcess14SV1TransferSyntax:
+        case EXS_JPEGProcess14SV1:
             /* we prefer JPEGLossless:Hierarchical-1stOrderPrediction (default lossless) */
             transferSyntaxes[0] = UID_JPEGProcess14SV1TransferSyntax;
             transferSyntaxes[1] = UID_LittleEndianExplicitTransferSyntax;
@@ -543,7 +540,7 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
             numTransferSyntaxes = 4;
             break;
 
-        case EXS_JPEGProcess1TransferSyntax:
+        case EXS_JPEGProcess1:
             /* we prefer JPEGBaseline (default lossy for 8 bit images) */
             transferSyntaxes[0] = UID_JPEGProcess1TransferSyntax;
             transferSyntaxes[1] = UID_LittleEndianExplicitTransferSyntax;
@@ -552,7 +549,7 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
             numTransferSyntaxes = 4;
             break;
 
-        case EXS_JPEGProcess2_4TransferSyntax:
+        case EXS_JPEGProcess2_4:
             /* we prefer JPEGExtended (default lossy for 12 bit images) */
             transferSyntaxes[0] = UID_JPEGProcess2_4TransferSyntax;
             transferSyntaxes[1] = UID_LittleEndianExplicitTransferSyntax;
@@ -937,15 +934,14 @@ void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int resp
     qDebug() << QString ( temp_str.c_str() );
 }
 
-void QtDcmMoveScu::substituteOverrideKeys ( DcmDataset *dset )
+void QtDcmMoveScu::substituteOverrideKeys ( DcmDataset & dset )
 {
-    if ( overrideKeys == NULL )
-    {
+    if ( overrideKeys.isEmpty()) {
         return; /* nothing to do */
     }
 
     /* copy the override keys */
-    DcmDataset keys ( *overrideKeys );
+    DcmDataset keys ( overrideKeys );
 
     /* put the override keys into dset replacing existing tags */
     unsigned long elemCount = keys.card();
@@ -953,8 +949,7 @@ void QtDcmMoveScu::substituteOverrideKeys ( DcmDataset *dset )
     for ( unsigned long i = 0; i < elemCount; i++ )
     {
         DcmElement *elem = keys.remove ( ( unsigned long ) 0 );
-
-        dset->insert ( elem, OFTrue );
+        dset.insert ( elem, OFTrue );
     }
 }
 
@@ -970,7 +965,7 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
     QuerySyntax querySyntax[3] =
     {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-            UID_MOVEPatientRootQueryRetrieveInformationModel },
+          UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
@@ -990,7 +985,7 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
     }
 
     /* replace specific keys by those in overrideKeys */
-    substituteOverrideKeys ( file.getDataset() );
+    substituteOverrideKeys ( *file.getDataset() );
 
     sopClass = querySyntax[queryModel].moveSyntax;
 

@@ -24,6 +24,7 @@
 #include <QtGui>
 #include <QtNetwork>
 
+class QTreeWidget;
 class QtDcm;
 class QtDcmServer;
 class QtDcmPreferences;
@@ -58,13 +59,13 @@ private:
 public:
     enum outputdirmode
     {
-        CUSTOM, 
+        CUSTOM,
         DIALOG
     };
 
     enum convertiontool
     {
-        ITK, 
+        ITK,
         DCM2NII
     };
 
@@ -85,7 +86,7 @@ public:
      */
     void findPatientsScu();
     void findStudiesScu ( const QString &patientName );
-    void findSeriesScu ( const QString &patientName, 
+    void findSeriesScu ( const QString &patientName,
                          const QString &studyUID );
     void findImagesScu ( const QString &uid );
     void foundPatient ( const QMap<QString, QString> &infosMap );
@@ -96,10 +97,10 @@ public:
     void moveSelectedSeries();
     void getPreviewFromSelectedSerie ( const QString &uid, int elementCount );
 //     void getPreviewFromSelectedSerie ( int elementIndex );
-    
+
     void findPatientsDicomdir();
     void findStudiesDicomdir ( const QString &patientName );
-    void findSeriesDicomdir ( const QString &patientName, 
+    void findSeriesDicomdir ( const QString &patientName,
                               const QString &studyDescription );
     void findImagesDicomdir ( const QString &serieUID );
 
@@ -116,8 +117,8 @@ public:
     QtDcmManager::outputdirmode getOutputdirMode() const;
 
     void clearSerieInfo();
-    void updateSerieInfo ( const QString &eltCount, 
-                           const QString &institution, 
+    void updateSerieInfo ( const QString &eltCount,
+                           const QString &institution,
                            const QString &name );
 
     /**
@@ -201,9 +202,9 @@ public:
     void setPatientId ( const QString &patientId );
 
     QString getPatientBirthDate() const;
-    
+
     QString getPatientSex() const;
-    
+
     void setPatientSex ( const QString &sex );
 
     /**
@@ -235,7 +236,7 @@ public:
     void setStudyDescription ( const QString &studyDescription );
 
     QString getExamDate() const;
-    
+
     /**
      * Study modality setter
      *
@@ -319,7 +320,7 @@ public:
 
 public slots:
 //    void onPatientFound()
-    
+
     void updateProgressBar ( int i );
     void moveSeriesFinished();
     void clearPreview();

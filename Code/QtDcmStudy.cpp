@@ -21,81 +21,85 @@
 #include <QtDcmSerie.h>
 #include <QtDcmPatient.h>
 
-class QtDcmStudyPrivate
+class QtDcmStudy::Private
 {
-
 public:
     QString id; /** Dicom study identificator */
     QString description; /** Dicom study description */
     QDate date; /** Dicom study date */
     QString time; /** Dicom study time */
-    QList<QtDcmSerie *> series; /** List of series in the study */
-    QtDcmPatient * p_patient; /** Patient corresponding to the study */
+    QList<QtDcmSerie> series; /** List of series in the study */
+    QtDcmPatient patient; /** Patient corresponding to the study */
 };
 
-QtDcmStudy::QtDcmStudy() : d ( new QtDcmStudyPrivate ) {}
+QtDcmStudy::QtDcmStudy() : d ( new QtDcmStudy::Private ) {}
 
-QString QtDcmStudy::getId()
+QtDcmStudy::~QtDcmStudy()
+{
+    delete d;
+}
+
+QString QtDcmStudy::id() const
 {
     return d->id;
 }
 
-void QtDcmStudy::setId ( QString id )
+void QtDcmStudy::setId ( const QString & id )
 {
     d->id = id;
 }
 
-QString QtDcmStudy::getDescription()
+QString QtDcmStudy::description() const
 {
     return d->description;
 }
 
-void QtDcmStudy::setDescription ( QString description )
+void QtDcmStudy::setDescription ( const QString & description )
 {
     d->description = description;
 }
 
-QDate QtDcmStudy::getDate()
+QDate QtDcmStudy::date() const
 {
     return d->date;
 }
 
-void QtDcmStudy::setDate ( QDate date )
+void QtDcmStudy::setDate ( const QDate & date )
 {
     d->date = date;
 }
 
-QString QtDcmStudy::getTime()
+QString QtDcmStudy::time() const
 {
     return d->time;
 }
 
-void QtDcmStudy::setTime ( QString time )
+void QtDcmStudy::setTime ( const QString & time )
 {
     d->time = time;
 }
 
-QList<QtDcmSerie *> QtDcmStudy::getSeries()
+QList<QtDcmSerie> QtDcmStudy::series() const
 {
     return d->series;
 }
 
-void QtDcmStudy::setSeries ( QList<QtDcmSerie *> series )
+void QtDcmStudy::setSeries ( const QList<QtDcmSerie> & series )
 {
     d->series = series;
 }
 
-QtDcmPatient * QtDcmStudy::getPatient()
+QtDcmPatient QtDcmStudy::patient() const
 {
-    return d->p_patient;
+    return d->patient;
 }
 
-void QtDcmStudy::setPatient ( QtDcmPatient * patient )
+void QtDcmStudy::setPatient ( const QtDcmPatient & patient )
 {
-    d->p_patient = patient;
+    d->patient = patient;
 }
 
-void QtDcmStudy::addSerie ( QtDcmSerie * serie )
+void QtDcmStudy::addSerie ( const QtDcmSerie & serie )
 {
     d->series.append ( serie );
 }

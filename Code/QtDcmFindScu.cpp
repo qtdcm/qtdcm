@@ -215,7 +215,6 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
 {
     //Image level
     OFList<OFString> fileNameList;
-    OFString temp_str;
     DcmFindSCU findscu;
 
     // test connection

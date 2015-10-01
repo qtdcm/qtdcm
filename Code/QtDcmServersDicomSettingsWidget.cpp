@@ -27,36 +27,37 @@
 // From Dcmtk:
 #include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
 
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
+#include <dcmtk/ofstd/ofstdinc.h>
+#include <dcmtk/ofstd/ofstd.h>
+#include <dcmtk/ofstd/ofconapp.h>
 #include <dcmtk/ofstd/ofstream.h>
 #include <dcmtk/dcmdata/dctk.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
+#include <dcmtk/dcmnet/dfindscu.h>
 #include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
 // For dcm images
 #include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
+#include <dcmtk/dcmdata/dcrledrg.h>      /* for DcmRLEDecoderRegistration */
+#include <dcmtk/dcmjpeg/djdecode.h>     /* for dcmjpeg decoders */
+#include <dcmtk/dcmjpeg/dipijpeg.h>     /* for dcmimage JPEG plugin */
 // For color images
 #include <dcmtk/dcmimage/diregist.h>
 
 //#define INCLUDEd->CSTDLIB
 //#define INCLUDEd->CSTRING
-#include "dcmtk/ofstd/ofstdinc.h"
+#include <dcmtk/ofstd/ofstdinc.h>
 
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
+#include <dcmtk/dcmnet/dimse.h>
+#include <dcmtk/dcmnet/diutil.h>
+#include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/dcmdata/dcuid.h>      /* for dcmtk version name */
 
 #ifdef WITH_OPENSSL
-#include "dcmtk/dcmtls/tlstrans.h"
-#include "dcmtk/dcmtls/tlslayer.h"
+#include <dcmtk/dcmtls/tlstrans.h>
+#include <dcmtk/dcmtls/tlslayer.h>
 #endif
 
+#include <QMessageBox>
 #include <QTcpSocket>
 
 #include <QtDcmPreferences.h>
@@ -73,7 +74,7 @@ QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* pare
 {
     this->setupUi ( this );
 
-    d->preferences = NULL;
+    d->preferences = QtDcmPreferences::instance();
 
     treeWidget->setColumnWidth ( 1, 100 );
     treeWidget->setColumnWidth ( 2, 100 );
@@ -88,6 +89,11 @@ QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* pare
 
 
     this->initConnections();
+}
+
+QtDcmServersDicomSettingsWidget::~QtDcmServersDicomSettingsWidget()
+{
+    delete d;
 }
 
 void QtDcmServersDicomSettingsWidget::initConnections()
@@ -276,7 +282,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     cond = ASC_setAPTitles ( params, aet.toUtf8().data(), serverAet.toUtf8().data(), NULL );
 
     // the DICOM server accepts connections at server.nowhere.com port 104
-    cond = ASC_setPresentationAddresses ( params, hostname.toUtf8().data(), QString ( serverHostname + ":" + serverPort ).toAscii().data() );
+    cond = ASC_setPresentationAddresses ( params, hostname.toUtf8().data(), QString ( serverHostname + ":" + serverPort ).toLatin1().data() );
 
     // list of transfer syntaxes, only a single entry here
     const char* ts[] = { UID_LittleEndianImplicitTransferSyntax };
