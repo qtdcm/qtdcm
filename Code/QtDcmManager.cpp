@@ -523,25 +523,22 @@ void QtDcmManager::importSelectedSeries()
     if ( this->useConverter() ) { //Use QtDcm convertion tool (ITK or dcm2nii)
         if ( this->seriesToImportSize() != 0 ) {
             if ( this->getOutputdirMode() == QtDcmManager::DIALOG ) {
-                QFileDialog * dialog = new QFileDialog ( d->mainWidget );
-                dialog->setFileMode ( QFileDialog::Directory );
-                dialog->setOption ( QFileDialog::ShowDirsOnly, true );
-                dialog->setDirectory ( QDir::home().dirName() );
-                dialog->setWindowTitle ( tr ( "Export directory" ) );
+                QFileDialog dialog( d->mainWidget );
+                dialog.setFileMode ( QFileDialog::Directory );
+                dialog.setOption ( QFileDialog::ShowDirsOnly, true );
+                dialog.setDirectory ( QDir::home().dirName() );
+                dialog.setWindowTitle ( tr ( "Export directory" ) );
                 QString directory;
 
-                if ( dialog->exec() ) {
-                    directory = dialog->selectedFiles() [0];
+                if ( dialog.exec() ) {
+                    directory = dialog.selectedFiles() [0];
                 }
-                dialog->close();
 
                 if ( !directory.isEmpty() ) { // A file has been chosen
                     // Set the choosen output directory to the manager and launch the conversion process
                     this->setOutputDirectory ( directory );
                     this->moveSelectedSeries();
                 }
-
-                delete dialog;
             }
             else {
                 if ( QDir ( this->outputDirectory() ).exists() ) {
@@ -744,6 +741,9 @@ void QtDcmManager::makePreview ( const QString &filename )
 
         delete dcimage;
     }
+    
+    DcmRLEDecoderRegistration::cleanup();
+    DJDecoderRegistration::cleanup();
 }
 
 // Getters and setters

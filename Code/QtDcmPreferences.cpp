@@ -115,6 +115,8 @@ void QtDcmPreferences::writeSettings()
 {   
     //Instantiate a QSettings object with the ini file.
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
+    prefs.clear();
+    
     //Write local settings from the private attributes
     prefs.beginGroup ( "LocalSettings" );
     prefs.setValue ( "AETitle", d->aetitle );

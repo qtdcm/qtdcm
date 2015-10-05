@@ -20,49 +20,13 @@
 
 #include "QtDcmServersDicomSettingsWidget.h"
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include <dcmtk/ofstd/ofstdinc.h>
-#include <dcmtk/ofstd/ofstd.h>
-#include <dcmtk/ofstd/ofconapp.h>
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include <dcmtk/dcmnet/dfindscu.h>
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include <dcmtk/dcmdata/dcrledrg.h>      /* for DcmRLEDecoderRegistration */
-#include <dcmtk/dcmjpeg/djdecode.h>     /* for dcmjpeg decoders */
-#include <dcmtk/dcmjpeg/dipijpeg.h>     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-//#define INCLUDEd->CSTDLIB
-//#define INCLUDEd->CSTRING
-#include <dcmtk/ofstd/ofstdinc.h>
-
 #include <dcmtk/dcmnet/dimse.h>
-#include <dcmtk/dcmnet/diutil.h>
-#include <dcmtk/dcmdata/dcdict.h>
-#include <dcmtk/dcmdata/dcuid.h>      /* for dcmtk version name */
-
-#ifdef WITH_OPENSSL
-#include <dcmtk/dcmtls/tlstrans.h>
-#include <dcmtk/dcmtls/tlslayer.h>
-#endif
 
 #include <QMessageBox>
 #include <QTcpSocket>
 
 #include <QtDcmPreferences.h>
 #include <QtDcmServer.h>
-#include <qtcpsocket.h>
 
 QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* parent ) 
     : QWidget ( parent )
@@ -111,19 +75,24 @@ void QtDcmServersDicomSettingsWidget::initConnections()
 void QtDcmServersDicomSettingsWidget::readPreferences()
 {
     QtDcmPreferences* prefs = QtDcmPreferences::instance();
-
+    treeWidget->clear();
+    
     for ( int i = 0; i < prefs->servers().size(); i++ )
     {
         QTreeWidgetItem * item = new QTreeWidgetItem ( treeWidget );
         item->setText ( 0, prefs->servers().at ( i ).name() );
         item->setData ( 0, 1, QVariant ( prefs->servers().at ( i ).name() ) );
-        item->setData ( 4, 1, QVariant ( i ) );
+        
         item->setText ( 1, prefs->servers().at ( i ).aetitle() );
         item->setData ( 1, 1, QVariant ( prefs->servers().at ( i ).aetitle() ) );
+        
         item->setText ( 2, prefs->servers().at ( i ).port() );
         item->setData ( 2, 1, QVariant ( prefs->servers().at ( i ).port() ) );
+        
         item->setText ( 3, prefs->servers().at ( i ).address() );
         item->setData ( 3, 1, QVariant ( prefs->servers().at ( i ).address() ) );
+        
+        item->setData ( 4, 1, QVariant ( i ) );
     }
 }
 
@@ -157,12 +126,16 @@ void QtDcmServersDicomSettingsWidget::addServer()
     
     item->setText ( 0, server.name() );
     item->setData ( 0, 1, QVariant ( server.name() ) );
+    
     item->setText ( 1, server.aetitle() );
     item->setData ( 1, 1, QVariant ( server.aetitle() ) );
-    item->setText ( 2, server.aetitle() );
+    
+    item->setText ( 2, server.port() );
     item->setData ( 2, 1, QVariant ( server.port().toInt() ) );
+    
     item->setText ( 3, server.address() );
     item->setData ( 3, 1, QVariant ( server.address() ) );
+    
     item->setData ( 4, 1, QVariant ( prefs->servers().size() - 1 ) );
     
     prefs->addServer(server);
@@ -171,22 +144,21 @@ void QtDcmServersDicomSettingsWidget::addServer()
 void QtDcmServersDicomSettingsWidget::removeServer()
 {
     QTreeWidgetItem * root = treeWidget->invisibleRootItem();
-    QtDcmPreferences::instance()->removeServer ( root->indexOfChild ( treeWidget->currentItem() ) );
+    if (!treeWidget->currentItem()) {
+        return;
+    }
+    
+    const int index = root->indexOfChild ( treeWidget->currentItem());
+    QTreeWidgetItem * item = treeWidget->currentItem();
+    root->removeChild(item);
+    delete item;
+    
+    QtDcmPreferences::instance()->removeServer ( index );
 
-    if ( root->childCount() == 0 )
-    {
+    if ( root->childCount() == 0 ) {
         echoButton->setEnabled ( false );
         removeButton->setEnabled ( false );
     }
-    else if ( root->childCount() == 1 )
-    {
-        treeWidget->reset();
-        treeWidget->clear();
-        removeButton->setEnabled ( false );
-        echoButton->setEnabled ( false );
-    }
-    else
-        root->removeChild ( treeWidget->currentItem() );
 }
 
 void QtDcmServersDicomSettingsWidget::itemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previous )
@@ -245,7 +217,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     const QString serverHostname = treeWidget->currentItem()->data ( 3, 1 ).toString();
     const QString serverPort = treeWidget->currentItem()->data ( 2, 1 ).toString();
 
-    T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
+    T_ASC_Network *net = 0; // network struct, contains DICOM upper layer FSM etc.
 
     OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 30 /* timeout */, &net );
     if ( cond != EC_Normal )
@@ -254,6 +226,9 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
         msgBox.setIcon ( QMessageBox::Critical );
         msgBox.setText ( "Cannot initialize network" );
         msgBox.exec();
+        
+        ASC_dropNetwork ( &net );
+        
         return;
     }
 
@@ -264,6 +239,9 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
         msgBox.setIcon ( QMessageBox::Information );
         msgBox.setText ( "Cannot connect to server " + serverHostname + " on port " + serverPort + " !" );
         msgBox.exec();
+        
+        ASC_dropNetwork ( &net );
+        
         return;
     }
     
@@ -287,7 +265,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     cond = ASC_addPresentationContext ( params, 1, UID_VerificationSOPClass, ts, 1 );
 
     // request DICOM association
-    T_ASC_Association *assoc;
+    T_ASC_Association *assoc = 0;
 
     if ( ASC_requestAssociation ( net, params, &assoc ).good() )
     {
@@ -325,4 +303,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     ASC_releaseAssociation ( assoc ); // release association
     ASC_destroyAssociation ( &assoc ); // delete assoc structure
     ASC_dropNetwork ( &net ); // delete net structure
+    
+    net = 0;
+    assoc = 0;
 }
