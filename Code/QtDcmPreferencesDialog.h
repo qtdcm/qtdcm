@@ -25,29 +25,23 @@
 
 #include <ui_qtdcmpreferencesdialog.h>
 
-class QtDcmPreferences;
 class QtDcmPreferencesWidget;
-class QtDcmPreferencesDialogPrivate;
 
 /*
  *
  */
-
 class QtDcmPreferencesDialog : public QDialog, public Ui::PreferencesDialog
 {
     Q_OBJECT
 
 public:
-    QtDcmPreferencesDialog ( QWidget * parent );
+    explicit QtDcmPreferencesDialog ( QWidget * parent = 0);
     virtual ~QtDcmPreferencesDialog();
 
-    QtDcmPreferencesWidget * getWidget();
+    QtDcmPreferencesWidget * preferencesWidget();
 
-    void setPreferences ( QtDcmPreferences * prefs );
+    void readPreferences();
     void updatePreferences();
-
-private:
-    QtDcmPreferencesDialogPrivate * d;
 };
 
 #endif /* QTDCMPREFERENCESDIALOG_H_ */

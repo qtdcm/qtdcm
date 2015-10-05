@@ -26,10 +26,7 @@
 
 #include "ui_qtdcmServersDicomSettingsWidget.h"
 
-
 class QtDcmPreferences;
-class QtDcmServersDicomSettingsWidgetPrivate;
-
 
 class  QTDCM_EXPORT QtDcmServersDicomSettingsWidget : public QWidget, public Ui::QtDcmServersDicomSettingsWidget
 {
@@ -38,17 +35,15 @@ public:
     explicit QtDcmServersDicomSettingsWidget ( QWidget* parent = 0 );
     virtual ~QtDcmServersDicomSettingsWidget();
 
-    QtDcmPreferences * getPreferences();
-
-    void setPreferences ( QtDcmPreferences * prefs );
+    void readPreferences();
     void updatePreferences();
 
 public slots:
     void itemSelected ( QTreeWidgetItem* current , QTreeWidgetItem* previous );
-    void serverHostnameChanged ( QString text );
-    void serverNameChanged ( QString text );
-    void serverAetitleChanged ( QString text );
-    void serverPortChanged ( QString text );
+    void serverHostnameChanged ( const QString & text );
+    void serverNameChanged ( const QString & text );
+    void serverAetitleChanged ( const QString & text );
+    void serverPortChanged ( const QString & text );
     void removeServer();
     void addServer();
     void sendEcho();
@@ -56,8 +51,6 @@ public slots:
 private:
     void initConnections();
     void populate();
-
-    QtDcmServersDicomSettingsWidgetPrivate * d;
 };
 
 #endif // QTDCMSERVERSDICOMSETTINGSWIDGET_H

@@ -24,27 +24,27 @@
 #include <QtGui>
 #include "ui_qtdcmDcm2niiSettingsWidget.h"
 
-class QtDcmDcm2niiSettingsWidgetPrivate;
 class QtDcmPreferences;
 
 class QtDcmDcm2niiSettingsWidget : public QWidget, public Ui::QtDcmDcm2niiSettingsWidget
 {
     Q_OBJECT
 public:
-    QtDcmDcm2niiSettingsWidget ( QWidget * parent = 0 );
-
+    explicit QtDcmDcm2niiSettingsWidget ( QWidget * parent = 0 );
+    virtual ~QtDcmDcm2niiSettingsWidget();
+    
     QtDcmPreferences * getPreferences();
 
-    void setPreferences ( QtDcmPreferences * prefs );
+    void readPreferences();
     void updatePreferences();
-
+    
 public slots:
-  void browseDcm2niiPath();
-  void toggleDcm2niiFrame(int state);
+    void onBrowseDcm2niiPathClicked();
+    void onUseDcm2niiCheckChanged(int state);
   
-
 private:
-    QtDcmDcm2niiSettingsWidgetPrivate * d;
+    class Private;
+    Private * d;
 };
 
 #endif // QTDCMDCM2NIISETTINGSWIDGET_H

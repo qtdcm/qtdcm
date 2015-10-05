@@ -32,12 +32,14 @@ public:
     bool useDcm2nii;      /** Use dcm2nii as a conversion tool */
     QString dcm2niiPath;  /** The dcm2nii binary path */
 
-    QList<QtDcmServer *> servers; /** List of server that QtDcm can query */
+    QList<QtDcmServer> servers; /** List of server that QtDcm can query */
 };
 
 QtDcmPreferences * QtDcmPreferences::_instance = 0;
 
-QtDcmPreferences::QtDcmPreferences() : d ( new QtDcmPreferencesPrivate )
+QtDcmPreferences::QtDcmPreferences(QObject * parent) 
+    : QObject(parent),
+      d ( new QtDcmPreferencesPrivate )
 {
 }
 
@@ -55,9 +57,17 @@ QtDcmPreferences* QtDcmPreferences::instance()
     return _instance;
 }
 
-void QtDcmPreferences::addServer()
+void QtDcmPreferences::destroy()
 {
-    d->servers.append ( new QtDcmServer );
+    if (_instance != 0) {
+        delete _instance;
+        _instance = 0;
+    }
+}
+
+void QtDcmPreferences::addServer(const QtDcmServer &server)
+{
+    d->servers.append ( server );
 }
 
 void QtDcmPreferences::removeServer ( int index )
@@ -89,11 +99,12 @@ void QtDcmPreferences::readSettings()
     prefs.beginGroup ( "Servers" );
     for ( int i = 0; i < prefs.childGroups().size(); i++ )
     {
-        d->servers.append ( new QtDcmServer );
-        d->servers.at ( i )->setAetitle ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/AETitle" ).toString() );
-        d->servers.at ( i )->setHostname ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Hostname" ).toString() );
-        d->servers.at ( i )->setPort ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Port" ).toString() );
-        d->servers.at ( i )->setName ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Name" ).toString() );
+        QtDcmServer server;
+        server.setAetitle ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/AETitle" ).toString() );
+        server.setAddress ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Hostname" ).toString() );
+        server.setPort ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Port" ).toString() );
+        server.setName ( prefs.value ( "Server" + QString::number ( i + 1 ) + "/Name" ).toString() );
+        d->servers.append ( server );
     }
     prefs.endGroup();
 
@@ -101,10 +112,7 @@ void QtDcmPreferences::readSettings()
 }
 
 void QtDcmPreferences::writeSettings()
-{
-    //Remove settings file
-    QFile ini ( d->iniFile.fileName() );
-    ini.remove();
+{   
     //Instantiate a QSettings object with the ini file.
     QSettings prefs ( d->iniFile.fileName(), QSettings::IniFormat );
     //Write local settings from the private attributes
@@ -121,59 +129,19 @@ void QtDcmPreferences::writeSettings()
 
     //Do the job for each server
     prefs.beginGroup ( "Servers" );
-    for ( int i = 0; i < d->servers.size(); i++ )
-    {
+    for ( int i = 0; i < d->servers.size(); i++ ) {
+        QtDcmServer server = d->servers[i];
         prefs.beginGroup ( "Server" + QString::number ( i + 1 ) );
-        prefs.setValue ( "AETitle", d->servers.at ( i )->getAetitle() );
-        prefs.setValue ( "Hostname", d->servers.at ( i )->getHostname() );
-        prefs.setValue ( "Port", d->servers.at ( i )->getPort() );
-        prefs.setValue ( "Name", d->servers.at ( i )->getName() );
+        prefs.setValue ( "AETitle", server.aetitle() );
+        prefs.setValue ( "Hostname", server.address() );
+        prefs.setValue ( "Port", server.port() );
+        prefs.setValue ( "Name", server.name() );
         prefs.endGroup();
     }
 
     prefs.endGroup();
-
+    
     emit preferencesUpdated();
-}
-
-void QtDcmPreferences::onUpdatePreferences()
-{
-  this->writeSettings();
-}
-
-void QtDcmPreferences::onUseDcm2niiSet ( bool use )
-{
-  d->useDcm2nii = use;
-}
-
-void QtDcmPreferences::onDcm2niiPathSet ( QString path )
-{
-  d->dcm2niiPath = path;
-}
-
-void QtDcmPreferences::onLocalAetSet ( QString aet )
-{
-  d->aetitle = aet;
-}
-
-void QtDcmPreferences::onLocalHostnameSet ( QString host )
-{
-  d->hostname = host;
-}
-
-void QtDcmPreferences::onLocalPortSet ( QString port )
-{
-  d->port = port;
-}
-
-void QtDcmPreferences::onPacsAdded ()
-{
-  this->addServer();
-}
-
-void QtDcmPreferences::onPacsRemoved ( int index )
-{
-  this->removeServer(index);
 }
 
 void QtDcmPreferences::setDefaultIniFile()
@@ -186,16 +154,16 @@ void QtDcmPreferences::setDefaultIniFile()
     d->dcm2niiPath = "";
     d->useDcm2nii = 0;
 
-    QtDcmServer * server = new QtDcmServer();
-    server->setAetitle ( "SERVER" );
-    server->setHostname ( "hostname" );
-    server->setName ( "Server" + QString::number ( d->servers.size() + 1 ) );
-    server->setPort ( "11112" );
+    QtDcmServer server;
+    server.setAetitle ( "SERVER" );
+    server.setAddress ( "hostname" );
+    server.setName ( "Server" + QString::number ( d->servers.size() + 1 ) );
+    server.setPort ( "11112" );
     d->servers.append ( server );
     this->writeSettings();
 }
 
-QString QtDcmPreferences::getIniFile ( void )
+QString QtDcmPreferences::iniFile ( void )
 {
     return d->iniFile.fileName();
 }
@@ -209,70 +177,74 @@ void QtDcmPreferences::setIniFile ( const QString ini )
 
     d->iniFile.setFileName ( iniDir.absolutePath() + QDir::separator() + ini );
 
-    if ( !d->iniFile.exists() )
+    if ( !d->iniFile.exists() ) {
+        qWarning() << "Configuration not found, using default settings";
         this->setDefaultIniFile(); //If it doesn't exist create it with default parameters
-    else
+    }
+    else {
+        qDebug() << "Reading configuration file" << d->iniFile.fileName();
         this->readSettings();
+    }
 
     emit preferencesUpdated();
 }
 
-QString QtDcmPreferences::getAetitle() const
+QString QtDcmPreferences::aetitle() const
 {
     return d->aetitle;
 }
 
-QString QtDcmPreferences::getPort() const
+QString QtDcmPreferences::port() const
 {
     return d->port;
 }
 
-QList<QtDcmServer *> QtDcmPreferences::getServers()
+QList<QtDcmServer> QtDcmPreferences::servers() const
 {
     return d->servers;
 }
 
-void QtDcmPreferences::setHostname ( QString hostname )
+void QtDcmPreferences::setHostname ( const QString & hostname )
 {
     d->hostname = hostname;
 }
 
-QString QtDcmPreferences::getHostname()
+QString QtDcmPreferences::hostname() const
 {
     return d->hostname;
 }
 
-void QtDcmPreferences::setAetitle ( QString aetitle )
+void QtDcmPreferences::setAetitle ( const QString & aetitle )
 {
     d->aetitle = aetitle;
 }
 
-void QtDcmPreferences::setPort ( QString port )
+void QtDcmPreferences::setPort ( const QString & port )
 {
     d->port = port;
 }
 
-void QtDcmPreferences::setServers ( QList<QtDcmServer *> servers )
+void QtDcmPreferences::setServers ( const QList<QtDcmServer> & servers )
 {
     d->servers = servers;
 }
 
-QString QtDcmPreferences::getDcm2niiPath()
+QString QtDcmPreferences::dcm2niiPath() const
 {
     return d->dcm2niiPath;
 }
 
-void QtDcmPreferences::setDcm2niiPath ( QString path )
+void QtDcmPreferences::setDcm2niiPath ( const QString & path )
 {
     d->dcm2niiPath = path;
 }
 
-bool QtDcmPreferences::useDcm2nii()
+bool QtDcmPreferences::useDcm2nii() const
 {
     return d->useDcm2nii;
 }
 
-void QtDcmPreferences::useDcm2nii ( bool use )
+void QtDcmPreferences::setUseDcm2nii ( bool use )
 {
     d->useDcm2nii = use;
 }

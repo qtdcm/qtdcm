@@ -82,8 +82,8 @@ QtDcm::QtDcm ( QWidget *parent )
     QtDcmManager::instance()->setStudiesTreeWidget ( treeWidgetStudies );
     QtDcmManager::instance()->setSeriesTreeWidget ( treeWidgetSeries );
 
-    QtDcmManager::instance()->setDate1 ( startDateEdit->date().toString ( "yyyyMMdd" ) );
-    QtDcmManager::instance()->setDate2 ( endDateEdit->date().toString ( "yyyyMMdd" ) );
+    QtDcmManager::instance()->setStartDate ( startDateEdit->date().toString ( "yyyyMMdd" ) );
+    QtDcmManager::instance()->setEndDate ( endDateEdit->date().toString ( "yyyyMMdd" ) );
 
     initConnections();
 }
@@ -120,8 +120,10 @@ void QtDcm::updatePacsComboBox()
     pacsComboBox->blockSignals ( true );
     pacsComboBox->clear();
 
-    for ( int i = 0; i < QtDcmPreferences::instance()->getServers().size(); i++ )
-        pacsComboBox->addItem ( QtDcmPreferences::instance()->getServers().at ( i )->getName() );
+    for ( int i = 0; i < QtDcmPreferences::instance()->servers().size(); i++ ) {
+        pacsComboBox->addItem ( QtDcmPreferences::instance()->servers().at ( i ).name() );
+    }
+    
     pacsComboBox->blockSignals ( false );
 }
 
@@ -182,14 +184,14 @@ void QtDcm::serieItemSelected ( QTreeWidgetItem* current, QTreeWidgetItem* previ
 {
     if ( current != 0 )   // Avoid crash when clearDisplay is called
     {
-        QtDcmManager::instance()->clearListImages();
+        QtDcmManager::instance()->clearListOfImages();
 
         if ( d->mode == QtDcm::CD )
             QtDcmManager::instance()->findImagesDicomdir ( current->text ( 3 ) );
         else
             QtDcmManager::instance()->findImagesScu ( current->text ( 3 ) );
 
-        int elementCount = QtDcmManager::instance()->getListImages().size();
+        int elementCount = QtDcmManager::instance()->listOfImages().size();
         QString institution = current->data ( 5, 0 ).toString();
         QString opName = current->data ( 6, 0 ).toString();
 
@@ -212,23 +214,23 @@ void QtDcm::openDicomdir()
     this->clearDisplay();
     d->mode = QtDcm::CD;
     // Open a QFileDialog for choosing a Dicomdir
-    QFileDialog * dialog = new QFileDialog( this );
-    dialog->setFileMode ( QFileDialog::ExistingFile );
-    dialog->setDirectory ( QDir::home().dirName() );
-    dialog->setWindowTitle ( tr ( "Open dicomdir" ) );
+    QFileDialog dialog(this);
+    dialog.setFileMode ( QFileDialog::ExistingFile );
+    dialog.setDirectory ( QDir::home().dirName() );
+    dialog.setWindowTitle ( tr ( "Open dicomdir" ) );
     QStringList filters;
     filters << "Dicomdir files (dicomdir* DICOMDIR*)";
     filters << "Any files (*)";
-    dialog->setNameFilters(filters);
+    dialog.setNameFilters(filters);
 
     QString fileName;
 
-    if ( dialog->exec() )
+    if ( dialog.exec() )
     {
-        fileName = dialog->selectedFiles() [0];
+        fileName = dialog.selectedFiles() [0];
     }
 
-    dialog->close();
+    dialog.close();
 
     if ( !fileName.isEmpty() )   // A file has been chosen
     {
@@ -238,8 +240,6 @@ void QtDcm::openDicomdir()
             this->loadPatientsFromDicomdir();
         }
     }
-
-    dialog->deleteLater();
 }
 
 void QtDcm::loadPatientsFromDicomdir()
@@ -322,7 +322,7 @@ void QtDcm::startDateChanged ( QDate date )
         return;
     }
 
-    QtDcmManager::instance()->setDate1 ( date.toString ( "yyyyMMdd" ) );
+    QtDcmManager::instance()->setStartDate ( date.toString ( "yyyyMMdd" ) );
 
     treeWidgetStudies->clear();
     treeWidgetSeries->clear();
@@ -345,7 +345,7 @@ void QtDcm::endDateChanged ( QDate date )
         return;
     }
 
-    QtDcmManager::instance()->setDate2 ( date.toString ( "yyyyMMdd" ) );
+    QtDcmManager::instance()->setEndDate ( date.toString ( "yyyyMMdd" ) );
 
     treeWidgetStudies->clear();
     treeWidgetSeries->clear();
@@ -363,12 +363,9 @@ void QtDcm::editPreferences()
 {
     //Launch a dialog window for editing PACS settings
     QtDcmPreferencesDialog * dialog = new QtDcmPreferencesDialog ( this );
-    dialog->getWidget()->setPreferences ( QtDcmPreferences::instance() );
-    dialog->setPreferences ( QtDcmPreferences::instance() );
-
+    dialog->readPreferences();
     if ( dialog->exec() )
     {
-        dialog->getWidget()->updatePreferences();
         dialog->updatePreferences();
 //         this->updatePacsComboBox();
     }

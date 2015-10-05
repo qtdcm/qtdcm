@@ -45,36 +45,29 @@ class  QTDCM_EXPORT QtDcmManager : public QObject
 {
     Q_OBJECT
 
-private:
-    void generateCurrentSerieDir();
-
-    void deleteCurrentSerieDir();
-
-    /**
-     * Create the temporary directory (/tmp/qtdcm on Unix) and the logging directory.
-     * (/tmp/qtdcm/logs)
-     */
-    void createTemporaryDirs();
-
 public:
-    enum outputdirmode
-    {
-        CUSTOM,
+    enum eOutputdirMode {
+        CUSTOM = 0,
         DIALOG
     };
 
-    enum convertiontool
-    {
-        ITK,
+    enum eConvertionMethod {
+        ITK = 0,
         DCM2NII
+    };
+    
+    enum eMoveMode {
+        MEDIA = 0,
+        PACS
     };
 
     static QtDcmManager* instance();
-
+    static void destroy();
+    
     /**
      * Default constructor. Instantiate the internal pointers and create the temporary directory.
      */
-    QtDcmManager();
+    QtDcmManager(QObject * parent = 0);
 
     /**
      * The default destructor
@@ -113,8 +106,8 @@ public:
     void setPreviewWidget ( QtDcmPreviewWidget * widget );
     void setSerieInfoWidget ( QtDcmSerieInfoWidget * widget );
 
-    void setOutputdirMode ( QtDcmManager::outputdirmode mode );
-    QtDcmManager::outputdirmode getOutputdirMode() const;
+    void setOutputdirMode ( QtDcmManager::eOutputdirMode mode );
+    QtDcmManager::eOutputdirMode getOutputdirMode() const;
 
     void clearSerieInfo();
     void updateSerieInfo ( const QString &eltCount,
@@ -146,7 +139,7 @@ public:
      *
      * @return _dicomdir the dicomdir file name.
      */
-    QString getDicomdir() const;
+    QString dicomdir() const;
 
     /**
      * Set the dicomdir file name
@@ -160,7 +153,7 @@ public:
      *
      * @return _outputdir the output directory path
      */
-    QString getOutputDirectory() const;
+    QString outputDirectory() const;
 
     /**
      * Set the output directory
@@ -169,7 +162,7 @@ public:
      */
     void setOutputDirectory ( const QString &directory );
 
-    QtDcmServer * getCurrentPacs();
+    QtDcmServer currentPacs() const;
 
     void setCurrentPacs ( int index );
 
@@ -178,7 +171,7 @@ public:
      *
      * @return _patientName as a QString
      */
-    QString getPatientName() const;
+    QString patientName() const;
 
     /**
      * Patient name setter
@@ -192,7 +185,7 @@ public:
      *
      * @return _patientId as a QString
      */
-    QString getPatientId() const;
+    QString patientId() const;
 
     /**
      * Patient id setter
@@ -201,9 +194,9 @@ public:
      */
     void setPatientId ( const QString &patientId );
 
-    QString getPatientBirthDate() const;
+    QString patientBirthdate() const;
 
-    QString getPatientSex() const;
+    QString patientGender() const;
 
     void setPatientSex ( const QString &sex );
 
@@ -212,7 +205,7 @@ public:
      *
      * @return _serieDescription as a QString
      */
-    QString getSerieDescription() const;
+    QString seriesDescription() const;
 
     /**
      * Serie description setter
@@ -226,7 +219,7 @@ public:
      *
      * @return _studyDescription as a QString
      */
-    QString getStudyDescription() const;
+    QString studyDescription() const;
 
     /**
      * Study description setter
@@ -235,7 +228,7 @@ public:
      */
     void setStudyDescription ( const QString &studyDescription );
 
-    QString getExamDate() const;
+    QString examDate() const;
 
     /**
      * Study modality setter
@@ -249,35 +242,35 @@ public:
      *
      * @return _modality as a QString
      */
-    QString getModality() const;
+    QString modality() const;
 
     /**
      * Study date setter
      *
      * @param date as a QString
      */
-    void setDate1 ( const QString &date );
+    void setStartDate ( const QString &date );
 
     /**
      * Study date getter
      *
      * @return _date as a QString
      */
-    QString getDate1() const;
+    QString startDate() const;
 
     /**
      * Study date setter
      *
      * @param date as a QString
      */
-    void setDate2 ( const QString &date );
+    void setEndDate ( const QString &date );
 
     /**
      * Study date getter
      *
      * @return _date as a QString
      */
-    QString getDate2() const;
+    QString getEndDate() const;
 
     void addSerieToImport ( const QString &uid );
 
@@ -295,16 +288,16 @@ public:
     /**
      * Mode getter
      */
-    QString getMode() const;
+    eMoveMode mode() const;
 
-    void setImagesList ( const QList<QString> &images );
+    void setListOfImages ( const QStringList &images );
 
-    QList<QString> getListImages() const;
-    void clearListImages();
+    QList<QString> listOfImages() const;
+    void clearListOfImages();
 
     void setSerieId ( const QString &id );
 
-    QString getCurrentSerieDirectory() const;
+    QString currentSeriesDirectory() const;
 
 //     void setPreviewImageUID ( QString uid );
 
@@ -334,7 +327,18 @@ signals:
     void serieMoved ( const QString &directory );
     void importFinished();
     void gettingPreview();
+    
+private:
+    void generateCurrentSerieDir();
 
+    void deleteCurrentSerieDir();
+
+    /**
+     * Create the temporary directory (/tmp/qtdcm on Unix) and the logging directory.
+     * (/tmp/qtdcm/logs)
+     */
+    void createTemporaryDirs();
+    
 private:
     static QtDcmManager * _instance;
     QtDcmManagerPrivate *d;

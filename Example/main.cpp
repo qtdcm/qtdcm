@@ -19,8 +19,7 @@ main( int argc , char *argv[] )
     dcm.show();
     
     int ret = app.exec();
-    
-    delete QtDcmManager::instance();
+    QtDcmManager::destroy();
     
     return ret;
   }

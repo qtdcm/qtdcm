@@ -23,27 +23,26 @@
 
 #include <QtGui>
 
-class QtDcmConvertPrivate;
-
 class QtDcmConvert : public QObject
 {
     Q_OBJECT
 
 public:
-    QtDcmConvert ( QObject * parent );
+    QtDcmConvert ( QObject * parent = 0);
 
     ~QtDcmConvert();
 
     void convert();
-    void setInputDirectory ( QString dir );
-    void setOutputDirectory ( QString dir );
-    void setOutputFilename ( QString fname );
-    void setTempDirectory(QString dir);
-    void setSerieUID(QString uid);
+    void setInputDirectory ( const QString & dir );
+    void setOutputDirectory ( const QString & dir );
+    void setOutputFilename ( const QString & fname );
+    void setTempDirectory( const QString & dir);
+    void setSerieUID( const QString & uid);
     
 
 private:
-    QtDcmConvertPrivate * d;
+    class Private;
+    Private * d;
 };
 
 #endif // QTDCMCONVERT_H

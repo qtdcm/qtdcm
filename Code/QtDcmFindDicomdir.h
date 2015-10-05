@@ -32,7 +32,7 @@ class QtDcmFindDicomdir : public QObject
     Q_OBJECT
 
 public:
-    QtDcmFindDicomdir ( QObject * parent );
+    QtDcmFindDicomdir ( QObject * parent = 0);
     virtual ~QtDcmFindDicomdir();
 
     void setDcmItem ( DcmItem * item );

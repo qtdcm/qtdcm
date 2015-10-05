@@ -64,17 +64,10 @@
 #include <QtDcmServer.h>
 #include <qtcpsocket.h>
 
-class QtDcmServersDicomSettingsWidgetPrivate
-{
-public:
-    QtDcmPreferences * preferences;
-};
-
-QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* parent ) : QWidget ( parent ), d ( new QtDcmServersDicomSettingsWidgetPrivate )
+QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* parent ) 
+    : QWidget ( parent )
 {
     this->setupUi ( this );
-
-    d->preferences = QtDcmPreferences::instance();
 
     treeWidget->setColumnWidth ( 1, 100 );
     treeWidget->setColumnWidth ( 2, 100 );
@@ -93,86 +86,92 @@ QtDcmServersDicomSettingsWidget::QtDcmServersDicomSettingsWidget ( QWidget* pare
 
 QtDcmServersDicomSettingsWidget::~QtDcmServersDicomSettingsWidget()
 {
-    delete d;
 }
 
 void QtDcmServersDicomSettingsWidget::initConnections()
 {
-    QObject::connect ( treeWidget, SIGNAL ( currentItemChanged ( QTreeWidgetItem*, QTreeWidgetItem* ) ), this, SLOT ( itemSelected ( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
-    QObject::connect ( serverNameEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverNameChanged ( QString ) ) );
-    QObject::connect ( serverHostnameEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverHostnameChanged ( QString ) ) );
-    QObject::connect ( serverAetitleEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverAetitleChanged ( QString ) ) );
-    QObject::connect ( serverPortEdit, SIGNAL ( textChanged ( QString ) ), this, SLOT ( serverPortChanged ( QString ) ) );
-    QObject::connect ( addButton, SIGNAL ( clicked() ), this, SLOT ( addServer() ) );
-    QObject::connect ( removeButton, SIGNAL ( clicked() ), this, SLOT ( removeServer() ) );
-    QObject::connect ( echoButton, SIGNAL ( clicked() ), this, SLOT ( sendEcho() ) );
+    QObject::connect ( treeWidget, &QTreeWidget::currentItemChanged, 
+                       this,       &QtDcmServersDicomSettingsWidget::itemSelected);
+    QObject::connect ( serverNameEdit,     &QLineEdit::textChanged, 
+                       this,               &QtDcmServersDicomSettingsWidget::serverNameChanged);
+    QObject::connect ( serverHostnameEdit, &QLineEdit::textChanged, 
+                       this,               &QtDcmServersDicomSettingsWidget::serverHostnameChanged );
+    QObject::connect ( serverAetitleEdit,  &QLineEdit::textChanged, 
+                       this,               &QtDcmServersDicomSettingsWidget::serverAetitleChanged );
+    QObject::connect ( serverPortEdit,     &QLineEdit::textChanged, 
+                       this,               &QtDcmServersDicomSettingsWidget::serverPortChanged );
+    QObject::connect ( addButton,    &QPushButton::clicked, 
+                       this,         &QtDcmServersDicomSettingsWidget::addServer);
+    QObject::connect ( removeButton, &QPushButton::clicked, 
+                       this,         &QtDcmServersDicomSettingsWidget::removeServer);
+    QObject::connect ( echoButton,   &QPushButton::clicked, 
+                       this,         &QtDcmServersDicomSettingsWidget::sendEcho);
 }
 
-QtDcmPreferences* QtDcmServersDicomSettingsWidget::getPreferences()
+void QtDcmServersDicomSettingsWidget::readPreferences()
 {
-    return d->preferences;
-}
+    QtDcmPreferences* prefs = QtDcmPreferences::instance();
 
-void QtDcmServersDicomSettingsWidget::setPreferences ( QtDcmPreferences* prefs )
-{
-    d->preferences = prefs;
-
-    for ( int i = 0; i < d->preferences->getServers().size(); i++ )
+    for ( int i = 0; i < prefs->servers().size(); i++ )
     {
         QTreeWidgetItem * item = new QTreeWidgetItem ( treeWidget );
-        item->setText ( 0, d->preferences->getServers().at ( i )->getName() );
-        item->setData ( 0, 1, QVariant ( d->preferences->getServers().at ( i )->getName() ) );
+        item->setText ( 0, prefs->servers().at ( i ).name() );
+        item->setData ( 0, 1, QVariant ( prefs->servers().at ( i ).name() ) );
         item->setData ( 4, 1, QVariant ( i ) );
-        item->setText ( 1, d->preferences->getServers().at ( i )->getAetitle() );
-        item->setData ( 1, 1, QVariant ( d->preferences->getServers().at ( i )->getAetitle() ) );
-        item->setText ( 2, d->preferences->getServers().at ( i )->getPort() );
-        item->setData ( 2, 1, QVariant ( d->preferences->getServers().at ( i )->getPort() ) );
-        item->setText ( 3, d->preferences->getServers().at ( i )->getHostname() );
-        item->setData ( 3, 1, QVariant ( d->preferences->getServers().at ( i )->getHostname() ) );
+        item->setText ( 1, prefs->servers().at ( i ).aetitle() );
+        item->setData ( 1, 1, QVariant ( prefs->servers().at ( i ).aetitle() ) );
+        item->setText ( 2, prefs->servers().at ( i ).port() );
+        item->setData ( 2, 1, QVariant ( prefs->servers().at ( i ).port() ) );
+        item->setText ( 3, prefs->servers().at ( i ).address() );
+        item->setData ( 3, 1, QVariant ( prefs->servers().at ( i ).address() ) );
     }
 }
 
 void QtDcmServersDicomSettingsWidget::updatePreferences()
-{
-    if ( d->preferences )
-    {
-        QTreeWidgetItem * root = treeWidget->invisibleRootItem();
-
-        for ( int i = 0; i < d->preferences->getServers().size(); i++ )
-        {
-            d->preferences->getServers().at ( i )->setName ( root->child ( i )->data ( 0, 1 ).toString() );
-            d->preferences->getServers().at ( i )->setAetitle ( root->child ( i )->data ( 1, 1 ).toString() );
-            d->preferences->getServers().at ( i )->setPort ( root->child ( i )->data ( 2, 1 ).toString() );
-            d->preferences->getServers().at ( i )->setHostname ( root->child ( i )->data ( 3, 1 ).toString() );
-        }
-
-        d->preferences->writeSettings();
+{   
+    QtDcmPreferences* prefs = QtDcmPreferences::instance();
+    QTreeWidgetItem * root = treeWidget->invisibleRootItem();
+    
+    QList<QtDcmServer> servers;
+    for (int i = 0; i < root->childCount() ; i++) {
+        QtDcmServer server;
+        server.setName(root->child ( i )->data ( 0, 1 ).toString());
+        server.setAetitle(root->child ( i )->data ( 1, 1 ).toString());
+        server.setPort(root->child ( i )->data ( 2, 1 ).toString());
+        server.setAddress(root->child ( i )->data ( 3, 1 ).toString());
+        servers << server;
     }
+    
+    prefs->setServers(servers);
 }
 
 void QtDcmServersDicomSettingsWidget::addServer()
 {
+    QtDcmPreferences* prefs = QtDcmPreferences::instance();
     QTreeWidgetItem * item = new QTreeWidgetItem ( treeWidget );
-    d->preferences->addServer();
-    item->setText ( 0, "Name" );
-    item->setData ( 0, 1, QVariant ( "Name" ) );
-    d->preferences->getServers().last()->setName ( "Name" );
-    item->setText ( 1, "AETITLE" );
-    item->setData ( 1, 1, QVariant ( "AETITLE" ) );
-    d->preferences->getServers().last()->setAetitle ( "AETITLE" );
-    item->setText ( 2, "2010" );
-    d->preferences->getServers().last()->setPort ( "2010" );
-    item->setData ( 2, 1, QVariant ( 2010 ) );
-    item->setText ( 3, "hostname" );
-    item->setData ( 3, 1, QVariant ( "hostname" ) );
-    item->setData ( 4, 1, QVariant ( d->preferences->getServers().size() - 1 ) );
-    d->preferences->getServers().last()->setHostname ( "hostname" );
+    QtDcmServer server;
+    server.setName("Name");
+    server.setAetitle("AETITLE");
+    server.setPort("2010");
+    server.setAddress("hostname");
+    
+    item->setText ( 0, server.name() );
+    item->setData ( 0, 1, QVariant ( server.name() ) );
+    item->setText ( 1, server.aetitle() );
+    item->setData ( 1, 1, QVariant ( server.aetitle() ) );
+    item->setText ( 2, server.aetitle() );
+    item->setData ( 2, 1, QVariant ( server.port().toInt() ) );
+    item->setText ( 3, server.address() );
+    item->setData ( 3, 1, QVariant ( server.address() ) );
+    item->setData ( 4, 1, QVariant ( prefs->servers().size() - 1 ) );
+    
+    prefs->addServer(server);
 }
 
 void QtDcmServersDicomSettingsWidget::removeServer()
 {
     QTreeWidgetItem * root = treeWidget->invisibleRootItem();
-    d->preferences->removeServer ( root->indexOfChild ( treeWidget->currentItem() ) );
+    QtDcmPreferences::instance()->removeServer ( root->indexOfChild ( treeWidget->currentItem() ) );
 
     if ( root->childCount() == 0 )
     {
@@ -204,7 +203,7 @@ void QtDcmServersDicomSettingsWidget::itemSelected ( QTreeWidgetItem* current, Q
     serverHostnameEdit->setText ( current->data ( 3, 1 ).toString() );
 }
 
-void QtDcmServersDicomSettingsWidget::serverAetitleChanged ( QString text )
+void QtDcmServersDicomSettingsWidget::serverAetitleChanged ( const QString & text )
 {
     QRegExp rexp ( "[A-Z0-9._-]{1,50}" );
     QRegExpValidator * valid = new QRegExpValidator ( rexp, this );
@@ -213,19 +212,19 @@ void QtDcmServersDicomSettingsWidget::serverAetitleChanged ( QString text )
     treeWidget->currentItem()->setData ( 1, 1, QVariant ( text ) );
 }
 
-void QtDcmServersDicomSettingsWidget::serverHostnameChanged ( QString text )
+void QtDcmServersDicomSettingsWidget::serverHostnameChanged (const QString &text)
 {
     treeWidget->currentItem()->setText ( 3, text );
     treeWidget->currentItem()->setData ( 3, 1, QVariant ( text ) );
 }
 
-void QtDcmServersDicomSettingsWidget::serverNameChanged ( QString text )
+void QtDcmServersDicomSettingsWidget::serverNameChanged (const QString &text)
 {
     treeWidget->currentItem()->setText ( 0, text );
     treeWidget->currentItem()->setData ( 0, 1, QVariant ( text ) );
 }
 
-void QtDcmServersDicomSettingsWidget::serverPortChanged ( QString text )
+void QtDcmServersDicomSettingsWidget::serverPortChanged (const QString &text)
 {
     QIntValidator * valid = new QIntValidator ( 1000, 100000, this );
     serverPortEdit->setValidator ( valid );
@@ -235,45 +234,42 @@ void QtDcmServersDicomSettingsWidget::serverPortChanged ( QString text )
 
 void QtDcmServersDicomSettingsWidget::sendEcho()
 {
-    if ( !d->preferences )
-        return;
-
     if ( !treeWidget->currentItem() )
         return;
 
-    QString aet = d->preferences->getAetitle();
-    QString serverAet = treeWidget->currentItem()->data ( 1, 1 ).toString();
-    QString hostname = d->preferences->getHostname();
-    QString serverHostname = treeWidget->currentItem()->data ( 3, 1 ).toString();
-    QString serverPort = treeWidget->currentItem()->data ( 2, 1 ).toString();
+    QtDcmPreferences* prefs = QtDcmPreferences::instance();
+    
+    const QString aet = prefs->aetitle();
+    const QString serverAet = treeWidget->currentItem()->data ( 1, 1 ).toString();
+    const QString hostname = prefs->hostname();
+    const QString serverHostname = treeWidget->currentItem()->data ( 3, 1 ).toString();
+    const QString serverPort = treeWidget->currentItem()->data ( 2, 1 ).toString();
 
     T_ASC_Network *net; // network struct, contains DICOM upper layer FSM etc.
 
     OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 30 /* timeout */, &net );
     if ( cond != EC_Normal )
     {
-        QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-        msgBox->setIcon ( QMessageBox::Critical );
-        msgBox->setText ( "Cannot initialize network" );
-        msgBox->exec();
-        delete msgBox;
+        QMessageBox msgBox( QApplication::activeWindow() );
+        msgBox.setIcon ( QMessageBox::Critical );
+        msgBox.setText ( "Cannot initialize network" );
+        msgBox.exec();
         return;
     }
 
-    QTcpSocket * socket = new QTcpSocket;
+    QTcpSocket * socket = new QTcpSocket(this);
     socket->connectToHost(serverHostname, serverPort.toInt());
-    if (socket->waitForConnected(1000))
-        socket->disconnectFromHost();
-    else
-    {
-        QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-        msgBox->setIcon ( QMessageBox::Information );
-        msgBox->setText ( "Cannot connect to server " + serverHostname + " on port " + serverPort + " !" );
-        msgBox->exec();
-        delete msgBox;
+    if (!socket->waitForConnected(1000)) {
+        QMessageBox msgBox( QApplication::activeWindow() );
+        msgBox.setIcon ( QMessageBox::Information );
+        msgBox.setText ( "Cannot connect to server " + serverHostname + " on port " + serverPort + " !" );
+        msgBox.exec();
         return;
     }
-
+    
+    socket->disconnectFromHost();
+    delete socket;
+    
     T_ASC_Parameters *params; // parameters of association request
 
     cond = ASC_createAssociationParameters ( &params, ASC_DEFAULTMAXPDU );
@@ -303,30 +299,27 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
             DcmDataset *sd = NULL; // status detail will be stored here
             // send C-ECHO-RQ and handle response
             DIMSE_echoUser ( assoc, id, DIMSE_BLOCKING, 0, &status, &sd );
-
             delete sd; // we don't care about status detail
-            QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-            msgBox->setIcon ( QMessageBox::Information );
-            msgBox->setText ( "Echo request successful !" );
-            msgBox->exec();
-            delete msgBox;
+            
+            QMessageBox msgBox( QApplication::activeWindow() );
+            msgBox.setIcon ( QMessageBox::Information );
+            msgBox.setText ( "Echo request successful !" );
+            msgBox.exec();
         }
         else
         {
-            QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-            msgBox->setIcon ( QMessageBox::Critical );
-            msgBox->setText ( "Wrong presentation context, echo request failed" );
-            msgBox->exec();
-            delete msgBox;
+            QMessageBox msgBox( QApplication::activeWindow() );
+            msgBox.setIcon ( QMessageBox::Critical );
+            msgBox.setText ( "Wrong presentation context, echo request failed" );
+            msgBox.exec();
         }
     }
     else
     {
-        QMessageBox * msgBox = new QMessageBox ( QApplication::activeWindow() );
-        msgBox->setIcon ( QMessageBox::Critical );
-        msgBox->setText ( "Wrong dicom association, echo request failed" );
-        msgBox->exec();
-        delete msgBox;
+        QMessageBox msgBox( QApplication::activeWindow() );
+        msgBox.setIcon ( QMessageBox::Critical );
+        msgBox.setText ( "Wrong dicom association, echo request failed" );
+        msgBox.exec();
     }
 
     ASC_releaseAssociation ( assoc ); // release association

@@ -20,9 +20,13 @@
 
 #include "QtDcmImportWidget.h"
 
-QtDcmImportWidget::QtDcmImportWidget(QWidget* parent): QWidget(parent)
+QtDcmImportWidget::QtDcmImportWidget(QWidget* parent) : QWidget(parent)
 {
     this->setupUi(this);
+}
+
+QtDcmImportWidget::~QtDcmImportWidget()
+{
 }
 
 void QtDcmImportWidget::hideProgressBar()

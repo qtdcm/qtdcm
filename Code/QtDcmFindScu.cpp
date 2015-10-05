@@ -17,38 +17,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #define QT_NO_CAST_TO_ASCII
-
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-#include "dcmtk/ofstd/ofstdinc.h"
-
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
 
 #ifdef WITH_OPENSSL
 #include "dcmtk/dcmtls/tlstrans.h"
@@ -63,25 +32,25 @@
 #include <QtDcmServer.h>
 #include <QtDcmFindScu.h>
 
-class QtDcmFindScuPrivate
+class QtDcmFindScu::Private
 {
-
 public:
     QtDcmManager * manager;
     QTcpSocket * socket;
     int networkTimeout;
 };
 
-QtDcmFindScu::QtDcmFindScu ( QObject * parent ) : d ( new QtDcmFindScuPrivate )
+QtDcmFindScu::QtDcmFindScu ( QObject * parent ) 
+    : QObject(parent),
+      d( new QtDcmFindScu::Private )
 {
     d->manager = QtDcmManager::instance();
-    d->socket = new QTcpSocket();
+    d->socket = new QTcpSocket(this);
     d->networkTimeout = 30;
 }
 
 QtDcmFindScu::~QtDcmFindScu()
 {
-    delete d->socket;
     delete d;
     d = NULL;
 }
@@ -164,7 +133,6 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     overrideKeys.push_back ( QString ( "NumberOfSeriesRelatedInstances" ).toUtf8().data() );
 
     doQuery ( overrideKeys, QtDcmFindCallback::SERIE );
-
 }
 
 void QtDcmFindScu::findImagesScu ( QString seriesUID )
@@ -178,7 +146,6 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     overrideKeys.push_back ( QString ( "InstanceNumber" ).toUtf8().data() );
 
     doQuery ( overrideKeys, QtDcmFindCallback::IMAGES );
-
 }
 
 void QtDcmFindScu::findImageScu ( QString imageUID )
@@ -192,19 +159,18 @@ void QtDcmFindScu::findImageScu ( QString imageUID )
     overrideKeys.push_back ( QString ( "SOPInstanceUID="+ imageUID ).toUtf8().data() );
 
     doQuery ( overrideKeys, QtDcmFindCallback::IMAGE );
-
 }
 
 bool QtDcmFindScu::checkServerConnection ( int timeout )
 {
     bool result = true;
     d->socket->setSocketOption ( QAbstractSocket::LowDelayOption, 1 );
-    d->socket->connectToHost ( d->manager->getCurrentPacs()->getHostname(),  d->manager->getCurrentPacs()->getPort().toInt() );
+    d->socket->connectToHost ( d->manager->currentPacs().address(),  d->manager->currentPacs().port().toInt() );
     if ( d->socket->waitForConnected ( timeout ) ) {
         d->socket->disconnectFromHost();
     }
     else {
-        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->getCurrentPacs()->getHostname() + " on port " + d->manager->getCurrentPacs()->getPort() + " !" );
+        d->manager->displayErrorMessage ( "Cannot connect to server " + d->manager->currentPacs().address() + " on port " + d->manager->currentPacs().port() + " !" );
         result = false;
     }
     
@@ -228,17 +194,18 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
         return false;
     }
 
-    if ( findscu.performQuery ( d->manager->getCurrentPacs()->getHostname().toUtf8().data(),
-                                d->manager->getCurrentPacs()->getPort().toInt(),
-                                QtDcmPreferences::instance()->getAetitle().toUtf8().data(),
-                                d->manager->getCurrentPacs()->getAetitle().toUtf8().data(),
+    if ( findscu.performQuery ( d->manager->currentPacs().address().toUtf8().data(),
+                                d->manager->currentPacs().port().toInt(),
+                                QtDcmPreferences::instance()->aetitle().toUtf8().data(),
+                                d->manager->currentPacs().aetitle().toUtf8().data(),
                                 UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown,
                                 DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
     }
 
-    if ( findscu.dropNetwork().bad() )
+    if ( findscu.dropNetwork().bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
+    }
 
     return true;
 }

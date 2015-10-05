@@ -52,18 +52,18 @@ class QTDCM_EXPORT QtDcmPreferences : public QObject
     Q_OBJECT
 
 public:
-    static QtDcmPreferences *
-    instance();
+    static QtDcmPreferences * instance();
+    static void destroy();
+    
     /**
      * Default constructor
      */
-    QtDcmPreferences();
+    QtDcmPreferences(QObject * parent = 0);
 
     /**
      * Default destructor
      */
-    virtual
-    ~QtDcmPreferences();
+    virtual ~QtDcmPreferences();
 
     /**
      * Read the settings from the ini file.
@@ -79,21 +79,21 @@ public:
 
     void setIniFile ( const QString ini );
 
-    QString getIniFile ( void );
+    QString iniFile ( void );
 
     /**
      * QtDcm local AETitle getter
      *
      * @return _aetitle as a QString
      */
-    QString getAetitle() const;
+    QString aetitle() const;
 
     /**
      * QtDcm local application TCP port getter
      *
      * @return _port as a QString
      */
-    QString getPort() const;
+    QString port() const;
 
     /**
      * QtDcm server list getter
@@ -101,44 +101,44 @@ public:
      * @return _servers as a QList of server
      * @see QtDcmServer
      */
-    QList<QtDcmServer *> getServers();
+    QList<QtDcmServer> servers() const;
 
     /**
      * QtDcm local AETitle setter
      *
      * @param _aetitle as a QString
      */
-    void setHostname ( QString hostname );
+    void setHostname ( const QString & hostname );
 
-    QString getHostname();
+    QString hostname() const;
 
     /**
      * QtDcm local AETitle setter
      *
      * @param _aetitle as a QString
      */
-    void setAetitle ( QString aetitle );
+    void setAetitle ( const QString & aetitle );
 
     /**
      * QtDcm local application TCP port setter
      *
      * @param _port as a QString
      */
-    void setPort ( QString port );
+    void setPort ( const QString & port );
 
 
-    QString getDcm2niiPath();
+    QString dcm2niiPath() const;
 
-    void setDcm2niiPath ( QString path );
+    void setDcm2niiPath ( const QString & path );
 
-    bool useDcm2nii();
+    bool useDcm2nii() const;
 
-    void useDcm2nii ( bool use );
+    void setUseDcm2nii ( bool use );
 
     /**
      * Add server to the QList
      */
-    void addServer();
+    void addServer(const QtDcmServer& server);
 
     /**
      * Remove server from the QList at position i
@@ -153,20 +153,10 @@ public:
      * @param servers as a QList of servers
      * @see QtDcmServer
      */
-    void setServers ( QList<QtDcmServer *> servers );
+    void setServers ( const QList<QtDcmServer> & servers );
 
 signals:
     void preferencesUpdated();
-
-public slots:
-    void onUpdatePreferences();
-    void onUseDcm2niiSet(bool use);
-    void onDcm2niiPathSet(QString path);
-    void onLocalPortSet(QString port);
-    void onLocalHostnameSet(QString host);
-    void onLocalAetSet(QString aet);
-    void onPacsAdded();
-    void onPacsRemoved(int index);
 
 private:
     /**

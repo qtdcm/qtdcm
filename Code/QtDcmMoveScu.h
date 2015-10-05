@@ -47,52 +47,17 @@
 
 #include <QtDcmConvert.h>
 
-class QtDcmMoveScuPrivate;
-
 class QtDcmMoveScu : public QThread
 {
     Q_OBJECT
 
 public:
-    QtDcmMoveScu ( QObject * parent );
-
-    virtual ~QtDcmMoveScu();
-
-    enum mode
-    {
-        IMPORT, PREVIEW
-    };
-
-    void setMode ( mode mode );
-
-    QtDcmMoveScu::mode getMode();
-
-    void setImageId ( QString id );
-
-    void setOutputDir ( QString dir );
-
-    void setImportDir ( QString dir );
-
-    void setSeries ( QList<QString> series );
-
-    void run();
-
-public slots:
-    void onStopMove();
-    
-signals:
-    void updateProgress ( int i );
-    void previewSlice ( QString filename );
-    void serieMoved(QString directory, QString uid, int number);
-
-protected:
-
     typedef struct
     {
         T_ASC_Association *assoc;
         T_ASC_PresentationContextID presId;
     } MyCallbackInfo;
-
+    
     typedef enum
     {
         QMPatientRoot = 0,
@@ -105,10 +70,40 @@ protected:
         const char *findSyntax;
         const char *moveSyntax;
     } QuerySyntax;
+    
+    enum eMoveMode {
+        IMPORT = 0, 
+        PREVIEW
+    };
+    
+    QtDcmMoveScu ( QObject * parent = 0);
 
-    OFCondition move ( QString uid );
+    virtual ~QtDcmMoveScu();
 
-    void addOverrideKey ( QString key );
+    void setMode ( eMoveMode eMoveMode );
+
+    void setImageId ( const QString & id );
+
+    void setOutputDir ( const QString & dir );
+
+    void setImportDir ( const QString & dir );
+
+    void setSeries ( const QStringList & series );
+
+    void run();
+
+public slots:
+    void onStopMove();
+    
+signals:
+    void updateProgress ( int i );
+    void previewSlice ( const QString & filename );
+    void serieMoved(const QString & directory, const QString & uid, int number);
+
+protected:
+    OFCondition move ( const QString & uid );
+
+    void addOverrideKey ( const QString & key );
 
     OFCondition addPresentationContext ( T_ASC_Parameters *params, T_ASC_PresentationContextID pid, const char* abstractSyntax, E_TransferSyntax preferredTransferSyntax );
 
@@ -133,45 +128,8 @@ protected:
     OFCondition moveSCU ( T_ASC_Association * assoc, const char *fname );
 
 private:
-    QtDcmMoveScuPrivate * d;
-
-    T_ASC_Network*        net;              /* the global DICOM network */
-    T_ASC_Parameters*     params;
-    T_ASC_Association*  assoc;
-    T_ASC_PresentationContextID presId;
-
-    DcmFileFormat*      file;
-    char*               imageFile;
-
-    QueryModel queryModel;
-    T_DIMSE_BlockingMode  blockMode;
-    OFBool useMetaheader;
-    OFBool bitPreserving;
-    OFBool ignore;
-    E_TransferSyntax writeTransferSyntax;
-    OFBool correctUIDPadding;
-    E_GrpLenEncoding groupLength;
-    E_EncodingType sequenceType;
-    E_PaddingEncoding paddingType;
-    OFCmdUnsignedInt filepad;
-    OFCmdUnsignedInt itempad;
-    const char *moveDestination;
-    int dimseTimeout;
-    int acseTimeout;
-    OFCmdUnsignedInt maxPDU;
-    E_TransferSyntax networkTransferSyntax;
-    OFCmdUnsignedInt repeatCount;
-    OFBool abortAssociation;
-    OFCmdSignedInt cancelAfterNResponses;
-    OFBool ignorePendingDatasets;
-    OFBool useStoreSCP;
-    DcmDataset overrideKeys;
-    OFString outputDirectory;
-
-    int slicesCount;
-    int progressTotal;
-    int progressSerie;
-    int step;
+    class Private;
+    Private * d;
 };
 
 #endif /* QTDCMMOVESCU_H_ */

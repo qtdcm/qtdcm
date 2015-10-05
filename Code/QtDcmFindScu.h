@@ -23,14 +23,12 @@
 #include <QtGui>
 #include "QtDcmFindCallback.h"
 
-class QtDcmFindScuPrivate;
-
 class QtDcmFindScu : public QObject
 {
     Q_OBJECT
 
 public:
-    QtDcmFindScu ( QObject * parent );
+    explicit QtDcmFindScu ( QObject * parent = 0);
     virtual ~QtDcmFindScu();
 
     void findPatientsScu ( QString patientName );
@@ -66,7 +64,8 @@ protected:
     bool checkServerConnection(int timeout = 10000);
 
 private:
-    QtDcmFindScuPrivate * d;
+    class Private;
+    Private * d;
 };
 
 #endif /* QTDCMFINDSCU_H_ */

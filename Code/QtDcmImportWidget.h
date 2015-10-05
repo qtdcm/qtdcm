@@ -29,7 +29,9 @@ class QTDCM_EXPORT QtDcmImportWidget : public QWidget, public Ui::QtDcmImportWid
 {
     Q_OBJECT
 public:
-    QtDcmImportWidget ( QWidget * parent = 0 );
+    explicit QtDcmImportWidget ( QWidget * parent = 0 );
+    virtual ~QtDcmImportWidget();
+    
     void hideProgressBar();
     void showProgressBar();
     void setImportButtonEnabled(bool enable);

@@ -19,36 +19,6 @@
 
 #define QT_NO_CAST_TO_ASCII
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-#include "dcmtk/ofstd/ofstdinc.h"
-
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
-
 #ifdef WITH_OPENSSL
 #include "dcmtk/dcmtls/tlstrans.h"
 #include "dcmtk/dcmtls/tlslayer.h"
@@ -59,50 +29,90 @@
 #include <QtDcmManager.h>
 #include <QtDcmMoveScu.h>
 
-class QtDcmMoveScuPrivate
+class QtDcmMoveScu::Private
 {
 
 public:
-    QList<QString> series;
-    QList<QString> filenames;
+    QStringList series;
+    QStringList filenames;
     QString outputDir;
     QString importDir;
     QString currentSerie;
 
-    QtDcmMoveScu::mode mode;
+    QtDcmMoveScu::eMoveMode mode;
     QString imageId;
+    
+    
+    
+    T_ASC_Network*        net;              /* the global DICOM network */
+    T_ASC_Parameters*     params;
+    T_ASC_Association*  assoc;
+    T_ASC_PresentationContextID presId;
+
+    DcmFileFormat*      file;
+    char*               imageFile;
+
+    QtDcmMoveScu::QueryModel queryModel;
+    T_DIMSE_BlockingMode  blockMode;
+    OFBool useMetaheader;
+    OFBool bitPreserving;
+    OFBool ignore;
+    E_TransferSyntax writeTransferSyntax;
+    OFBool correctUIDPadding;
+    E_GrpLenEncoding groupLength;
+    E_EncodingType sequenceType;
+    E_PaddingEncoding paddingType;
+    OFCmdUnsignedInt filepad;
+    OFCmdUnsignedInt itempad;
+    const char *moveDestination;
+    int dimseTimeout;
+    int acseTimeout;
+    OFCmdUnsignedInt maxPDU;
+    E_TransferSyntax networkTransferSyntax;
+    OFCmdUnsignedInt repeatCount;
+    OFBool abortAssociation;
+    OFCmdSignedInt cancelAfterNResponses;
+    OFBool ignorePendingDatasets;
+    OFBool useStoreSCP;
+    DcmDataset overrideKeys;
+    OFString outputDirectory;
+
+    int slicesCount;
+    int progressTotal;
+    int progressSerie;
+    int step;
 };
 
 QtDcmMoveScu::QtDcmMoveScu ( QObject * parent ) 
     : QThread(parent), 
-      d ( new QtDcmMoveScuPrivate )
+      d ( new QtDcmMoveScu::Private )
 {
-    progressTotal = 0;
-    progressSerie = 0;
-    step = 0;
+    d->progressTotal = 0;
+    d->progressSerie = 0;
+    d->step = 0;
 
-    maxPDU = ASC_DEFAULTMAXPDU;
-    useMetaheader = OFTrue;
-    networkTransferSyntax = EXS_Unknown;
-    writeTransferSyntax = EXS_Unknown;
-    groupLength = EGL_recalcGL;
-    sequenceType = EET_ExplicitLength;
-    paddingType = EPD_withoutPadding;
-    filepad = 0;
-    itempad = 0;
-    bitPreserving = OFFalse;
-    ignore = OFFalse;
-    correctUIDPadding = OFFalse;
-    repeatCount = 1;
-    abortAssociation = OFFalse;
-    moveDestination = NULL;
-    cancelAfterNResponses = -1;
-    queryModel = QMPatientRoot;
-    ignorePendingDatasets = OFTrue;
-    outputDirectory = ".";
-    acseTimeout = 30;
-    useStoreSCP = true;
-    blockMode = DIMSE_BLOCKING;
+    d->maxPDU = ASC_DEFAULTMAXPDU;
+    d->useMetaheader = OFTrue;
+    d->networkTransferSyntax = EXS_Unknown;
+    d->writeTransferSyntax = EXS_Unknown;
+    d->groupLength = EGL_recalcGL;
+    d->sequenceType = EET_ExplicitLength;
+    d->paddingType = EPD_withoutPadding;
+    d->filepad = 0;
+    d->itempad = 0;
+    d->bitPreserving = OFFalse;
+    d->ignore = OFFalse;
+    d->correctUIDPadding = OFFalse;
+    d->repeatCount = 1;
+    d->abortAssociation = OFFalse;
+    d->moveDestination = NULL;
+    d->cancelAfterNResponses = -1;
+    d->queryModel = QMPatientRoot;
+    d->ignorePendingDatasets = OFTrue;
+    d->outputDirectory = ".";
+    d->acseTimeout = 30;
+    d->useStoreSCP = true;
+    d->blockMode = DIMSE_BLOCKING;
 
     d->mode = QtDcmMoveScu::IMPORT;
 }
@@ -113,89 +123,76 @@ QtDcmMoveScu::~QtDcmMoveScu()
     d = NULL;
 }
 
-void QtDcmMoveScu::setMode ( QtDcmMoveScu::mode mode )
+void QtDcmMoveScu::setMode ( QtDcmMoveScu::eMoveMode mode )
 {
     d->mode = mode;
 }
 
-QtDcmMoveScu::mode QtDcmMoveScu::getMode()
-{
-    return d->mode;
-}
-
-void QtDcmMoveScu::setImageId ( QString id )
+void QtDcmMoveScu::setImageId ( const QString & id )
 {
     d->imageId = id;
 }
 
-void QtDcmMoveScu::setSeries ( QList<QString> series )
+void QtDcmMoveScu::setSeries ( const QStringList & series )
 {
     d->series = series;
 }
 
-void QtDcmMoveScu::setOutputDir ( QString dir )
+void QtDcmMoveScu::setOutputDir ( const QString & dir )
 {
     d->outputDir = dir;
 }
 
-void QtDcmMoveScu::setImportDir ( QString dir )
+void QtDcmMoveScu::setImportDir ( const QString & dir )
 {
     d->importDir = dir;
 }
 
 void QtDcmMoveScu::onStopMove()
 {
-    if ( this->isRunning() )
-    {
-        ASC_dropNetwork ( &net );
-        this->exit();
+    if ( this->isRunning() ) {
+        ASC_dropNetwork ( &d->net );
     }
 }
-
 
 void QtDcmMoveScu::run()
 {
     OFCondition cond;
-    step = ( int ) ( 100.0 / d->series.size() );
-    progressTotal = 0;
+    d->step = ( int ) ( 100.0 / d->series.size() );
+    d->progressTotal = 0;
 
-    for ( int i = 0; i < d->series.size(); i++ )
-    {
+    for ( int i = 0; i < d->series.size(); i++ ) {
         d->currentSerie = d->series.at ( i );
         const QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( i ) );
 
-        if ( !serieDir.exists() )
+        if ( !serieDir.exists() ) {
             QDir ( d->outputDir ).mkdir ( d->series.at ( i ) );
+        }
 
-        outputDirectory = QString ( d->outputDir + QDir::separator() + d->currentSerie ).toUtf8().constData();
+        d->outputDirectory = QString ( d->outputDir + QDir::separator() + d->currentSerie ).toUtf8().constData();
 
-        if ( d->mode == IMPORT )
-        {
+        if ( d->mode == IMPORT ) {
             cond = this->move ( d->series.at ( i ) );
             emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i );
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
-            progressTotal += step;
+            d->progressTotal += d->step;
         }
-        else
-        {
+        else {
             cond = this->move ( d->imageId );
         }
     }
-
-    exit();
 }
 
-OFCondition QtDcmMoveScu::move ( QString uid )
+OFCondition QtDcmMoveScu::move ( const QString & uid )
 {
     OFString temp_str;
-    params = NULL;
-    assoc = NULL;
-    net = NULL;
+    d->params = NULL;
+    d->assoc = NULL;
+    d->net = NULL;
 
-    QuerySyntax querySyntax[3] =
-    {
+    QuerySyntax querySyntax[3] = {
         { UID_FINDPatientRootQueryRetrieveInformationModel,
-            UID_MOVEPatientRootQueryRetrieveInformationModel },
+          UID_MOVEPatientRootQueryRetrieveInformationModel },
         { UID_FINDStudyRootQueryRetrieveInformationModel,
           UID_MOVEStudyRootQueryRetrieveInformationModel },
         { UID_RETIRED_FINDPatientStudyOnlyQueryRetrieveInformationModel,
@@ -204,145 +201,128 @@ OFCondition QtDcmMoveScu::move ( QString uid )
 
     OFCondition cond;
 
-    if ( d->mode == IMPORT )
-    {
+    if ( d->mode == IMPORT ) {
         this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) );
         this->addOverrideKey ( QString ( "SeriesInstanceUID=" + uid ) );
     }
-    else
-    {
+    else {
         this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) );
         this->addOverrideKey ( QString ( "SOPInstanceUID=" + uid ) );
     }
 
-    cond = ASC_initializeNetwork ( NET_ACCEPTORREQUESTOR, QtDcmPreferences::instance()->getPort().toInt(), acseTimeout, &net );
+    cond = ASC_initializeNetwork ( NET_ACCEPTORREQUESTOR, QtDcmPreferences::instance()->port().toInt(), d->acseTimeout, &d->net );
 
-    if ( cond.bad() )
-    {
+    if ( cond.bad() ) {
         qDebug() << "Cannot create network: " << DimseCondition::dump ( temp_str, cond ).c_str();
         return cond;
     }
 
-    cond = ASC_createAssociationParameters ( &params, maxPDU );
+    cond = ASC_createAssociationParameters ( &d->params, d->maxPDU );
 
-    if ( cond.bad() )
-    {
+    if ( cond.bad() ) {
         qDebug() << "Cannot create association: " << DimseCondition::dump ( temp_str, cond ).c_str();
         return cond;
     }
 
-    ASC_setAPTitles ( params, QtDcmPreferences::instance()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data(), QtDcmManager::instance()->getCurrentPacs()->getAetitle().toUtf8().data() );
+    ASC_setAPTitles ( d->params, 
+                      QtDcmPreferences::instance()->aetitle().toUtf8().data(), 
+                      QtDcmManager::instance()->currentPacs().aetitle().toUtf8().data(), 
+                      QtDcmManager::instance()->currentPacs().aetitle().toUtf8().data() );
 
-    ASC_setPresentationAddresses ( params, QtDcmPreferences::instance()->getHostname().toUtf8().data(), QString ( QtDcmManager::instance()->getCurrentPacs()->getHostname() + ":"
-                                   + QtDcmManager::instance()->getCurrentPacs()->getPort() ).toUtf8().data() );
+    ASC_setPresentationAddresses ( d->params, 
+                                   QtDcmPreferences::instance()->hostname().toUtf8().data(), 
+                                   QString ( QtDcmManager::instance()->currentPacs().address() + ":" + QtDcmManager::instance()->currentPacs().port() ).toUtf8().data() );
 
-    cond = addPresentationContext ( params, 1, querySyntax[queryModel].findSyntax, networkTransferSyntax );
-    cond = addPresentationContext ( params, 3, querySyntax[queryModel].moveSyntax, networkTransferSyntax );
+    cond = addPresentationContext ( d->params, 1, querySyntax[d->queryModel].findSyntax, d->networkTransferSyntax );
+    cond = addPresentationContext ( d->params, 3, querySyntax[d->queryModel].moveSyntax, d->networkTransferSyntax );
 
-    if ( cond.bad() )
-    {
+    if ( cond.bad() ) {
         qDebug() << "Wrong presentation context:" << DimseCondition::dump ( temp_str, cond ).c_str();
         return cond;
     }
 
-    cond = ASC_requestAssociation ( net, params, &assoc );
+    cond = ASC_requestAssociation ( d->net, d->params, &d->assoc );
 
-    if ( cond.bad() )
-    {
-        if ( cond == DUL_ASSOCIATIONREJECTED )
-        {
+    if ( cond.bad() ) {
+        if ( cond == DUL_ASSOCIATIONREJECTED ) {
             T_ASC_RejectParameters rej;
-            ASC_getRejectParameters ( params, &rej );
+            ASC_getRejectParameters ( d->params, &rej );
             ASC_printRejectParameters ( temp_str, &rej );
             qDebug() << "Association Rejected:" << QString ( temp_str.c_str() );
             return cond;
         }
-        else
-        {
+        else {
             qDebug() << "Association Request Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
             return cond;
         }
     }
 
-    if ( ASC_countAcceptedPresentationContexts ( params ) == 0 )
-    {
+    if ( ASC_countAcceptedPresentationContexts ( d->params ) == 0 ) {
         qDebug() << "No Acceptable Presentation Contexts";
         return cond;
     }
 
     cond = EC_Normal;
 
-    cond = this->cmove ( assoc, NULL );
+    cond = this->cmove ( d->assoc, NULL );
 
-    overrideKeys.clear();
+    d->overrideKeys.clear();
     this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "STUDY" "" ) );
 
-    if ( cond == EC_Normal )
-    {
-        if ( abortAssociation )
-        {
+    if ( cond == EC_Normal ) {
+        if ( d->abortAssociation ) {
             qDebug() << "Aborting Association";
-            cond = ASC_abortAssociation ( assoc );
-            ASC_dropNetwork ( &net );
+            cond = ASC_abortAssociation ( d->assoc );
+            ASC_dropNetwork ( &d->net );
 
-            if ( cond.bad() )
-            {
+            if ( cond.bad() ) {
                 qDebug() << "Association Abort Failed: " << DimseCondition::dump ( temp_str,cond ).c_str();
                 return cond;
             }
         }
-        else
-        {
+        else {
             /* release association */
             qDebug() << "Releasing Association";
 //             cond = ASC_releaseAssociation(assoc); //Problem with error message Illegal Key
-            ASC_dropNetwork ( &net );
-
-            if ( cond.bad() )
-            {
+            ASC_dropNetwork ( &d->net );
+            if ( cond.bad() ) {
                 qDebug() << "Association Release Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
                 return cond;
             }
         }
     }
-    else if ( cond == DUL_PEERREQUESTEDRELEASE )
-    {
+    else if ( cond == DUL_PEERREQUESTEDRELEASE ) {
         qDebug() << "Protocol Error: Peer requested release (Aborting)";
-        cond = ASC_abortAssociation ( assoc );
-        ASC_dropNetwork ( &net );
+        cond = ASC_abortAssociation ( d->assoc );
+        ASC_dropNetwork ( &d->net );
 
-        if ( cond.bad() )
-        {
+        if ( cond.bad() ) {
             qDebug() << "Association Abort Failed: " << DimseCondition::dump ( temp_str,cond ).c_str();
             return cond;
         }
 
         return cond;
     }
-    else if ( cond == DUL_PEERABORTEDASSOCIATION )
-    {
+    else if ( cond == DUL_PEERABORTEDASSOCIATION ) {
         qDebug() << "Peer Aborted Association";
         return cond;
     }
-    else
-    {
+    else {
         qDebug() << "Move SCU Failed: Aborting Association";
-        cond = ASC_abortAssociation ( assoc );
-        ASC_dropNetwork ( &net );
+        cond = ASC_abortAssociation ( d->assoc );
+        ASC_dropNetwork ( &d->net );
 
-        if ( cond.bad() )
-        {
+        if ( cond.bad() ) {
             qDebug() << "Association Abort Failed: " << DimseCondition::dump ( temp_str,cond ).c_str();
             return cond;
         }
-
         return cond;
     }
 
     return cond;
 }
 
-void QtDcmMoveScu::addOverrideKey ( QString key )
+void QtDcmMoveScu::addOverrideKey ( const QString & key )
 {
     char * s = key.toUtf8().data();
     unsigned int g = 0xffff;
@@ -357,68 +337,56 @@ void QtDcmMoveScu::addOverrideKey ( QString key )
     OFString toParse = s;
     size_t eqPos = toParse.find ( '=' );
 
-    if ( n < 2 ) // if at least no tag could be parsed
-    {
+    if ( n < 2 ) { // if at least no tag could be parsed
         // if value is given, extract it (and extrect dictname)
-        if ( eqPos != OFString_npos )
-        {
+        if ( eqPos != OFString_npos ) {
             dicName = toParse.substr ( 0, eqPos ).c_str();
             valStr = toParse.substr ( eqPos + 1, toParse.length() );
         }
-        else
+        else {
             // no value given, just dictionary name
             dicName = s; // only dictionary name given (without value)
-
+        }
+        
         // try to lookup in dictionary
         DcmTagKey key ( 0xffff, 0xffff );
-
         const DcmDataDictionary& globalDataDict = dcmDataDict.rdlock();
-
         const DcmDictEntry *dicent = globalDataDict.findEntry ( dicName.c_str() );
 
         dcmDataDict.unlock();
 
-        if ( dicent != NULL )
-        {
+        if ( dicent != NULL ) {
             // found dictionary name, copy group and element number
             key = dicent->getKey();
             g = key.getGroup();
             e = key.getElement();
         }
-        else
-        {
+        else {
             // not found in dictionary
             msg = "bad key format or dictionary name not found in dictionary: ";
             msg += dicName;
             qDebug() << QString ( msg.c_str() );
         }
     } // tag could be parsed, copy value if it exists
-    else
-    {
+    else {
         if ( eqPos != OFString_npos )
             valStr = toParse.substr ( eqPos + 1, toParse.length() );
     }
 
     DcmTag tag ( g, e );
-
-    if ( tag.error() != EC_Normal )
-    {
+    if ( tag.error() != EC_Normal ) {
         sprintf ( msg2, "unknown tag: (%04x,%04x)", g, e );
         qDebug() << QString ( msg2 );
     }
 
     DcmElement *elem = newDicomElement ( tag );
-
-    if ( elem == NULL )
-    {
+    if ( elem == NULL ) {
         sprintf ( msg2, "cannot create element for tag: (%04x,%04x)", g, e );
         qDebug() << QString ( msg2 );
     }
 
-    if ( valStr.length() > 0 )
-    {
-        if ( elem->putString ( valStr.c_str() ).bad() )
-        {
+    if ( valStr.length() > 0 ) {
+        if ( elem->putString ( valStr.c_str() ).bad() ) {
             sprintf ( msg2, "cannot put tag value: (%04x,%04x)=\"", g, e );
             msg = msg2;
             msg += valStr;
@@ -427,8 +395,7 @@ void QtDcmMoveScu::addOverrideKey ( QString key )
         }
     }
 
-    if ( overrideKeys.insert ( elem, OFTrue ).bad() )
-    {
+    if ( d->overrideKeys.insert ( elem, OFTrue ).bad() ) {
         sprintf ( msg2, "cannot insert tag: (%04x,%04x)", g, e );
         qDebug() << QString ( msg2 );
     }
@@ -441,7 +408,6 @@ OFCondition QtDcmMoveScu::addPresentationContext ( T_ASC_Parameters *params, T_A
 
     switch ( preferredTransferSyntax )
     {
-
     case EXS_LittleEndianImplicit:
         /* we only support Little Endian Implicit */
         transferSyntaxes[0]  = UID_LittleEndianImplicitTransferSyntax;
@@ -470,13 +436,11 @@ OFCondition QtDcmMoveScu::addPresentationContext ( T_ASC_Parameters *params, T_A
          * LittleEndianExplicitTransferSyntax to BigEndianTransferSyntax.
          */
 
-        if ( gLocalByteOrder == EBO_LittleEndian )  /* defined in dcxfer.h */
-        {
+        if ( gLocalByteOrder == EBO_LittleEndian )  /* defined in dcxfer.h */ {
             transferSyntaxes[0] = UID_LittleEndianExplicitTransferSyntax;
             transferSyntaxes[1] = UID_BigEndianExplicitTransferSyntax;
         }
-        else
-        {
+        else {
             transferSyntaxes[0] = UID_BigEndianExplicitTransferSyntax;
             transferSyntaxes[1] = UID_LittleEndianExplicitTransferSyntax;
         }
@@ -488,26 +452,20 @@ OFCondition QtDcmMoveScu::addPresentationContext ( T_ASC_Parameters *params, T_A
     }
 
     return ASC_addPresentationContext (
-
-               params, pid, abstractSyntax,
-               transferSyntaxes, numTransferSyntaxes );
+                params, pid, abstractSyntax,
+                transferSyntaxes, numTransferSyntaxes );
 }
 
 OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Association ** assoc )
 {
-    const char* knownAbstractSyntaxes[] =
-    {
-        UID_VerificationSOPClass
-    };
+    const char* knownAbstractSyntaxes[] = { UID_VerificationSOPClass };
     const char* transferSyntaxes[] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
     int numTransferSyntaxes;
 
     OFCondition cond = ASC_receiveAssociation ( aNet, assoc, ASC_DEFAULTMAXPDU );
 
-    if ( cond.good() )
-    {
-        switch ( EXS_Unknown )
-        {
+    if ( cond.good() ) {
+        switch ( EXS_Unknown ) {
 
         case EXS_LittleEndianImplicit:
             /* we only support Little Endian Implicit */
@@ -622,11 +580,8 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
             numTransferSyntaxes = 4;
             break;
 #endif
-
         default:
-
-            if ( OFFalse )
-            {
+            if ( OFFalse ) {
                 /* we accept all supported transfer syntaxes
                  * (similar to "AnyTransferSyntax" in "storescp.cfg")
                  */
@@ -641,13 +596,11 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
                 transferSyntaxes[8] = UID_MPEG2MainProfileAtMainLevelTransferSyntax;
                 transferSyntaxes[9] = UID_DeflatedExplicitVRLittleEndianTransferSyntax;
 
-                if ( gLocalByteOrder == EBO_LittleEndian )
-                {
+                if ( gLocalByteOrder == EBO_LittleEndian ) {
                     transferSyntaxes[10] = UID_LittleEndianExplicitTransferSyntax;
                     transferSyntaxes[11] = UID_BigEndianExplicitTransferSyntax;
                 }
-                else
-                {
+                else {
                     transferSyntaxes[10] = UID_BigEndianExplicitTransferSyntax;
                     transferSyntaxes[11] = UID_LittleEndianExplicitTransferSyntax;
                 }
@@ -656,19 +609,16 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
 
                 numTransferSyntaxes = 13;
             }
-            else
-            {
+            else {
                 /* We prefer explicit transfer syntaxes.
                  * If we are running on a Little Endian machine we prefer
                  * LittleEndianExplicitTransferSyntax to BigEndianTransferSyntax.
                  */
-                if ( gLocalByteOrder == EBO_LittleEndian )  /* defined in dcxfer.h */
-                {
+                if ( gLocalByteOrder == EBO_LittleEndian )  /* defined in dcxfer.h */ {
                     transferSyntaxes[0] = UID_LittleEndianExplicitTransferSyntax;
                     transferSyntaxes[1] = UID_BigEndianExplicitTransferSyntax;
                 }
-                else
-                {
+                else {
                     transferSyntaxes[0] = UID_BigEndianExplicitTransferSyntax;
                     transferSyntaxes[1] = UID_LittleEndianExplicitTransferSyntax;
                 }
@@ -684,24 +634,22 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
 
         /* accept the Verification SOP Class if presented */
         cond = ASC_acceptContextsWithPreferredTransferSyntaxes (
-                   ( *assoc )->params,
-                   knownAbstractSyntaxes, DIM_OF ( knownAbstractSyntaxes ),
-                   transferSyntaxes, numTransferSyntaxes );
+                    ( *assoc )->params,
+                    knownAbstractSyntaxes, DIM_OF ( knownAbstractSyntaxes ),
+                    transferSyntaxes, numTransferSyntaxes );
 
-        if ( cond.good() )
-        {
+        if ( cond.good() ) {
             /* the array of Storage SOP Class UIDs comes from dcuid.h */
             cond = ASC_acceptContextsWithPreferredTransferSyntaxes (
-                       ( *assoc )->params,
-                       dcmAllStorageSOPClassUIDs, numberOfAllDcmStorageSOPClassUIDs,
-                       transferSyntaxes, numTransferSyntaxes );
+                        ( *assoc )->params,
+                        dcmAllStorageSOPClassUIDs, numberOfAllDcmStorageSOPClassUIDs,
+                        transferSyntaxes, numTransferSyntaxes );
         }
     }
 
     if ( cond.good() ) cond = ASC_acknowledgeAssociation ( *assoc );
 
-    if ( cond.bad() )
-    {
+    if ( cond.bad() ) {
         ASC_dropAssociation ( *assoc );
         ASC_destroyAssociation ( assoc );
     }
@@ -713,8 +661,7 @@ OFCondition QtDcmMoveScu::echoSCP ( T_ASC_Association * assoc, T_DIMSE_Message *
 {
     OFCondition cond = DIMSE_sendEchoResponse ( assoc, presID, &msg->msg.CEchoRQ, STATUS_Success, NULL );
 
-    if ( cond.bad() )
-    {
+    if ( cond.bad() ) {
         qDebug() << "Echo SCP Failed";
     }
 
@@ -723,7 +670,11 @@ OFCondition QtDcmMoveScu::echoSCP ( T_ASC_Association * assoc, T_DIMSE_Message *
 
 OFCondition QtDcmMoveScu::storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *msg, T_ASC_PresentationContextID presID, void* subOpCallbackData )
 {
-    QtDcmMoveScu * self = ( QtDcmMoveScu* ) subOpCallbackData;
+    QtDcmMoveScu * self = static_cast<QtDcmMoveScu * >(subOpCallbackData);
+    if (!self) {
+        qWarning() << "Cannot cast caller";
+        return EC_IllegalCall;
+    }
 
     OFCondition cond = EC_Normal;
     T_DIMSE_C_StoreRQ *req;
@@ -731,31 +682,28 @@ OFCondition QtDcmMoveScu::storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *
 
     req = &msg->msg.CStoreRQ;
 
-    if ( OFFalse )
-    {
+    if ( OFFalse ) {
 #ifdef _WIN32
         tmpnam ( imageFile );
 #else
         strcpy ( imageFile, NULL_DEVICE_NAME );
 #endif
     }
-    else
-    {
+    else {
         sprintf ( imageFile, "%s.%s",
                   dcmSOPClassUIDToModality ( req->AffectedSOPClassUID ),
                   req->AffectedSOPInstanceUID );
     }
 
-    self->assoc = assoc;
+    self->d->assoc = assoc;
 
-    self->imageFile = imageFile;
+    self->d->imageFile = imageFile;
     DcmFileFormat dcmff;
-    self->file = &dcmff;
+    self->d->file = &dcmff;
 
     // store SourceApplicationEntityTitle in metaheader
 
-    if ( assoc && assoc->params )
-    {
+    if ( assoc && assoc->params ) {
         const char *aet = assoc->params->DULparams.callingAPTitle;
 
         if ( aet ) dcmff.getMetaInfo()->putAndInsertString ( DCM_SourceApplicationEntityTitle, aet );
@@ -763,13 +711,11 @@ OFCondition QtDcmMoveScu::storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *
 
     DcmDataset *dset = dcmff.getDataset();
 
-    if ( OFFalse )
-    {
+    if ( OFFalse ) {
         cond = DIMSE_storeProvider ( assoc, presID, req, imageFile, OFFalse,
                                      NULL, storeSCPCallback, ( void * ) subOpCallbackData, DIMSE_BLOCKING, 0 );
     }
-    else
-    {
+    else {
         cond = DIMSE_storeProvider ( assoc, presID, req, ( char * ) NULL, OFFalse,
                                      &dset, storeSCPCallback, ( void * ) subOpCallbackData, DIMSE_BLOCKING, 0 );
     }
@@ -779,45 +725,43 @@ OFCondition QtDcmMoveScu::storeSCP ( T_ASC_Association *assoc, T_DIMSE_Message *
 
 void QtDcmMoveScu::storeSCPCallback ( void *callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ *req, char *imageFile, DcmDataset **imageDataSet, T_DIMSE_C_StoreRSP *rsp, DcmDataset **statusDetail )
 {
-    QtDcmMoveScu* self = ( QtDcmMoveScu* ) callbackData;
-
+    QtDcmMoveScu * self = static_cast<QtDcmMoveScu * >(callbackData);
+    if (!self) {
+        qWarning() << "Cannot cast caller";
+        return;
+    }
+    
     DIC_UI sopClass;
     DIC_UI sopInstance;
 
-    if ( progress->state == DIMSE_StoreEnd )
-    {
+    if ( progress->state == DIMSE_StoreEnd ) {
         *statusDetail = NULL;
-
-        if ( ( imageDataSet != NULL ) && ( *imageDataSet != NULL ) && !self->bitPreserving && !self->ignore )
-        {
+        if ( ( imageDataSet != NULL ) && ( *imageDataSet != NULL ) && !self->d->bitPreserving && !self->d->ignore ) {
             /* create full path name for the output file */
             OFString ofname;
-            OFStandard::combineDirAndFilename ( ofname, self->outputDirectory, self->imageFile, OFTrue /* allowEmptyDirName */ );
+            OFStandard::combineDirAndFilename ( ofname, self->d->outputDirectory, self->d->imageFile, OFTrue /* allowEmptyDirName */ );
 
-            E_TransferSyntax xfer = self->writeTransferSyntax;
+            E_TransferSyntax xfer = self->d->writeTransferSyntax;
 
             if ( xfer == EXS_Unknown ) xfer = ( *imageDataSet )->getOriginalXfer();
 
-            OFCondition cond = self->file->saveFile ( ofname.c_str(), xfer, self->sequenceType, self->groupLength,
-                               self->paddingType, OFstatic_cast ( Uint32, self->filepad ), OFstatic_cast ( Uint32, self->itempad ),
-                               ( self->useMetaheader ) ? EWM_fileformat : EWM_dataset );
+            OFCondition cond = self->d->file->saveFile ( ofname.c_str(), xfer, self->d->sequenceType, self->d->groupLength,
+                               self->d->paddingType, OFstatic_cast ( Uint32, self->d->filepad ), OFstatic_cast ( Uint32, self->d->itempad ),
+                               ( self->d->useMetaheader ) ? EWM_fileformat : EWM_dataset );
 
-            if ( QFile ( ofname.c_str() ).exists() )
+            if ( QFile ( ofname.c_str() ).exists() ) {
                 emit self->previewSlice ( QString ( ofname.c_str() ) );
+            }
 
-            if ( ( rsp->DimseStatus == STATUS_Success ) && !self->ignore )
-            {
+            if ( ( rsp->DimseStatus == STATUS_Success ) && !self->d->ignore ) {
                 /* which SOP class and SOP instance ? */
-                if ( !DU_findSOPClassAndInstanceInDataSet ( *imageDataSet, sopClass, sopInstance, self->correctUIDPadding ) )
-                {
+                if ( !DU_findSOPClassAndInstanceInDataSet ( *imageDataSet, sopClass, sopInstance, self->d->correctUIDPadding ) ) {
                     rsp->DimseStatus = STATUS_STORE_Error_CannotUnderstand;
                 }
-                else if ( strcmp ( sopClass, req->AffectedSOPClassUID ) != 0 )
-                {
+                else if ( strcmp ( sopClass, req->AffectedSOPClassUID ) != 0 ) {
                     rsp->DimseStatus = STATUS_STORE_Error_DataSetDoesNotMatchSOPClass;
                 }
-                else if ( strcmp ( sopInstance, req->AffectedSOPInstanceUID ) != 0 )
-                {
+                else if ( strcmp ( sopInstance, req->AffectedSOPInstanceUID ) != 0 ) {
                     rsp->DimseStatus = STATUS_STORE_Error_DataSetDoesNotMatchSOPClass;
                 }
             }
@@ -832,20 +776,19 @@ OFCondition QtDcmMoveScu::subOpSCP ( T_ASC_Association **subAssoc, void * subOpC
     T_DIMSE_Message     msg;
     T_ASC_PresentationContextID presID;
 
-    if ( !ASC_dataWaiting ( *subAssoc, 0 ) ) /* just in case */
+    if ( !ASC_dataWaiting ( *subAssoc, 0 ) ) { /* just in case */
         return DIMSE_NODATAAVAILABLE;
+    }
 
     OFCondition cond = DIMSE_receiveCommand ( *subAssoc, DIMSE_BLOCKING, 0, &presID, &msg, NULL );
 
-    if ( cond == EC_Normal )
-    {
+    if ( cond == EC_Normal ) {
         switch ( msg.CommandField )
         {
-
         case DIMSE_C_STORE_RQ:
             cond = storeSCP ( *subAssoc, &msg, presID, subOpCallbackData );
             break;
-
+            
         case DIMSE_C_ECHO_RQ:
             cond = echoSCP ( *subAssoc, &msg, presID );
             break;
@@ -857,26 +800,22 @@ OFCondition QtDcmMoveScu::subOpSCP ( T_ASC_Association **subAssoc, void * subOpC
     }
 
     /* clean up on association termination */
-    if ( cond == DUL_PEERREQUESTEDRELEASE )
-    {
+    if ( cond == DUL_PEERREQUESTEDRELEASE ) {
         cond = ASC_acknowledgeRelease ( *subAssoc );
         ASC_dropSCPAssociation ( *subAssoc );
         ASC_destroyAssociation ( subAssoc );
         return cond;
     }
-    else if ( cond == DUL_PEERABORTEDASSOCIATION )
-    {
+    else if ( cond == DUL_PEERABORTEDASSOCIATION ) {
     }
-    else if ( cond != EC_Normal )
-    {
+    else if ( cond != EC_Normal ) {
         OFString temp_str;
         qDebug() << "DIMSE failure (aborting sub-association): " << DimseCondition::dump ( temp_str, cond ).c_str();
         /* some kind of error so abort the association */
         cond = ASC_abortAssociation ( *subAssoc );
     }
 
-    if ( cond != EC_Normal )
-    {
+    if ( cond != EC_Normal ) {
         ASC_dropAssociation ( *subAssoc );
         ASC_destroyAssociation ( subAssoc );
     }
@@ -889,26 +828,28 @@ void QtDcmMoveScu::subOpCallback ( void * caller, T_ASC_Network *aNet, T_ASC_Ass
     if ( !caller )
         return;
 
-    QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
-
-//     if ( self->getMode() == QtDcmMoveScu::IMPORT )
-    if ( self->slicesCount )
-        emit self->updateProgress ( self->progressTotal + ( int ) ( ( ( float ) ( self->step * ( self->progressSerie ) / self->slicesCount ) ) ) );
+    QtDcmMoveScu * self = static_cast<QtDcmMoveScu * >(caller);
+    if (!self) {
+        qWarning() << "Cannot cast caller";
+        return;
+    }
+    
+    if ( self->d->slicesCount ) {
+        emit self->updateProgress ( self->d->progressTotal + ( int ) ( ( ( float ) ( self->d->step * ( self->d->progressSerie ) / self->d->slicesCount ) ) ) );
+    }
 
     if ( aNet == NULL ) return; /* help no net ! */
 
-    if ( *subAssoc == NULL )
-    {
+    if ( *subAssoc == NULL ) {
         /* negotiate association */
         acceptSubAssoc ( aNet, subAssoc );
     }
-    else
-    {
+    else {
         /* be a service class provider */
         subOpSCP ( subAssoc, caller );
     }
 
-    self->progressSerie ++;
+    self->d->progressSerie ++;
 }
 
 void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int responseCount, T_DIMSE_C_MoveRSP * rsp )
@@ -916,38 +857,39 @@ void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int resp
     if ( !caller )
         return;
 
-    QtDcmMoveScu * self = ( QtDcmMoveScu* ) caller;
+    QtDcmMoveScu * self = static_cast<QtDcmMoveScu * >(caller);
+    if (!self) {
+        qWarning() << "Cannot cast caller";
+        return;
+    }
 
-    if ( responseCount == 1 )
-        self->progressSerie = 0;
+    if ( responseCount == 1 ) {
+        self->d->progressSerie = 0;
+    }
 
-    self->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
-
-    OFCondition cond = EC_Normal;
+    self->d->slicesCount = rsp->NumberOfRemainingSubOperations + rsp->NumberOfFailedSubOperations + rsp->NumberOfWarningSubOperations + rsp->NumberOfCompletedSubOperations;
 
     OFString temp_str;
 
     DIMSE_dumpMessage ( temp_str, *rsp, DIMSE_INCOMING );
 
     qDebug() << "Move Response " << responseCount << ":";
-
     qDebug() << QString ( temp_str.c_str() );
 }
 
 void QtDcmMoveScu::substituteOverrideKeys ( DcmDataset & dset )
 {
-    if ( overrideKeys.isEmpty()) {
+    if ( d->overrideKeys.isEmpty()) {
         return; /* nothing to do */
     }
 
     /* copy the override keys */
-    DcmDataset keys ( overrideKeys );
+    DcmDataset keys ( d->overrideKeys );
 
     /* put the override keys into dset replacing existing tags */
     unsigned long elemCount = keys.card();
 
-    for ( unsigned long i = 0; i < elemCount; i++ )
-    {
+    for ( unsigned long i = 0; i < elemCount; i++ ) {
         DcmElement *elem = keys.remove ( ( unsigned long ) 0 );
         dset.insert ( elem, OFTrue );
     }
@@ -974,11 +916,8 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
 
 
     DcmFileFormat file;
-
-    if ( fname != NULL )
-    {
-        if ( file.loadFile ( fname ).bad() )
-        {
+    if ( fname != NULL ) {
+        if ( file.loadFile ( fname ).bad() ) {
             qDebug() << "bad DICOM file: " << QString ( fname );
             return DIMSE_BADDATA;
         }
@@ -987,12 +926,12 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
     /* replace specific keys by those in overrideKeys */
     substituteOverrideKeys ( *file.getDataset() );
 
-    sopClass = querySyntax[queryModel].moveSyntax;
+    sopClass = querySyntax[d->queryModel].moveSyntax;
 
     /* which presentation context should be used */
-    presId = ASC_findAcceptedPresentationContextID ( assoc, sopClass );
+    d->presId = ASC_findAcceptedPresentationContextID ( d->assoc, sopClass );
 
-    if ( presId == 0 ) return DIMSE_NOVALIDPRESENTATIONCONTEXTID;
+    if ( d->presId == 0 ) return DIMSE_NOVALIDPRESENTATIONCONTEXTID;
 
     req.MessageID = msgId;
 
@@ -1002,23 +941,51 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
 
     req.DataSetType = DIMSE_DATASET_PRESENT;
 
-    if ( moveDestination == NULL )
-    {
+    if ( d->moveDestination == NULL ) {
         /* set the destination to be me */
         ASC_getAPTitles ( assoc->params, req.MoveDestination,
                           NULL, NULL );
     }
-    else
-    {
-        strcpy ( req.MoveDestination, moveDestination );
+    else {
+        strcpy( req.MoveDestination, d->moveDestination );
     }
 
     OFCondition cond;
 
-    if ( useStoreSCP )
-        cond = DIMSE_moveUser ( assoc, presId, &req, file.getDataset(), moveCallback, ( void* ) this, blockMode, dimseTimeout, net, subOpCallback, ( void* ) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets );
-    else
-        cond = DIMSE_moveUser ( assoc, presId, &req, file.getDataset(), moveCallback, ( void* ) this, blockMode, dimseTimeout, net, NULL, ( void* ) this, &rsp, &statusDetail, &rspIds, ignorePendingDatasets );
+    if ( d->useStoreSCP ) {
+        cond = DIMSE_moveUser ( assoc, 
+                                d->presId, 
+                                &req, 
+                                file.getDataset(), 
+                                moveCallback, 
+                                ( void* ) this, 
+                                d->blockMode, 
+                                d->dimseTimeout, 
+                                d->net, 
+                                subOpCallback, 
+                                ( void* ) this, 
+                                &rsp, 
+                                &statusDetail, 
+                                &rspIds, 
+                                d->ignorePendingDatasets );
+    }
+    else {
+        cond = DIMSE_moveUser ( assoc, 
+                                d->presId, 
+                                &req, 
+                                file.getDataset(), 
+                                moveCallback, 
+                                ( void* ) this, 
+                                d->blockMode, 
+                                d->dimseTimeout, 
+                                d->net, 
+                                NULL, 
+                                ( void* ) this, 
+                                &rsp, 
+                                &statusDetail, 
+                                &rspIds, 
+                                d->ignorePendingDatasets );
+    }
 
     if ( rspIds != NULL ) delete rspIds;
 
@@ -1029,10 +996,11 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
 OFCondition QtDcmMoveScu::cmove ( T_ASC_Association * assoc, const char *fname )
 {
     OFCondition cond = EC_Normal;
-    int n = ( int ) repeatCount;
+    int n = ( int ) d->repeatCount;
 
-    while ( cond.good() && n-- )
+    while ( cond.good() && n-- ) {
         cond = moveSCU ( assoc, fname );
+    }
 
     return cond;
 }

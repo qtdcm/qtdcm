@@ -24,7 +24,6 @@
 #include <dcmtk/dcmnet/dfindscu.h>
 
 struct T_DIMSE_C_FindRQ;
-
 struct T_DIMSE_C_FindRSP;
 
 class DcmDataset;
@@ -35,8 +34,7 @@ class QtDcmFindCallback : public DcmFindSCUCallback
 {
 
 public:
-    QtDcmFindCallback();
-    QtDcmFindCallback ( int type );
+    QtDcmFindCallback ( int type = PATIENT );
 
     virtual ~QtDcmFindCallback();
 

@@ -34,36 +34,34 @@ public:
     QtDcmMoveDicomdir ( QObject * parent );
     virtual ~QtDcmMoveDicomdir();
 
-    enum mode
+    enum eMoveMode
     {
         IMPORT, PREVIEW
     };
 
-    void setMode ( mode mode );
-
-    QtDcmMoveDicomdir::mode getMode();
+    void setMode ( eMoveMode mode );
 
     void setDcmItem ( DcmItem * item );
 
-    void setOutputDir ( QString dir );
+    void setOutputDir ( const QString & dir );
 
-    void setImportDir ( QString dir );
+    void setImportDir ( const QString & dir );
 
-    void setSeries ( QList<QString> series );
+    void setSeries ( const QStringList & series );
 
     void setIndex ( int index );
 
-    void setImageId ( QString uid );
+    void setImageId ( const QString & uid );
 
     void run();
 
 signals:
     void updateProgress ( int i );
-    void previewSlice ( QString filename );
-    void serieMoved(QString directory, QString serie, int number);
+    void previewSlice ( const QString & filename );
+    void serieMoved(const QString & directory, const QString & serie, int number);
 
 private:
-    QString fixFilename ( QString name );
+    QString fixFilename ( const QString & name ) const;
 
     QtDcmMoveDicomdirPrivate * d;
 };

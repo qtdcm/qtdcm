@@ -21,49 +21,28 @@
 #include "QtDcmLocalDicomSettingsWidget.h"
 #include <QtDcmPreferences.h>
 
-class QtDcmLocalDicomSettingsWidgetPrivate
-{
-public:
-    QtDcmPreferences * preferences;
-};
-
-QtDcmLocalDicomSettingsWidget::QtDcmLocalDicomSettingsWidget ( QWidget* parent ) : QWidget ( parent ), d ( new QtDcmLocalDicomSettingsWidgetPrivate )
+QtDcmLocalDicomSettingsWidget::QtDcmLocalDicomSettingsWidget ( QWidget* parent ) 
+    : QWidget ( parent )
 {
     this->setupUi ( this );
-
-    d->preferences = NULL;
-}
-
-QtDcmPreferences* QtDcmLocalDicomSettingsWidget::getPreferences()
-{
-    return d->preferences;
-}
-
-void QtDcmLocalDicomSettingsWidget::setPreferences ( QtDcmPreferences* prefs )
-{
-    d->preferences = prefs;
-
-    localAetitleEdit->setText ( d->preferences->getAetitle() );
-    localPortEdit->setText ( d->preferences->getPort() );
-    localHostnameEdit->setText ( d->preferences->getHostname() );
-}
-
-void QtDcmLocalDicomSettingsWidget::updatePreferences()
-{
-    if ( d->preferences )
-    {
-        d->preferences->setAetitle ( localAetitleEdit->text() );
-        d->preferences->setPort ( localPortEdit->text() );
-        d->preferences->setHostname ( localHostnameEdit->text() );
-
-        d->preferences->writeSettings();
-    }
 }
 
 QtDcmLocalDicomSettingsWidget::~QtDcmLocalDicomSettingsWidget()
 {
-    delete d;
-    d = NULL;
+}
+
+void QtDcmLocalDicomSettingsWidget::readPreferences ()
+{
+    localAetitleEdit->setText ( QtDcmPreferences::instance()->aetitle() );
+    localPortEdit->setText ( QtDcmPreferences::instance()->port() );
+    localHostnameEdit->setText ( QtDcmPreferences::instance()->hostname() );
+}
+
+void QtDcmLocalDicomSettingsWidget::updatePreferences()
+{   
+    QtDcmPreferences::instance()->setAetitle ( localAetitleEdit->text() );
+    QtDcmPreferences::instance()->setPort ( localPortEdit->text() );
+    QtDcmPreferences::instance()->setHostname ( localHostnameEdit->text() );
 }
 
 

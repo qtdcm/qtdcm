@@ -26,23 +26,16 @@
 #include "ui_qtdcmLocalDicomSettingsWidget.h"
 
 class QtDcmPreferences;
-class QtDcmLocalDicomSettingsWidgetPrivate;
 
 class QTDCM_EXPORT QtDcmLocalDicomSettingsWidget : public QWidget, public Ui::QtDcmLocalDicomSettingsWidget
 {
     Q_OBJECT
 public:
-    QtDcmLocalDicomSettingsWidget ( QWidget * parent = 0 );
-
+    explicit QtDcmLocalDicomSettingsWidget ( QWidget * parent = 0 );
     virtual ~QtDcmLocalDicomSettingsWidget();
 
-    QtDcmPreferences * getPreferences();
-
-    void setPreferences ( QtDcmPreferences * prefs );
+    void readPreferences ();
     void updatePreferences();
-
-private:
-    QtDcmLocalDicomSettingsWidgetPrivate * d;
 };
 
 #endif // QTDCMLOCALDICOMSETTINGSWIDGET_H

@@ -19,33 +19,10 @@
 
 #define QT_NO_CAST_TO_ASCII
 
-#define INCLUDE_CSTDLIB
-#define INCLUDE_CSTDIO
-#define INCLUDE_CSTRING
-#define INCLUDE_CSTDARG
-// From Dcmtk:
-#include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
-
-#include "dcmtk/ofstd/ofstdinc.h"
-#include "dcmtk/ofstd/ofstd.h"
-#include "dcmtk/ofstd/ofconapp.h"
-#include <dcmtk/ofstd/ofstream.h>
-#include <dcmtk/dcmdata/dctk.h>
-#include <dcmtk/dcmdata/dcfilefo.h>
-#include "dcmtk/dcmnet/dfindscu.h"
-#include <dcmtk/dcmdata/dcistrmz.h>    /* for dcmZlibExpectRFC1950Encoding */
-// For dcm images
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include "dcmtk/dcmdata/dcrledrg.h"      /* for DcmRLEDecoderRegistration */
-#include "dcmtk/dcmjpeg/djdecode.h"     /* for dcmjpeg decoders */
-#include "dcmtk/dcmjpeg/dipijpeg.h"     /* for dcmimage JPEG plugin */
-// For color images
-#include <dcmtk/dcmimage/diregist.h>
-
-#include "dcmtk/dcmnet/dimse.h"
-#include "dcmtk/dcmnet/diutil.h"
-#include "dcmtk/dcmdata/dcdict.h"
-#include "dcmtk/dcmdata/dcuid.h"      /* for dcmtk version name */
+#include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmdata/dcstack.h>
+#include <dcmtk/dcmdata/dcitem.h>
+#include <dcmtk/dcmdata/dcelem.h>
 
 #include <QtDcmManager.h>
 #include <QtDcmMoveDicomdir.h>
@@ -59,32 +36,29 @@ public:
     QString importDir;
     DcmItem * dcmObject;
     DcmStack dicomdirItems;
-    QList<QString> filenames;
-    QList<QString> series;
-    QtDcmMoveDicomdir::mode mode;
+    QStringList filenames;
+    QStringList series;
+    QtDcmMoveDicomdir::eMoveMode mode;
     int index;
     QString uid;
 };
 
-QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) : d ( new QtDcmMoveDicomdirPrivate )
+QtDcmMoveDicomdir::QtDcmMoveDicomdir ( QObject * parent ) 
+    : QThread(parent),
+      d ( new QtDcmMoveDicomdirPrivate )
 {
     d->mode = QtDcmMoveDicomdir::IMPORT;
 }
 
 QtDcmMoveDicomdir::~QtDcmMoveDicomdir()
 {
-  delete d;
-  d = NULL;
+    delete d;
+    d = NULL;
 }
 
-void QtDcmMoveDicomdir::setMode ( QtDcmMoveDicomdir::mode mode )
+void QtDcmMoveDicomdir::setMode ( QtDcmMoveDicomdir::eMoveMode mode )
 {
     d->mode = mode;
-}
-
-QtDcmMoveDicomdir::mode QtDcmMoveDicomdir::getMode()
-{
-    return d->mode;
 }
 
 void QtDcmMoveDicomdir::setDcmItem ( DcmItem * item )
@@ -92,7 +66,7 @@ void QtDcmMoveDicomdir::setDcmItem ( DcmItem * item )
     d->dcmObject = item;
 }
 
-void QtDcmMoveDicomdir::setSeries ( QList<QString> series )
+void QtDcmMoveDicomdir::setSeries ( const QStringList & series )
 {
     d->series = series;
 }
@@ -102,18 +76,18 @@ void QtDcmMoveDicomdir::setIndex ( int index )
     d->index = index;
 }
 
-void QtDcmMoveDicomdir::setImageId ( QString uid)
+void QtDcmMoveDicomdir::setImageId ( const QString & uid)
 {
     d->uid = uid;
 }
 
 
-void QtDcmMoveDicomdir::setOutputDir ( QString dir )
+void QtDcmMoveDicomdir::setOutputDir ( const QString & dir )
 {
     d->outputDir = dir;
 }
 
-void QtDcmMoveDicomdir::setImportDir ( QString dir )
+void QtDcmMoveDicomdir::setImportDir ( const QString & dir )
 {
     d->importDir = dir;
 }
@@ -220,8 +194,9 @@ void QtDcmMoveDicomdir::run()
                         OFString strNumber;
                         lelt->getOFStringArray ( strNumber );
 
-                        if ( d->mode == QtDcmMoveDicomdir::PREVIEW )
+                        if ( d->mode == QtDcmMoveDicomdir::PREVIEW ) {
                             proceedIndex = ( QString ( strNumber.c_str() ) == d->uid );
+                        }
                     }
 
 //                     if ( lobj->findAndGetElement ( DCM_InstanceNumber, lelt ).good() )
@@ -238,12 +213,13 @@ void QtDcmMoveDicomdir::run()
                         OFString strFilename;
                         lelt->getOFStringArray ( strFilename );
 
-                        if ( d->mode == QtDcmMoveDicomdir::IMPORT )
+                        if ( d->mode == QtDcmMoveDicomdir::IMPORT ) {
                             d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
-                        else
-                        {
-                            if ( proceedIndex )
+                        }
+                        else {
+                            if ( proceedIndex ) {
                                 d->filenames.append ( this->fixFilename ( QString ( strFilename.c_str() ) ) );
+                            }
                         }
 
                     }
@@ -286,17 +262,18 @@ void QtDcmMoveDicomdir::run()
             }
         }
     }
-    exit();
 }
 
-QString QtDcmMoveDicomdir::fixFilename ( QString name )
+QString QtDcmMoveDicomdir::fixFilename ( const QString & name ) const
 {
-    QString basename = QFileInfo ( QtDcmManager::instance()->getDicomdir() ).path();
-    name.replace ( QChar ( '/' ), QDir::separator() ).replace ( QChar ( '\\' ), QDir::separator() );
-    QString filename = basename + QDir::separator() + name.toUpper();
+    QString tmpName(name);
+    const QString basename = QFileInfo ( QtDcmManager::instance()->dicomdir() ).path();
+    tmpName.replace ( QChar ( '/' ), QDir::separator() ).replace ( QChar ( '\\' ), QDir::separator() );
+    QString filename = basename + QDir::separator() + tmpName.toUpper();
 
-    if ( ! QFile ( filename ).exists() )
-        filename = basename + QDir::separator() + name.toLower();
+    if ( ! QFile ( filename ).exists() ) {
+        filename = basename + QDir::separator() + tmpName.toLower();
+    }
 
     return filename;
 }

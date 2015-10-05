@@ -15,9 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QtDcmPreferencesWidget" name="preferencesWidget" native="true">
-     <zorder>groupBox</zorder>
-    </widget>
+    <widget class="QtDcmPreferencesWidget" name="prefsWidget" native="true"/>
    </item>
    <item row="1" column="0">
     <widget class="QtDcmDcm2niiSettingsWidget" name="dcm2niiWidget" native="true"/>

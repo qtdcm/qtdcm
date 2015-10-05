@@ -30,7 +30,7 @@
 #include <itkMetaDataObject.h>
 #include <itkImageFileWriter.h>
 
-class QtDcmConvertPrivate
+class QtDcmConvert::Private
 {
 
 public:
@@ -41,7 +41,9 @@ public:
     QString outputFilename;
 };
 
-QtDcmConvert::QtDcmConvert ( QObject * parent ) : d ( new QtDcmConvertPrivate )
+QtDcmConvert::QtDcmConvert ( QObject * parent ) 
+    : QObject(parent),
+      d ( new QtDcmConvert::Private )
 {
     d->inputDirectory = "";
     d->outputFilename = "";
@@ -53,24 +55,21 @@ QtDcmConvert::~QtDcmConvert()
   d = NULL;
 }
 
-
 void QtDcmConvert::convert()
 {
     if (QtDcmPreferences::instance()->useDcm2nii())
     {
-        QString program = QtDcmPreferences::instance()->getDcm2niiPath();
+        const QString program = QtDcmPreferences::instance()->dcm2niiPath();
         QStringList arguments;
         arguments << "-x" << "N";
         arguments << "-r" << "N";
         arguments << "-g" << "N";
         arguments << "-o" << d->outputDirectory << d->inputDirectory;
         
-        QProcess * process = new QProcess(this);
-        process->setStandardOutputFile(d->tempDirectory + QDir::separator() + "logs" + QDir::separator() + d->serieUID + ".txt");
-        process->start(program, arguments);
-        process->waitForFinished();
-
-        delete process;
+        QProcess process(this);
+        process.setStandardOutputFile(d->tempDirectory + QDir::separator() + "logs" + QDir::separator() + d->serieUID + ".txt");
+        process.start(program, arguments);
+        process.waitForFinished();
     }
     else
     {
@@ -199,27 +198,27 @@ void QtDcmConvert::convert()
     }
 }
 
-void QtDcmConvert::setInputDirectory ( QString dir )
+void QtDcmConvert::setInputDirectory ( const QString & dir )
 {
     d->inputDirectory = dir;
 }
 
-void QtDcmConvert::setOutputDirectory ( QString dir )
+void QtDcmConvert::setOutputDirectory ( const QString & dir )
 {
     d->outputDirectory = dir;
 }
 
-void QtDcmConvert::setOutputFilename ( QString fname )
+void QtDcmConvert::setOutputFilename ( const QString & fname )
 {
     d->outputFilename = fname;
 }
 
-void QtDcmConvert::setSerieUID(QString uid)
+void QtDcmConvert::setSerieUID(const QString & uid)
 {
   d->serieUID = uid;
 }
 
-void QtDcmConvert::setTempDirectory(QString dir)
+void QtDcmConvert::setTempDirectory(const QString & dir)
 {
   d->tempDirectory = dir;
 }

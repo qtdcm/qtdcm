@@ -23,6 +23,7 @@ set(${PROJECT_NAME}_HDRS
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmSerie.h
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmStudy.h
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPatient.h
+  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServer.h
 )
 
 set(${PROJECT_NAME}_SRCS
@@ -59,7 +60,7 @@ set(${PROJECT_NAME}_MOC_HDRS
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferences.h
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServer.h)
+)
 
 set(${PROJECT_NAME}_MOC_SRCS
   ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcm.cpp

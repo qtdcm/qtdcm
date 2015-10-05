@@ -27,15 +27,8 @@
  * This class is a representation of a Dicom PACS server
  */
 
-class QtDcmServer : public QObject
+class QtDcmServer
 {
-    Q_OBJECT
-
-private:
-    QString _aetitle; /** Application entity title (AETitle) of the PACS server */
-    QString _hostname; /** The hostname of the server */
-    QString _port; /** TCP port the application is listening on */
-    QString _name; /** Description name of the PACS */
 
 public:
     /**
@@ -53,7 +46,7 @@ public:
      *
      * @return _aetitle a QString
      */
-    inline QString getAetitle() const
+    inline QString aetitle() const
     {
         return _aetitle;
     }
@@ -63,7 +56,7 @@ public:
      *
      * @return _name a QString
      */
-    inline QString getName() const
+    inline QString name() const
     {
         return _name;
     }
@@ -73,7 +66,7 @@ public:
      *
      * @return _port as a QString
      */
-    inline QString getPort() const
+    inline QString port() const
     {
         return _port;
     }
@@ -83,7 +76,7 @@ public:
      *
      * @return _server as a QString
      */
-    inline QString getHostname() const
+    inline QString address() const
     {
         return _hostname;
     }
@@ -123,10 +116,16 @@ public:
      *
      * @param _server as a QString
      */
-    inline void setHostname ( QString _server )
+    inline void setAddress ( QString _server )
     {
         this->_hostname = _server;
     }
+    
+private:
+    QString _aetitle; /** Application entity title (AETitle) of the PACS server */
+    QString _hostname; /** The hostname of the server */
+    QString _port; /** TCP port the application is listening on */
+    QString _name; /** Description name of the PACS */
 };
 
 #endif /* QTDCMSERVERS_H_ */

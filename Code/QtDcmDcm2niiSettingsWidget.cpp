@@ -23,43 +23,32 @@
 
 #include <QtDcmPreferences.h>
 
-class QtDcmDcm2niiSettingsWidgetPrivate
-{
-public:
-    QtDcmPreferences * preferences;
-};
-
-QtDcmDcm2niiSettingsWidget::QtDcmDcm2niiSettingsWidget(QWidget* parent): QWidget(parent), d(new QtDcmDcm2niiSettingsWidgetPrivate)
+QtDcmDcm2niiSettingsWidget::QtDcmDcm2niiSettingsWidget(QWidget* parent)
+    : QWidget(parent)
 {
     this->setupUi(this);
-    d->preferences = NULL;
 
-    QObject::connect(browseDcm2niiButton, SIGNAL(clicked()), this, SLOT(browseDcm2niiPath()));
-    QObject::connect(dcm2niiCheckBox, SIGNAL(stateChanged(int)), this, SLOT(toggleDcm2niiFrame(int)));
+    QObject::connect(browseDcm2niiButton, SIGNAL(clicked()), this, SLOT(onBrowseDcm2niiPathClicked()));
+    QObject::connect(dcm2niiCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onUseDcm2niiCheckChanged(int)));
 }
 
-QtDcmPreferences* QtDcmDcm2niiSettingsWidget::getPreferences()
+QtDcmDcm2niiSettingsWidget::~QtDcmDcm2niiSettingsWidget()
 {
-    return d->preferences;
 }
 
-void QtDcmDcm2niiSettingsWidget::setPreferences(QtDcmPreferences* prefs)
+void QtDcmDcm2niiSettingsWidget::readPreferences()
 {
-    d->preferences = prefs;
-
-    dcm2niiCheckBox->setChecked(d->preferences->useDcm2nii());
-    dcm2niiLineEdit->setText( d->preferences->getDcm2niiPath());
+    dcm2niiCheckBox->setChecked(QtDcmPreferences::instance()->useDcm2nii());
+    dcm2niiLineEdit->setText( QtDcmPreferences::instance()->dcm2niiPath());
 }
 
 void QtDcmDcm2niiSettingsWidget::updatePreferences()
 {
-    d->preferences->setDcm2niiPath(dcm2niiLineEdit->text());
-    d->preferences->useDcm2nii (dcm2niiCheckBox->isChecked());
-
-    d->preferences->writeSettings();
+    QtDcmPreferences::instance()->setDcm2niiPath(dcm2niiLineEdit->text());
+    QtDcmPreferences::instance()->setUseDcm2nii(dcm2niiCheckBox->isChecked());
 }
 
-void QtDcmDcm2niiSettingsWidget::browseDcm2niiPath()
+void QtDcmDcm2niiSettingsWidget::onBrowseDcm2niiPathClicked()
 {
     // Open aa QFileDialog in directory mode.
     QFileDialog * dialog = new QFileDialog(this);
@@ -80,15 +69,15 @@ void QtDcmDcm2niiSettingsWidget::browseDcm2niiPath()
     if (!filename.isEmpty()) // A file has been chosen
     {
         // The the output directory to the manager and launch the conversion process
-        d->preferences->setDcm2niiPath(filename);
+        QtDcmPreferences::instance()->setDcm2niiPath(filename);
         dcm2niiLineEdit->setText(filename);
     }
 }
 
-void QtDcmDcm2niiSettingsWidget::toggleDcm2niiFrame(int state)
+void QtDcmDcm2niiSettingsWidget::onUseDcm2niiCheckChanged(int state)
 {
     dcm2niiPathFrame->setEnabled((state == Qt::Checked));
-    d->preferences->useDcm2nii((state == Qt::Checked));
+    QtDcmPreferences::instance()->setUseDcm2nii((state == Qt::Checked));
 }
 
 
