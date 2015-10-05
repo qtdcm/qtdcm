@@ -464,7 +464,8 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
     if ( d->mapImages.size() && d->mapImages.contains ( elementIndex ) )
         imageId = d->mapImages[elementIndex];
 
-    if ( d->mode == "CD" )
+    switch(d->mode) {
+    case MEDIA:
     {
         QtDcmMoveDicomdir * mover = new QtDcmMoveDicomdir ( this );
         mover->setMode ( QtDcmMoveDicomdir::PREVIEW );
@@ -472,20 +473,25 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( QStringList() << uid );
         mover->setImageId ( imageId );
-        QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
+        QObject::connect(mover, &QtDcmMoveDicomdir::previewSlice , 
+                         this,  &QtDcmManager::makePreview);
+        QObject::connect(mover, &QtDcmMoveDicomdir::finished, 
+                         mover, &QtDcmMoveDicomdir::deleteLater);
         mover->start();
     }
-    else // mode PACS
+        break;
+    case PACS:
     {
         //Check if file has already been moved
         this->clearPreview();
         emit gettingPreview();
 
         QString modality ( "MR" );
-        if ( d->seriesTreeWidget->currentItem() )
+        if ( d->seriesTreeWidget->currentItem() ) {
             modality = d->seriesTreeWidget->currentItem()->text ( 1 );
+        }
+        
         QString filename ( d->tempDir.absolutePath() + "/" + uid + "/" + modality + "." + imageId );
-
         if ( QFile ( filename ).exists() ) {
             makePreview ( filename );
         }
@@ -495,12 +501,17 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
             mover->setOutputDir ( d->tempDir.absolutePath() );
             mover->setSeries ( QStringList() << uid );
             mover->setImageId ( imageId );
-            QObject::connect ( mover, SIGNAL ( previewSlice ( QString ) ), this, SLOT ( makePreview ( QString ) ) );
-            QObject::connect ( this, SIGNAL ( gettingPreview ( ) ), mover, SLOT ( onStopMove() ) );
-            QObject::connect(mover, SIGNAL(finished()), mover, SLOT(deleteLater()));
-
+            QObject::connect(mover, &QtDcmMoveScu::previewSlice, 
+                             this,  &QtDcmManager::makePreview);
+            QObject::connect(mover, &QtDcmMoveScu::finished, 
+                             mover, &QtDcmMoveScu::deleteLater);
             mover->start();
         }
+    }
+        break;
+    default:
+        qWarning() <<  "Move mode not supported";
+        break;
     }
 
     return;
@@ -509,12 +520,9 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
 
 void QtDcmManager::importSelectedSeries()
 {
-    if ( this->useConverter() )  //Use QtDcm convertion tool (ITK or dcm2nii)
-    {
-        if ( this->seriesToImportSize() != 0 )
-        {
-            if ( this->getOutputdirMode() == QtDcmManager::DIALOG )
-            {
+    if ( this->useConverter() ) { //Use QtDcm convertion tool (ITK or dcm2nii)
+        if ( this->seriesToImportSize() != 0 ) {
+            if ( this->getOutputdirMode() == QtDcmManager::DIALOG ) {
                 QFileDialog * dialog = new QFileDialog ( d->mainWidget );
                 dialog->setFileMode ( QFileDialog::Directory );
                 dialog->setOption ( QFileDialog::ShowDirsOnly, true );
@@ -522,15 +530,12 @@ void QtDcmManager::importSelectedSeries()
                 dialog->setWindowTitle ( tr ( "Export directory" ) );
                 QString directory;
 
-                if ( dialog->exec() )
-                {
+                if ( dialog->exec() ) {
                     directory = dialog->selectedFiles() [0];
                 }
-
                 dialog->close();
 
-                if ( !directory.isEmpty() )   // A file has been chosen
-                {
+                if ( !directory.isEmpty() ) { // A file has been chosen
                     // Set the choosen output directory to the manager and launch the conversion process
                     this->setOutputDirectory ( directory );
                     this->moveSelectedSeries();
@@ -538,17 +543,14 @@ void QtDcmManager::importSelectedSeries()
 
                 delete dialog;
             }
-            else
-            {
-                if ( QDir ( this->outputDirectory() ).exists() )
-                {
+            else {
+                if ( QDir ( this->outputDirectory() ).exists() ) {
                     this->moveSelectedSeries();
                 }
             }
         }
     }
-    else //Only copy the dicom files in a temporary directory
-    {
+    else { //Only copy the dicom files in a temporary directory
         this->setOutputDirectory ( "" );
         this->moveSelectedSeries();
     }
@@ -556,8 +558,7 @@ void QtDcmManager::importSelectedSeries()
 
 void QtDcmManager::importToDirectory ( const QString &directory )
 {
-    if ( this->seriesToImportSize() != 0 )
-    {
+    if ( this->seriesToImportSize() != 0 ) {
         this->setOutputDirectory ( directory );
         this->moveSelectedSeries();
     }
@@ -566,8 +567,7 @@ void QtDcmManager::importToDirectory ( const QString &directory )
 void QtDcmManager::onSerieMoved ( const QString &directory , const QString &serie , int number )
 {
     emit serieMoved ( directory );
-    if ( d->useConverter )
-    {
+    if ( d->useConverter ) {
         QtDcmConvert * converter = new QtDcmConvert ( this );
         converter->setInputDirectory ( directory );
         converter->setOutputFilename ( serie + ".nii" );
@@ -577,21 +577,24 @@ void QtDcmManager::onSerieMoved ( const QString &directory , const QString &seri
         converter->convert();
         delete converter;
 
-        if ( number == this->seriesToImportSize() - 1 )
+        if ( number == this->seriesToImportSize() - 1 ) {
             emit importFinished();
+        }
     }
 }
 
 void QtDcmManager::moveSeriesFinished()
 {
-    if ( d->importWidget )
+    if ( d->importWidget ) {
         d->importWidget->importProgressBar->setValue ( 0 );
+    }
 }
 
 void QtDcmManager::updateProgressBar ( int i )
 {
-    if ( d->importWidget )
+    if ( d->importWidget ) {
         d->importWidget->importProgressBar->setValue ( i );
+    }
     qApp->processEvents();
 }
 
@@ -608,13 +611,13 @@ void QtDcmManager::createTemporaryDirs()
 
     QDir qtdcmDir = QDir ( QDir::tempPath() + QDir::separator() + "qtdcm" );
 
-    if ( !qtdcmDir.exists ( randName ) )
+    if ( !qtdcmDir.exists ( randName ) ) {
         qtdcmDir.mkdir ( randName );
+    }
 
     d->tempDir = QDir ( qtdcmDir.absolutePath() + QDir::separator() + randName ); // tempDir = /tmp/qtdcm
 
-    if ( !d->tempDir.exists ( "logs" ) )
-    {
+    if ( !d->tempDir.exists ( "logs" ) ) {
         if ( !d->tempDir.mkdir ( "logs" ) )
             qDebug() << tr ( "Repertoire logs non cree" );
     }
@@ -646,8 +649,7 @@ void QtDcmManager::deleteTemporaryDirs()
 
 void QtDcmManager::generateCurrentSerieDir()
 {
-    if ( !d->serieId.isEmpty() )
-    {
+    if ( !d->serieId.isEmpty() ) {
         d->currentSerieDir = d->tempDir.absolutePath() + QDir::separator() + d->serieId;
         d->tempDir.mkdir ( d->serieId );
     }
@@ -658,14 +660,14 @@ void QtDcmManager::deleteCurrentSerieDir()
     // Suppression des fichiers temporaires
     QStringList listFiles = d->currentSerieDir.entryList ( QDir::Files, QDir::Name );
 
-    for ( int i = 0; i < listFiles.size(); i++ )
-    {
+    for ( int i = 0; i < listFiles.size(); i++ ) {
         d->currentSerieDir.remove ( listFiles.at ( i ) );
     }
 
     // Suppression du répertoire temporaire
-    if ( !d->tempDir.rmdir ( d->serieId ) )
+    if ( !d->tempDir.rmdir ( d->serieId ) ) {
         qDebug() << tr ( "Probleme lors de la suppression du répertoire temporaire" );
+    }
 }
 
 void QtDcmManager::makePreview ( const QString &filename )
@@ -678,18 +680,15 @@ void QtDcmManager::makePreview ( const QString &filename )
     DicomImage* dcimage = new DicomImage ( dset, file.getDataset()->getOriginalXfer(), CIF_MayDetachPixelData );
 
 
-    if ( dcimage != NULL )
-    {
+    if ( dcimage != NULL ) {
         dcimage->setNoDisplayFunction();
         dcimage->hideAllOverlays();
         dcimage->setNoVoiTransformation();
 
-        if ( dcimage->getStatus() == EIS_Normal )
-        {
+        if ( dcimage->getStatus() == EIS_Normal ) {
             Uint32 *pixelData = ( Uint32 * ) ( dcimage->getOutputData ( 32 /* bits per sample */ ) );
 
-            if ( pixelData != NULL )
-            {
+            if ( pixelData != NULL ) {
                 Uint8 *colored = new Uint8[dcimage->getWidth() * dcimage->getHeight() * 4]; //4 * dcimage->getWidth() * dcimage->getHeight() matrix
                 Uint8 *col = colored;
                 Uint32 *p = pixelData;
@@ -701,15 +700,17 @@ void QtDcmManager::makePreview ( const QString &filename )
                 Uint32 p_min = std::numeric_limits<Uint32>::max();
 #endif                
 
-                for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
-                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p )
-                    {
-                        if ( *p > p_max )
+                for ( unsigned i = 0; i < dcimage->getWidth(); ++i ) {
+                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
+                        if ( *p > p_max ) {
                             p_max = *p;
-
-                        if ( *p < p_min )
+                        }
+                        
+                        if ( *p < p_min ) {
                             p_min = *p;
+                        }
                     }
+                }
 
                 double a = 4294967295.f / ( ( double ) p_max - ( double ) p_min );
 
@@ -717,9 +718,8 @@ void QtDcmManager::makePreview ( const QString &filename )
                 p = pixelData;
                 //copy the pixels in our QImage
 
-                for ( unsigned i = 0; i < dcimage->getWidth(); ++i )
-                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p )
-                    {
+                for ( unsigned i = 0; i < dcimage->getWidth(); ++i ) {
+                    for ( unsigned j = 0; j < dcimage->getHeight(); ++j, ++p ) {
                         *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
                         ++col;
                         *col = ( Uint8 ) ( ( 255.f / 4294967295.f ) * ( a * ( ( double ) ( *p ) - ( double ) p_min ) ) );
@@ -729,11 +729,13 @@ void QtDcmManager::makePreview ( const QString &filename )
                         *col = 255;
                         ++col;
                     }
+                }
 
                 QImage image ( colored, dcimage->getWidth(), dcimage->getHeight(), QImage::Format_ARGB32 );
 
-                if ( d->previewWidget )
+                if ( d->previewWidget ) {
                     d->previewWidget->imageLabel->setPixmap ( QPixmap::fromImage ( image.scaled ( 130,130 ), Qt::AutoColor ) );
+                }
 
                 delete[] colored;
 
@@ -756,8 +758,7 @@ void QtDcmManager::setDicomdir ( const QString &dicomdir )
     //Load dicomdir in a DCMTK DicomFileFormat object
     OFCondition status;
 
-    if ( ! ( status = d->dfile.loadFile ( d->dicomdir.toUtf8().data() ) ).good() )
-    {
+    if ( ! ( status = d->dfile.loadFile ( d->dicomdir.toUtf8().data() ) ).good() ) {
         return;
     }
 }
@@ -807,9 +808,9 @@ void QtDcmManager::setPatientId ( const QString &patientId )
 QString QtDcmManager::patientBirthdate() const 
 {
     QString birthdate;
-    if ( d->patientsTreeWidget )
-        if ( d->patientsTreeWidget->currentItem() )
-            birthdate = d->patientsTreeWidget->currentItem()->data ( 2,0 ).toString();
+    if ( d->patientsTreeWidget && d->patientsTreeWidget->currentItem() ) {
+        birthdate = d->patientsTreeWidget->currentItem()->data ( 2,0 ).toString();
+    }
     qDebug() << birthdate;
     return birthdate;
 }
@@ -817,9 +818,10 @@ QString QtDcmManager::patientBirthdate() const
 QString QtDcmManager::patientGender() const 
 {
     QString sex ( "" );
-    if ( d->patientsTreeWidget )
-        if ( d->patientsTreeWidget->currentItem() )
-            sex = d->patientsTreeWidget->currentItem()->data ( 3,0 ).toString();
+    if ( d->patientsTreeWidget && d->patientsTreeWidget->currentItem() ) {
+        sex = d->patientsTreeWidget->currentItem()->data ( 3,0 ).toString();
+    }
+    
     qDebug() << sex;
     return sex;
 }
@@ -827,9 +829,10 @@ QString QtDcmManager::patientGender() const
 QString QtDcmManager::examDate() const 
 { 
     QString examDate;
-    if ( d->studiesTreeWidget )
-        if ( d->studiesTreeWidget->currentItem() )
-            examDate = d->studiesTreeWidget->currentItem()->data ( 1,0 ).toString();
+    if ( d->studiesTreeWidget && d->studiesTreeWidget->currentItem() ) {
+        examDate = d->studiesTreeWidget->currentItem()->data ( 1,0 ).toString();
+    }
+    
     qDebug() << examDate;
     return examDate;
 }
@@ -927,8 +930,9 @@ QString QtDcmManager::currentSeriesDirectory() const
 
 void QtDcmManager::addSerieToImport ( const QString &uid )
 {
-    if ( !d->seriesToImport.contains ( uid ) )
+    if ( !d->seriesToImport.contains ( uid ) ) {
         d->seriesToImport.append ( uid );
+    }
 }
 
 void QtDcmManager::removeSerieToImport ( const QString &uid )
