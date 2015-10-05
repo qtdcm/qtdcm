@@ -238,6 +238,11 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
 
     if ( cond.bad() ) {
         qDebug() << "Wrong presentation context:" << DimseCondition::dump ( temp_str, cond ).c_str();
+        T_ASC_RejectParameters rej;
+        ASC_getRejectParameters ( d->params, &rej );
+        ASC_printRejectParameters ( temp_str, &rej );
+        
+        ASC_dropNetwork ( &d->net );
         return cond;
     }
 
@@ -248,17 +253,29 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
             T_ASC_RejectParameters rej;
             ASC_getRejectParameters ( d->params, &rej );
             ASC_printRejectParameters ( temp_str, &rej );
+            
+            ASC_abortAssociation ( d->assoc );
+            ASC_dropNetwork ( &d->net );
+            
             qDebug() << "Association Rejected:" << QString ( temp_str.c_str() );
             return cond;
         }
         else {
             qDebug() << "Association Request Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
+            
+            ASC_abortAssociation ( d->assoc );
+            ASC_dropNetwork ( &d->net );
+                    
             return cond;
         }
     }
 
     if ( ASC_countAcceptedPresentationContexts ( d->params ) == 0 ) {
         qDebug() << "No Acceptable Presentation Contexts";
+        
+        ASC_abortAssociation ( d->assoc );
+        ASC_dropNetwork ( &d->net );
+        
         return cond;
     }
 
@@ -284,7 +301,9 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
             /* release association */
             qDebug() << "Releasing Association";
 //             cond = ASC_releaseAssociation(assoc); //Problem with error message Illegal Key
-            ASC_dropNetwork ( &d->net );
+            ASC_abortAssociation ( d->assoc );
+            cond = ASC_dropNetwork ( &d->net );
+            
             if ( cond.bad() ) {
                 qDebug() << "Association Release Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
                 return cond;
@@ -305,6 +324,9 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
     }
     else if ( cond == DUL_PEERABORTEDASSOCIATION ) {
         qDebug() << "Peer Aborted Association";
+        ASC_abortAssociation ( d->assoc );
+        ASC_dropNetwork ( &d->net );
+        
         return cond;
     }
     else {

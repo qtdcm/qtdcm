@@ -77,8 +77,7 @@ void QtDcmServersDicomSettingsWidget::readPreferences()
     QtDcmPreferences* prefs = QtDcmPreferences::instance();
     treeWidget->clear();
     
-    for ( int i = 0; i < prefs->servers().size(); i++ )
-    {
+    for ( int i = 0; i < prefs->servers().size(); i++ ) {
         QTreeWidgetItem * item = new QTreeWidgetItem ( treeWidget );
         item->setText ( 0, prefs->servers().at ( i ).name() );
         item->setData ( 0, 1, QVariant ( prefs->servers().at ( i ).name() ) );
@@ -206,8 +205,9 @@ void QtDcmServersDicomSettingsWidget::serverPortChanged (const QString &text)
 
 void QtDcmServersDicomSettingsWidget::sendEcho()
 {
-    if ( !treeWidget->currentItem() )
+    if ( !treeWidget->currentItem() ) {
         return;
+    }
 
     QtDcmPreferences* prefs = QtDcmPreferences::instance();
     
@@ -220,8 +220,7 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     T_ASC_Network *net = 0; // network struct, contains DICOM upper layer FSM etc.
 
     OFCondition cond = ASC_initializeNetwork ( NET_REQUESTOR, 0, 30 /* timeout */, &net );
-    if ( cond != EC_Normal )
-    {
+    if ( cond != EC_Normal ) {
         QMessageBox msgBox( QApplication::activeWindow() );
         msgBox.setIcon ( QMessageBox::Critical );
         msgBox.setText ( "Cannot initialize network" );
@@ -267,10 +266,8 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
     // request DICOM association
     T_ASC_Association *assoc = 0;
 
-    if ( ASC_requestAssociation ( net, params, &assoc ).good() )
-    {
-        if ( ASC_countAcceptedPresentationContexts ( params ) == 1 )
-        {
+    if ( ASC_requestAssociation ( net, params, &assoc ).good() ) {
+        if ( ASC_countAcceptedPresentationContexts ( params ) == 1 ) {
             // the remote SCP has accepted the Verification Service Class
             DIC_US id = assoc->nextMsgID++; // generate next message ID
             DIC_US status; // DIMSE status of C-ECHO-RSP will be stored here
@@ -284,16 +281,14 @@ void QtDcmServersDicomSettingsWidget::sendEcho()
             msgBox.setText ( "Echo request successful !" );
             msgBox.exec();
         }
-        else
-        {
+        else {
             QMessageBox msgBox( QApplication::activeWindow() );
             msgBox.setIcon ( QMessageBox::Critical );
             msgBox.setText ( "Wrong presentation context, echo request failed" );
             msgBox.exec();
         }
     }
-    else
-    {
+    else {
         QMessageBox msgBox( QApplication::activeWindow() );
         msgBox.setIcon ( QMessageBox::Critical );
         msgBox.setText ( "Wrong dicom association, echo request failed" );

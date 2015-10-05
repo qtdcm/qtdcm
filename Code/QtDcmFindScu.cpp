@@ -184,16 +184,16 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
     DcmFindSCU findscu;
 
     // test connection
-    if ( !this->checkServerConnection(10000) )
+    if ( !this->checkServerConnection(10000) ) {
         return false;
-
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
+    }
 
     if ( findscu.initializeNetwork ( d->networkTimeout ).bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
         return false;
     }
 
+    QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
     if ( findscu.performQuery ( d->manager->currentPacs().address().toUtf8().data(),
                                 d->manager->currentPacs().port().toInt(),
                                 QtDcmPreferences::instance()->aetitle().toUtf8().data(),
@@ -206,6 +206,8 @@ bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::
     if ( findscu.dropNetwork().bad() ) {
         d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
     }
-
+    
+    delete callback;
+    
     return true;
 }
