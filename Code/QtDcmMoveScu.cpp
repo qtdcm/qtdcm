@@ -253,21 +253,16 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
             T_ASC_RejectParameters rej;
             ASC_getRejectParameters ( d->params, &rej );
             ASC_printRejectParameters ( temp_str, &rej );
-            
-            ASC_abortAssociation ( d->assoc );
-            ASC_dropNetwork ( &d->net );
-            
-            qDebug() << "Association Rejected:" << QString ( temp_str.c_str() );
-            return cond;
         }
         else {
             qDebug() << "Association Request Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
-            
-            ASC_abortAssociation ( d->assoc );
-            ASC_dropNetwork ( &d->net );
-                    
-            return cond;
         }
+        
+        ASC_abortAssociation ( d->assoc );
+        ASC_dropNetwork ( &d->net );
+        
+        qDebug() << "Association Rejected:" << QString ( temp_str.c_str() );
+        return cond;
     }
 
     if ( ASC_countAcceptedPresentationContexts ( d->params ) == 0 ) {
@@ -301,11 +296,9 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
             /* release association */
             qDebug() << "Releasing Association";
 //             cond = ASC_releaseAssociation(assoc); //Problem with error message Illegal Key
-            ASC_abortAssociation ( d->assoc );
             cond = ASC_dropNetwork ( &d->net );
-            
-            if ( cond.bad() ) {
-                qDebug() << "Association Release Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
+            if (cond.bad()) {
+                qDebug() << "Drop Network Failed:" << DimseCondition::dump ( temp_str,cond ).c_str();
                 return cond;
             }
         }

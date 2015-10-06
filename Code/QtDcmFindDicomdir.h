@@ -39,11 +39,11 @@ public:
 
     void findPatients();
 
-    void findStudies ( QString patientName );
+    void findStudies ( const QString & patientName );
 
-    void findSeries ( QString patientName, QString studyUid );
+    void findSeries ( const QString & patientName, const QString & studyUid );
 
-    void findImages ( QString seriesUID );
+    void findImages ( const QString & seriesUID );
 
 private:
     QtDcmFindDicomdirPrivate * d;

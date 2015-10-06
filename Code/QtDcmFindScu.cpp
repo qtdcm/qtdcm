@@ -56,12 +56,12 @@ QtDcmFindScu::~QtDcmFindScu()
 }
 
 
-void QtDcmFindScu::findPatientsScu ( QString patientName )
+void QtDcmFindScu::findPatientsScu (const QString &patientName)
 {
     this->findPatientsScu ( patientName, "*" );
 }
 
-void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
+void QtDcmFindScu::findPatientsScu (const QString &patientName, const QString &patientSex)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "PATIENT" "" ) ).toUtf8().data() );
@@ -76,17 +76,17 @@ void QtDcmFindScu::findPatientsScu ( QString patientName, QString patientSex )
 
 }
 
-void QtDcmFindScu::findStudiesScu ( QString patientName )
+void QtDcmFindScu::findStudiesScu (const QString &patientName)
 {
     this->findStudiesScu ( patientName, "*", QDate ( 1900,01,01 ).toString ( "yyyyMMdd" ),QDate::currentDate().toString ( "yyyyMMdd" ) );
 }
 
-void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescription )
+void QtDcmFindScu::findStudiesScu(const QString &patientName, const QString &studyDescription)
 {
     this->findStudiesScu ( patientName, studyDescription, QDate ( 1900,01,01 ).toString ( "yyyyMMdd" ),QDate::currentDate().toString ( "yyyyMMdd" ) );
 }
 
-void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescription, QString startDate, QString endDate )
+void QtDcmFindScu::findStudiesScu (const QString &patientName, const QString &studyDescription, const QString &startDate, const QString &endDate)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "STUDY" "" ) ).toUtf8().data() );
@@ -101,17 +101,17 @@ void QtDcmFindScu::findStudiesScu ( QString patientName, QString studyDescriptio
 
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID )
+void QtDcmFindScu::findSeriesScu (const QString &patientName, const QString &studyUID)
 {
     this->findSeriesScu ( patientName, studyUID, "*", "*", "*" );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString modality )
+void QtDcmFindScu::findSeriesScu (const QString &patientName, const QString &studyUID, const QString &studyDescription, const QString &modality)
 {
     this->findSeriesScu ( patientName, studyUID, studyDescription, "*", modality );
 }
 
-void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString serieDescription, QString modality )
+void QtDcmFindScu::findSeriesScu (const QString &patientName, const QString &studyUID, const QString &studyDescription, const QString &serieDescription, const QString &modality)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) ).toUtf8().data() );
@@ -135,7 +135,7 @@ void QtDcmFindScu::findSeriesScu ( QString patientName, QString studyUID, QStrin
     doQuery ( overrideKeys, QtDcmFindCallback::SERIE );
 }
 
-void QtDcmFindScu::findImagesScu ( QString seriesUID )
+void QtDcmFindScu::findImagesScu (const QString &seriesUID)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
@@ -148,7 +148,7 @@ void QtDcmFindScu::findImagesScu ( QString seriesUID )
     doQuery ( overrideKeys, QtDcmFindCallback::IMAGES );
 }
 
-void QtDcmFindScu::findImageScu ( QString imageUID )
+void QtDcmFindScu::findImageScu (const QString &imageUID)
 {
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
@@ -177,37 +177,36 @@ bool QtDcmFindScu::checkServerConnection ( int timeout )
     return result;
 }
 
-bool QtDcmFindScu::doQuery ( OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level )
+bool QtDcmFindScu::doQuery ( const OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level )
 {
     //Image level
     OFList<OFString> fileNameList;
     DcmFindSCU findscu;
-
+    OFList<OFString> keys = overrideKeys;
+    
     // test connection
     if ( !this->checkServerConnection(10000) ) {
         return false;
     }
 
     if ( findscu.initializeNetwork ( d->networkTimeout ).bad() ) {
-        d->manager->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
+        QtDcmManager::instance()->displayErrorMessage ( tr ( "Cannot establish network connection" ) );
         return false;
     }
 
-    QtDcmFindCallback * callback = new QtDcmFindCallback ( level );
+    QtDcmFindCallback callback( level );
     if ( findscu.performQuery ( d->manager->currentPacs().address().toUtf8().data(),
                                 d->manager->currentPacs().port().toInt(),
                                 QtDcmPreferences::instance()->aetitle().toUtf8().data(),
                                 d->manager->currentPacs().aetitle().toUtf8().data(),
                                 UID_FINDPatientRootQueryRetrieveInformationModel, EXS_Unknown,
-                                DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &overrideKeys, callback, &fileNameList ).bad() ) {
-        d->manager->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
+                                DIMSE_BLOCKING, 0, ASC_DEFAULTMAXPDU, false, false, 1, false, -1, &keys, &callback, &fileNameList ).bad() ) {
+        QtDcmManager::instance()->displayErrorMessage ( tr ( "Cannot perform query C-FIND" ) );
     }
 
     if ( findscu.dropNetwork().bad() ) {
-        d->manager->displayErrorMessage ( tr ( "Cannot drop network" ) );
+        QtDcmManager::instance()->displayErrorMessage ( tr ( "Cannot drop network" ) );
     }
-    
-    delete callback;
     
     return true;
 }

@@ -95,19 +95,20 @@ void QtDcmConvert::convert()
         inputNames->LoadSequencesOn();
         inputNames->LoadPrivateTagsOn();
         inputNames->SetInputDirectory ( d->inputDirectory.toStdString() );
-        try
-        {
+        try {
             const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
+            if (seriesUID.empty()) { // Prevent crash
+                qDebug() << "Series uid list is empty";
+                return;
+            }
             std::string seriesIdentifier = seriesUID.begin()->c_str();
             FileNamesContainer filenames = inputNames->GetFileNames ( seriesIdentifier );
 
             dicomIO->SetFileName ( filenames.begin()->c_str() );
-            try
-            {
+            try {
                 dicomIO->ReadImageInformation();
             }
-            catch ( itk::ExceptionObject &e )
-            {
+            catch ( itk::ExceptionObject &e ) {
                 qDebug() << e.GetDescription();
                 return;
             }
@@ -116,12 +117,10 @@ void QtDcmConvert::convert()
             reader->SetFileNames ( filenames );
             reader->SetImageIO ( dicomIO );
 
-            try
-            {
+            try {
                 reader->Update();
             }
-            catch ( itk::ExceptionObject &excp )
-            {
+            catch ( itk::ExceptionObject &excp ) {
                 std::cerr << excp << std::endl;
                 return;
             }
@@ -180,18 +179,15 @@ void QtDcmConvert::convert()
             writer->SetInput ( reader->GetOutput() );
 //         writer->SetInput ( image );
 
-            try
-            {
+            try {
                 writer->Update();
             }
-            catch ( itk::ExceptionObject &ex )
-            {
+            catch ( itk::ExceptionObject &ex ) {
                 std::cout << ex << std::endl;
                 return;
             }
         }
-        catch ( itk::ExceptionObject &ex )
-        {
+        catch ( itk::ExceptionObject &ex ) {
             std::cout << ex << std::endl;
             return;
         }

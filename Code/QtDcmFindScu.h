@@ -31,31 +31,46 @@ public:
     explicit QtDcmFindScu ( QObject * parent = 0);
     virtual ~QtDcmFindScu();
 
-    void findPatientsScu ( QString patientName );
+    void findPatientsScu ( const QString & patientName );
 
-    void findPatientsScu ( QString patientName, QString patientSex );
+    void findPatientsScu ( const QString & patientName, 
+                           const QString & patientSex );
 
-    void findStudiesScu ( QString patientName );
+    void findStudiesScu ( const QString & patientName );
 
-    void findStudiesScu ( QString patientName, QString studyDescription );
+    void findStudiesScu ( const QString & patientName, 
+                          const QString & studyDescription );
 
-    void findStudiesScu ( QString patientName, QString studyDescription, QString startDate, QString endDate );
+    void findStudiesScu ( const QString & patientName, 
+                          const QString & studyDescription, 
+                          const QString & startDate, 
+                          const QString & endDate );
 
-    void findSeriesScu ( QString patientName, QString studyUID );
+    void findSeriesScu ( const QString & patientName, 
+                         const QString & studyUID );
 
-    void findSeriesScu ( QString patientName, QString studyUID, QString modality );
+    void findSeriesScu ( const QString & patientName, 
+                         const QString & studyUID, 
+                         const QString & modality );
 
-    void findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString modality );
+    void findSeriesScu ( const QString & patientName, 
+                         const QString & studyUID, 
+                         const QString & studyDescription, 
+                         const QString & modality );
 
-    void findSeriesScu ( QString patientName, QString studyUID, QString studyDescription, QString serieDescription, QString modality );
+    void findSeriesScu ( const QString & patientName, 
+                         const QString & studyUID, 
+                         const QString & studyDescription, 
+                         const QString & serieDescription, 
+                         const QString & modality );
 
-    void findImagesScu ( QString seriesUID );
+    void findImagesScu ( const QString & seriesUID );
 
-    void findImageScu ( QString imageUID);
+    void findImageScu ( const QString & imageUID);
 
 protected:
 
-    bool doQuery(OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level);
+    bool doQuery(const OFList<OFString>& overrideKeys, QtDcmFindCallback::cbType level);
 
     /**
      * test if the current selected pacs is available
