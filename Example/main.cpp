@@ -9,11 +9,10 @@
 #include "dicom.h"
 #include <QtDcmManager.h>
 
-int
-main( int argc , char *argv[] )
-  {
+int main( int argc , char *argv[] )
+{
     QApplication app(argc, argv);
-
+    
     Dicom dcm;
     dcm.setWindowIcon(QIcon(":Images/dicom.xpm"));
     dcm.show();
@@ -22,4 +21,4 @@ main( int argc , char *argv[] )
     QtDcmManager::destroy();
     
     return ret;
-  }
+}

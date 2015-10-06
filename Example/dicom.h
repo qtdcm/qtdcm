@@ -13,18 +13,18 @@
 #include "ui_dicom.h"
 
 class Dicom : public QMainWindow
-  {
-  Q_OBJECT
-  private:
-
-  public:
+{
+    Q_OBJECT
+private:
+    
+public:
     Ui::Dicom ui;
     Dicom( QWidget *parent = 0 );
     ~Dicom();
-
-  public slots:
+    
+public slots:
     void openDicomdir();
     void exportSerie();
     void preferences();
-  };
+};
 #endif

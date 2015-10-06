@@ -19,78 +19,84 @@ set(${PROJECT_NAME}_RCCS
 )
 
 set(${PROJECT_NAME}_HDRS
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmImage.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmSerie.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmStudy.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPatient.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServer.h
+  QtDcmImage.h
+  QtDcmSerie.h
+  QtDcmStudy.h
+  QtDcmPatient.h
+  QtDcmServer.h
 )
 
 set(${PROJECT_NAME}_SRCS
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmFindCallback.cpp
+  QtDcmFindCallback.cpp
 )
 
-
 set(${PROJECT_NAME}_UIS
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcm.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmImportWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmPreviewWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmSerieInfoWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmLocalDicomSettingsWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmServersDicomSettingsWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmDcm2niiSettingsWidget.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmpreferencesdialog.ui
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/qtdcmpreferenceswidget.ui
+  qtdcm.ui
+  qtdcmImportWidget.ui
+  qtdcmPreviewWidget.ui
+  qtdcmSerieInfoWidget.ui
+  qtdcmLocalDicomSettingsWidget.ui
+  qtdcmServersDicomSettingsWidget.ui
+  qtdcmDcm2niiSettingsWidget.ui
+  qtdcmpreferencesdialog.ui
+  qtdcmpreferenceswidget.ui
 )
 
 set(${PROJECT_NAME}_MOC_HDRS   
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcm.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmImportWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreviewWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmLocalDicomSettingsWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServersDicomSettingsWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmDcm2niiSettingsWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmManager.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmFindScu.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmFindDicomdir.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmMoveScu.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmMoveDicomdir.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmConvert.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferences.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesWidget.h
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesDialog.h
+  QtDcm.h
+  QtDcmImportWidget.h
+  QtDcmPreviewWidget.h
+  QtDcmSerieInfoWidget.h
+  QtDcmLocalDicomSettingsWidget.h
+  QtDcmServersDicomSettingsWidget.h
+  QtDcmDcm2niiSettingsWidget.h
+  QtDcmManager.h
+  QtDcmFindScu.h
+  QtDcmFindDicomdir.h
+  QtDcmMoveScu.h
+  QtDcmMoveDicomdir.h
+  QtDcmConvert.h
+  QtDcmPreferences.h
+  QtDcmPreferencesWidget.h
+  QtDcmPreferencesDialog.h
 )
 
 set(${PROJECT_NAME}_MOC_SRCS
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcm.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmImportWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreviewWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmSerieInfoWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmLocalDicomSettingsWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServersDicomSettingsWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmDcm2niiSettingsWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmManager.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmFindScu.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmFindDicomdir.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmMoveScu.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmMoveDicomdir.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmConvert.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmImage.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmSerie.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmStudy.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPatient.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferences.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesWidget.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmPreferencesDialog.cpp
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code/QtDcmServer.cpp
+  QtDcm.cpp
+  QtDcmImportWidget.cpp
+  QtDcmPreviewWidget.cpp
+  QtDcmSerieInfoWidget.cpp
+  QtDcmLocalDicomSettingsWidget.cpp
+  QtDcmServersDicomSettingsWidget.cpp
+  QtDcmDcm2niiSettingsWidget.cpp
+  QtDcmManager.cpp
+  QtDcmFindScu.cpp
+  QtDcmFindDicomdir.cpp
+  QtDcmMoveScu.cpp
+  QtDcmMoveDicomdir.cpp
+  QtDcmConvert.cpp
+  QtDcmImage.cpp
+  QtDcmSerie.cpp
+  QtDcmStudy.cpp
+  QtDcmPatient.cpp
+  QtDcmPreferences.cpp
+  QtDcmPreferencesWidget.cpp
+  QtDcmPreferencesDialog.cpp
+  QtDcmServer.cpp
 )
 
 qt5_add_resources(${PROJECT_NAME}_RCC_SRCS ${${PROJECT_NAME}_RCCS})
 qt5_wrap_ui( ${PROJECT_NAME}_UI_HDRS ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp( ${PROJECT_NAME}_MOC_SRCS ${${PROJECT_NAME}_MOC_HDRS})
 
-include_directories(${CMAKE_BINARY_DIR} ${${PROJECT_NAME}_SOURCE_DIR}/Code ${${PROJECT_NAME}_BINARY_DIR}/Code ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIR})
+include_directories(
+  ${CMAKE_BINARY_DIR} 
+  ${${PROJECT_NAME}_SOURCE_DIR}/Code 
+  ${${PROJECT_NAME}_BINARY_DIR}/Code 
+  ${ITK_INCLUDE_DIRS} 
+  ${VTK_INCLUDE_DIRS} 
+  ${DCMTK_INCLUDE_DIR}
+)
 
 set(${PROJECT_NAME}_LIBRARIES
   Qt5::Core
@@ -154,7 +160,10 @@ set(${PROJECT_NAME}_HEADERS
 
 install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/qtdcm)
 if (WIN32 AND BUILD_SHARED_LIBS)
-  install(TARGETS qtdcm RUNTIME DESTINATION lib)
+  install(TARGETS qtdcm RUNTIME DESTINATION bin
+                        LIBRARY DESTINATION lib
+                        ARCHIVE DESTINATION lib
+  )
 else ()
   install(TARGETS qtdcm LIBRARY DESTINATION lib)
 endif ()

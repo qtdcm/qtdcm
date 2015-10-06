@@ -23,5 +23,5 @@ link_directories(${QTDCM_LIBRARY_DIRS})
 
 ## SETTING QTDCM LIBS
 SET(QTDCM_LIBS
-qtdcm
+  qtdcm
 )
