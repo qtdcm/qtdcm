@@ -1,23 +1,18 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
 
-project(dicom)
+project(dicom VERSION "2.0.2")
 
 if(NOT MSVC)
   add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}")
-set (QTDCM_DIR "${QTDCM_BINARY_DIR}")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}")
+set(QTDCM_DIR ${QtDcm_BINARY_DIR})
 
 find_package(QtDCM REQUIRED)
-if (QTDCM_FOUND)
+if(QTDCM_FOUND)
   include(${QTDCM_USE_FILE})
-endif (QTDCM_FOUND)
-
-find_package(ITK REQUIRED)
-if(ITK_FOUND)
-  include(${ITK_USE_FILE})
-endif(ITK_FOUND)
+endif()
 
 find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 
@@ -46,27 +41,28 @@ set(QT_LIBRARIES
 )
 
 if(WIN32)
-  set(QT_LIBRARIES ${QT_LIBRARIES}
-    Qt5::WinMain
-  )
+  list(APPEND QT_LIBRARIES Qt5::WinMain)
 endif()
 
-include_directories(${CMAKE_BINARY_DIR} ${QTDCM_INCLUDE_DIR} ${QTDCM_DIR} ${${PROJECT_NAME}_BINARY_DIR})
+set(INCLUDE_DIRECTORIES
+  ${QTDCM_INCLUDE_DIRS}
+  ${QTDCM_BINARY_DIR}
+  ${${PROJECT_NAME}_BINARY_DIR}
+  ${${PROJECT_NAME}_SOURCE_DIR}
+)
+include_directories(${INCLUDE_DIRECTORIES})
 
-add_executable( ${PROJECT_NAME} WIN32 ${${PROJECT_NAME}_SRCS} ${${PROJECT_NAME}_HDRS}  ${${PROJECT_NAME}_MOC_HDRS} ${${PROJECT_NAME}_MOC_SRCS} ${${PROJECT_NAME}_UI_HDRS})
+add_executable( ${PROJECT_NAME} WIN32 
+                ${${PROJECT_NAME}_HDRS}  
+                ${${PROJECT_NAME}_SRCS} 
+                ${${PROJECT_NAME}_MOC_HDRS} 
+                ${${PROJECT_NAME}_MOC_SRCS} 
+                ${${PROJECT_NAME}_UI_HDRS})
+
 target_link_libraries( ${PROJECT_NAME}
   qtdcm
   ${QT_LIBRARIES}
 )
-
-if(WIN32)
-   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
-   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
-   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:WINDOWS")
-   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "/SUBSYSTEM:WINDOWS")
-   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
-   set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS")
-endif()
 
 if(APPLE)
   include(FixDCMTKMacLink)

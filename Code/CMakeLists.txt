@@ -4,10 +4,11 @@ find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 
 find_package(DCMTK REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIRS})
-IF(APPLE)
+
+if(APPLE)
   include(FixDCMTKMacInstall)
   FixDCMTKMacInstall()
-ENDIF(APPLE)
+endif()
 
 find_package(ITK REQUIRED)
 if(ITK_FOUND)
@@ -129,22 +130,15 @@ target_link_libraries(qtdcm
 if(APPLE)
   include(FixDCMTKMacLink)
   FixDCMTKMacLibLink(qtdcm)
-endif(APPLE)
+endif()
 
 # External inclusion stuff :
 set(${PROJECT_NAME}_USE_FILE ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
-set(${PROJECT_NAME}_LIBRARY_DEPENDS_FILE ${${PROJECT_NAME}_BINARY_DIR}/QtDCMLibraryDepends.cmake)
-set(${PROJECT_NAME}_BUILD_SETTINGS_FILE ${${PROJECT_NAME}_BINARY_DIR}/QtDCMBuildSettings.cmake)
-# Copy the UseQtDCM.cmake file to the binary tree for backward compatability.
+
 configure_file(${${PROJECT_NAME}_SOURCE_DIR}/CMake/UseQtDCM.cmake.in
               ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
 configure_file(${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMConfig.cmake.in
               ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake)
-
-# Save the compiler settings so another project can import them.
-include(${CMAKE_ROOT}/Modules/CMakeExportBuildSettings.cmake)
-cmake_export_build_settings(${${PROJECT_NAME}_BINARY_DIR}/QtDCMBuildSettings.cmake)
-export_library_dependencies(${${PROJECT_NAME}_BINARY_DIR}/QtDCMLibraryDepends.cmake)
 
 # Create the QtDCMConfig.cmake file containing the QtDCM configuration used with make install and CPack.
 # include (${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMGenerateInstall.cmake)
@@ -159,7 +153,7 @@ set(${PROJECT_NAME}_HEADERS
 )
 
 install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/qtdcm)
-if (WIN32 AND BUILD_SHARED_LIBS)
+if (WIN32)
   install(TARGETS qtdcm RUNTIME DESTINATION bin
                         LIBRARY DESTINATION lib
                         ARCHIVE DESTINATION lib

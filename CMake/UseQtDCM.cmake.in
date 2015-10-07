@@ -5,16 +5,16 @@
 # obtained from QtDCMConfig.cmake.
 #
 
-IF(QTDCM_BUILD_SETTINGS_FILE)
-  INCLUDE("${CMAKE_ROOT}/Modules/CMakeImportBuildSettings.cmake")
-  CMAKE_IMPORT_BUILD_SETTINGS("${QTDCM_BUILD_SETTINGS_FILE}")
-ENDIF(QTDCM_BUILD_SETTINGS_FILE)
-
 # Add include directories needed to use QtDcm.
-INCLUDE_DIRECTORIES(${QTDCM_INCLUDE_DIRS} ${QTDCM_BINARY_DIR}/Code)
+include_directories(@QTDCM_INCLUDE_DIRS@ @QtDcm_BINARY_DIR@/Code)
 
 # Add link directories needed to use QtDcm.
-LINK_DIRECTORIES(${QTDCM_LIBRARY_DIRS})
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QTDCM_CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@QTDCM_CMAKE_MODULE_PATH@")
 
 find_package( Qt5 REQUIRED  COMPONENTS Core Gui Network)
+
+find_package(ITK REQUIRED)
+if(ITK_FOUND)
+  include(${ITK_USE_FILE})
+endif()
+

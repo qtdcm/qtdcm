@@ -18,22 +18,22 @@
 #                 compatability.  Use QtM3d_USE_FILE
 #                 instead.
 
-FIND_PATH(QTDCM_DIR UseQtDCM.cmake 
+find_path(QTDCM_DIR UseQtDCM.cmake 
   /usr/lib/qtdcm-0.1 
   /usr/local/lib/qtdcm-0.1
-  /home/aabadie/Softs/builds/qtdcm2
-  DOC "QTDCM directory")
+  "C:/Program Files/QtDcm/share/qtdcm"
+  "C:/Program Files (x86)/QtDcm/share/qtdcm"
+  DOC "QTDCM directory"
+)
 
-SET(QTDCM_CONFIG_FILE ${QTDCM_DIR}/QtDCMConfig.cmake)
-SET(QTDCM_USE_FILE ${QTDCM_DIR}/UseQtDCM.cmake)
+set(QTDCM_CONFIG_FILE "${QTDCM_DIR}/QtDCMConfig.cmake")
 # path is okay
-IF (EXISTS ${QTDCM_CONFIG_FILE})
-  SET(QTDCM_FOUND 1)
-  INCLUDE (${QTDCM_CONFIG_FILE})
-  INCLUDE (${QTDCM_USE_FILE})
-ELSE (EXISTS ${QTDCM_CONFIG_FILE})
-  SET(QTDCM_FOUND 0)
-  IF(QTDCM_FIND_REQUIRED)
-    MESSAGE(FATAL_ERROR "Please set QTDCM_DIR to the correct value")
-  ENDIF(QTDCM_FIND_REQUIRED)
-ENDIF (EXISTS ${QTDCM_CONFIG_FILE})
+if(EXISTS ${QTDCM_CONFIG_FILE})
+  set(QTDCM_FOUND 1)
+  include(${QTDCM_CONFIG_FILE})
+else()
+  set(QTDCM_FOUND 0)
+  if(QTDCM_FIND_REQUIRED)
+    message(FATAL_ERROR "Please set QTDCM_DIR to the correct value")
+  endif()
+endif()
