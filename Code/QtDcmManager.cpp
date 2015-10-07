@@ -66,7 +66,6 @@ public:
     QString outputDir;                               /** Output directory for reconstructed serie absolute path */
     QDir currentSerieDir;                            /** Directory containing current serie dicom slice */
     QDir tempDir;                                    /** Qtdcm temporary directory (/tmp/qtdcm on Unix) */
-    QDir logsDir;                                    /** Directory of the reconstruction process logs file (/tmp/qtdcm/logs) */
     DcmFileFormat dfile;                             /** This attribute is usefull for parsing the dicomdir */
     QList<QtDcmPatient> patients;                  /** List that contains patients resulting of a query or read from a CD */
     QStringList images;                           /** List of image filename to export from a CD */
@@ -123,7 +122,7 @@ void QtDcmManager::destroy()
 QtDcmManager::QtDcmManager(QObject *parent)
     : QObject(parent),
       d ( new QtDcmManagerPrivate )
-{
+{   
     //Initialization of the private attributes
     d->useConverter = true;
     d->mode = PACS;
@@ -156,6 +155,8 @@ QtDcmManager::QtDcmManager(QObject *parent)
 
 QtDcmManager::~QtDcmManager()
 {   
+    this->deleteTemporaryDirs();
+    
     QtDcmPreferences::destroy();
     delete d;
 }
@@ -526,10 +527,14 @@ void QtDcmManager::importSelectedSeries()
                 QFileDialog dialog( d->mainWidget );
                 dialog.setFileMode ( QFileDialog::Directory );
                 dialog.setOption ( QFileDialog::ShowDirsOnly, true );
-                dialog.setDirectory ( QDir::home().dirName() );
+                
+                // Trying to open directly on one of the available drives
+                if (!QDir::drives().isEmpty()) {
+                    dialog.setDirectory ( QDir::drives().first().absoluteDir() );
+                }
+                
                 dialog.setWindowTitle ( tr ( "Export directory" ) );
                 QString directory;
-
                 if ( dialog.exec() ) {
                     directory = dialog.selectedFiles() [0];
                 }
@@ -563,17 +568,18 @@ void QtDcmManager::importToDirectory ( const QString &directory )
 
 void QtDcmManager::onSerieMoved ( const QString &directory , const QString &serie , int number )
 {
-    emit serieMoved ( directory );
     if ( d->useConverter ) {
-        QtDcmConvert * converter = new QtDcmConvert ( this );
-        converter->setInputDirectory ( directory );
-        converter->setOutputFilename ( serie + ".nii" );
-        converter->setOutputDirectory ( d->outputDir );
-        converter->setTempDirectory ( d->tempDir.absolutePath() );
-        converter->setSerieUID ( serie );
-        converter->convert();
-        delete converter;
-
+        qDebug() << "Starting reconstruction of series" << serie;
+        
+        QtDcmConvert converter( this );
+        converter.setInputDirectory ( directory );
+        converter.setOutputFilename ( serie + ".nii" );
+        converter.setOutputDirectory ( d->outputDir );
+        converter.setTempDirectory ( d->tempDir.absolutePath() );
+        converter.setSerieUID ( serie );
+        converter.convert();
+        qDebug() << "Conversion complete";
+        
         if ( number == this->seriesToImportSize() - 1 ) {
             emit importFinished();
         }
@@ -612,36 +618,15 @@ void QtDcmManager::createTemporaryDirs()
         qtdcmDir.mkdir ( randName );
     }
 
-    d->tempDir = QDir ( qtdcmDir.absolutePath() + QDir::separator() + randName ); // tempDir = /tmp/qtdcm
-
-    if ( !d->tempDir.exists ( "logs" ) ) {
-        if ( !d->tempDir.mkdir ( "logs" ) )
-            qDebug() << tr ( "Repertoire logs non cree" );
-    }
-
-    d->logsDir = QDir ( d->tempDir.absolutePath() + QDir::separator() + "logs" );
+    d->tempDir = QDir ( qtdcmDir.absolutePath() + QDir::separator() + randName );
 }
 
 void QtDcmManager::deleteTemporaryDirs()
 {   
-    foreach( const QString &dir, d->logsDir.entryList ( QDir::Files, QDir::Name )) {
-        d->logsDir.remove ( dir );
+    QDir qtdcmTmpDir(QDir::tempPath() + QDir::separator() + "qtdcm");
+    if(!qtdcmTmpDir.removeRecursively()) {
+        qWarning() << "Cannot remove recursively temporary directory" << qtdcmTmpDir.absolutePath();
     }
-    d->tempDir.rmdir ( "logs" );
-
-    const QStringList listSerie = d->tempDir.entryList ( QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name );
-
-    foreach (const QString &serie, listSerie) {
-        QDir serieDir ( d->tempDir.absolutePath() + QDir::separator() + serie);
-        const QStringList listFiles = serieDir.entryList ( QDir::Files, QDir::Name );
-        foreach (const QString & file, listFiles) {
-            serieDir.remove ( file );
-        }
-        
-        d->tempDir.rmdir ( serie );
-    }
-
-    QDir ( QDir::tempPath() ).rmdir ( d->tempDir.dirName() );
 }
 
 void QtDcmManager::generateCurrentSerieDir()

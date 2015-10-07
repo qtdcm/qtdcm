@@ -1,24 +1,7 @@
 #CPack config file
 if(BUILD_PACKAGE)
   message(STATUS "Configuring CPack")
-  if(WIN32)
-    option(BUILD_PACKAGE_BINARY "Build runtime package" ON)
-    option(BUILD_PACKAGE_SDK "Build development package" OFF)
-    mark_as_advanced(BUILD_PACKAGE BUILD_PACKAGE_BINARY BUILD_PACKAGE_SDK)
-  else()
-    if (APPLE)
-      option(BUILD_PACKAGE_BINARY "Package binary distribution of QtDCM" ON)
-      option(BUILD_PACKAGE_SDK "Package development distribution of QtDCM" OFF)
-      mark_as_advanced(BUILD_PACKAGE BUILD_PACKAGE_BINARY BUILD_PACKAGE_SDK)
-    else() # For Linux
-      option(BUILD_PACKAGE_DEBIAN "Build debian package" ON)
-      option(BUILD_PACKAGE_RPM "Build rpm package" ON)
-      option(BUILD_PACKAGE_BINARY "Package binary distribution of QtDCM" ON)
-      option(BUILD_PACKAGE_DEV "Package development distribution of QtDCM" OFF)
-      mark_as_advanced(BUILD_PACKAGE BUILD_PACKAGE_DEBIAN BUILD_PACKAGE_RPM BUILD_PACKAGE_BINARY BUILD_PACKAGE_DEV)
-    endif()
-  endif()
-  
+
   set(BUILD_TESTING OFF)
   include(InstallRequiredSystemLibraries)
   set(CPACK_GENERATOR "")

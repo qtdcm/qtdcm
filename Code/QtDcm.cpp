@@ -90,8 +90,6 @@ QtDcm::QtDcm ( QWidget *parent )
 
 QtDcm::~QtDcm()
 {
-  QtDcmManager::instance()->deleteTemporaryDirs();
-
   delete d;
   d = NULL;
 }
@@ -215,16 +213,15 @@ void QtDcm::openDicomdir()
     d->mode = QtDcm::CD;
     // Open a QFileDialog for choosing a Dicomdir
     QFileDialog dialog(this);
-    dialog.setFileMode ( QFileDialog::ExistingFile );
-    dialog.setDirectory ( QDir::home().dirName() );
     dialog.setWindowTitle ( tr ( "Open dicomdir" ) );
-    QStringList filters;
-    filters << "Dicomdir files (dicomdir* DICOMDIR*)";
-    filters << "Any files (*)";
-    dialog.setNameFilters(filters);
-
+    dialog.setNameFilters(QStringList() << "Dicomdir files (dicomdir* DICOMDIR*)");
+    
+    // Trying to open directly on one of the available drives
+    if (!QDir::drives().isEmpty()) {
+        dialog.setDirectory ( QDir::drives().first().absoluteDir() );
+    }
+    
     QString fileName;
-
     if ( dialog.exec() ) {
         fileName = dialog.selectedFiles() [0];
     }

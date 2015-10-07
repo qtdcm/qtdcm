@@ -57,8 +57,7 @@ QtDcmConvert::~QtDcmConvert()
 
 void QtDcmConvert::convert()
 {
-    if (QtDcmPreferences::instance()->useDcm2nii())
-    {
+    if (QtDcmPreferences::instance()->useDcm2nii()) {
         const QString program = QtDcmPreferences::instance()->dcm2niiPath();
         QStringList arguments;
         arguments << "-x" << "N";
@@ -71,8 +70,7 @@ void QtDcmConvert::convert()
         process.start(program, arguments);
         process.waitForFinished();
     }
-    else
-    {
+    else {
         typedef signed short                                PixelType;
         const unsigned int Dimension = 3;
         typedef itk::Image< PixelType, Dimension >          ImageType;
@@ -98,7 +96,7 @@ void QtDcmConvert::convert()
         try {
             const SeriesIdContainer & seriesUID = inputNames->GetSeriesUIDs();
             if (seriesUID.empty()) { // Prevent crash
-                qDebug() << "Series uid list is empty";
+                qCritical() << "Series uid list is empty";
                 return;
             }
             std::string seriesIdentifier = seriesUID.begin()->c_str();
@@ -109,7 +107,7 @@ void QtDcmConvert::convert()
                 dicomIO->ReadImageInformation();
             }
             catch ( itk::ExceptionObject &e ) {
-                qDebug() << e.GetDescription();
+                qCritical() << e.GetDescription();
                 return;
             }
 
@@ -121,7 +119,7 @@ void QtDcmConvert::convert()
                 reader->Update();
             }
             catch ( itk::ExceptionObject &excp ) {
-                std::cerr << excp << std::endl;
+                qCritical() << excp.GetDescription();
                 return;
             }
 
@@ -183,12 +181,12 @@ void QtDcmConvert::convert()
                 writer->Update();
             }
             catch ( itk::ExceptionObject &ex ) {
-                std::cout << ex << std::endl;
+                qCritical() << ex.GetDescription();
                 return;
             }
         }
         catch ( itk::ExceptionObject &ex ) {
-            std::cout << ex << std::endl;
+            qCritical() << ex.GetDescription();
             return;
         }
     }

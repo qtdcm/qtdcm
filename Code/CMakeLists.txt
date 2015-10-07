@@ -158,6 +158,16 @@ if (WIN32)
                         LIBRARY DESTINATION lib
                         ARCHIVE DESTINATION lib
   )
+
+  # Also copy dependencies when generating an auto-installer package
+  if(BUILD_PACKAGE)
+    include(GetPrerequisites)
+    get_prerequisites(${LIBRARY_OUTPUT_PATH}/qtdcm.dll WIN32_PREREQUISITES 1 0 "" "")
+    foreach(DEPENDENCY_FILE ${WIN32_PREREQUISITES})
+      gp_resolve_item("${LIBRARY_OUTPUT_PATH}/qtdcm.dll" "${DEPENDENCY_FILE}" "" "" resolved_file)
+      install(FILES ${resolved_file} DESTINATION bin)
+    endforeach()
+  endif()
 else ()
   install(TARGETS qtdcm LIBRARY DESTINATION lib)
 endif ()

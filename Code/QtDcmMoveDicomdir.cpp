@@ -97,8 +97,7 @@ void QtDcmMoveDicomdir::run()
     int step = ( int ) ( 100.0 / d->series.size() );
     int progress = 0;
 
-    for ( int s = 0; s < d->series.size(); s++ )
-    {
+    for ( int s = 0; s < d->series.size(); s++ ) {
         QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( s ) );
 
         if ( !serieDir.exists() )
@@ -120,8 +119,7 @@ void QtDcmMoveDicomdir::run()
         if ( !d->dcmObject->findAndGetElements ( DCM_Item, itemsTmp ).good() )
             return;
 
-        while ( itemsTmp.card() > 0 )
-        {
+        while ( itemsTmp.card() > 0 ) {
             d->dicomdirItems.push ( itemsTmp.top() );
             itemsTmp.pop();
         }
@@ -132,65 +130,55 @@ void QtDcmMoveDicomdir::run()
 
         //Unstacking and loading the different lists
 
-        while ( d->dicomdirItems.card() > 0 )
-        {
+        while ( d->dicomdirItems.card() > 0 ) {
             DcmItem* lobj = ( DcmItem* ) d->dicomdirItems.top();
             DcmStack dirent;
 
             OFCondition condition = lobj->findAndGetElements ( DCM_DirectoryRecordType, dirent );
 
-            if ( !condition.good() )
-            {
+            if ( !condition.good() ) {
                 d->dicomdirItems.pop();
                 continue;
             }
 
-            while ( dirent.card() )
-            {
+            while ( dirent.card() ) {
                 DcmElement* elt = ( DcmElement* ) dirent.top();
                 OFString cur;
                 elt->getOFStringArray ( cur );
 
-                if ( cur ==Patient )
-                {
+                if ( cur ==Patient ) {
                     DcmElement* lelt;
 
                     if ( lobj->findAndGetElement ( DCM_PatientName, lelt ).good() )
                         lelt->getOFStringArray ( strName );
                 }
 
-                if ( cur == Study )
-                {
+                if ( cur == Study ) {
                     DcmElement* lelt;
 
                     if ( lobj->findAndGetElement ( DCM_StudyDate, lelt ).good() )
                         lelt->getOFStringArray ( strDate );
                 }
 
-                if ( cur == Series )
-                {
+                if ( cur == Series ) {
                     DcmElement* lelt;
 
-                    if ( lobj->findAndGetElement ( DCM_SeriesInstanceUID, lelt ).good() )
-                    {
+                    if ( lobj->findAndGetElement ( DCM_SeriesInstanceUID, lelt ).good() ) {
                         OFString strID;
                         lelt->getOFStringArray ( strID );
                         proceed = ( QString ( strID.c_str() ) == d->series.at ( s ) );
                     }
 
-                    if ( proceed )
-                    {
+                    if ( proceed ) {
                         if ( lobj->findAndGetElement ( DCM_SeriesDescription, lelt ).good() )
                             lelt->getOFStringArray ( strDesc );
                     }
                 }
 
-                if ( ( cur == Image ) && proceed )
-                {
+                if ( ( cur == Image ) && proceed ) {
                     DcmElement* lelt;
 
-                    if ( lobj->findAndGetElement ( DCM_ReferencedSOPInstanceUIDInFile, lelt ).good() )
-                    {
+                    if ( lobj->findAndGetElement ( DCM_ReferencedSOPInstanceUIDInFile, lelt ).good() ) {
                         OFString strNumber;
                         lelt->getOFStringArray ( strNumber );
 
@@ -208,8 +196,7 @@ void QtDcmMoveDicomdir::run()
 //                             proceedIndex = ( QString ( strNumber.c_str() ).toInt() == d->index );
 //                     }
 
-                    if ( lobj->findAndGetElement ( DCM_ReferencedFileID, lelt ).good() )
-                    {
+                    if ( lobj->findAndGetElement ( DCM_ReferencedFileID, lelt ).good() ) {
                         OFString strFilename;
                         lelt->getOFStringArray ( strFilename );
 
@@ -236,27 +223,25 @@ void QtDcmMoveDicomdir::run()
 
         d->dicomdirItems.clear();
 
-        if ( d->mode == QtDcmMoveDicomdir::IMPORT )
-        {
-            for ( int i = 0; i < d->filenames.size(); i++ )
-            {
+        if ( d->mode == QtDcmMoveDicomdir::IMPORT ) {
+            for ( int i = 0; i < d->filenames.size(); i++ ) {
                 QFile image ( d->filenames.at ( i ) );
 
-                if ( image.exists() )
-                {
+                if ( image.exists() ) {
                     QString zeroStr;
                     zeroStr.fill ( QChar ( '0' ), 5 - QString::number ( i ).size() );
-                    image.copy ( serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number ( i ) );
+                    QString newFile(serieDir.absolutePath() + QDir::separator() + "ima" + zeroStr + QString::number ( i ));
+                    image.copy(newFile);
+                    QFile(newFile).setPermissions(QFileDevice::WriteOwner);
+                    
                     emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
                 }
             }
             emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) , s );
             progress += step;
         }
-        else
-        {
-            if ( !d->filenames.isEmpty() )
-            {
+        else {
+            if ( !d->filenames.isEmpty() ) {
                 QFile filename ( d->filenames.first() );
                 emit previewSlice ( filename.fileName() );
             }

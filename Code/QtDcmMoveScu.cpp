@@ -173,9 +173,9 @@ void QtDcmMoveScu::run()
 
         if ( d->mode == IMPORT ) {
             cond = this->move ( d->series.at ( i ) );
-            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i );
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             d->progressTotal += d->step;
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( i ), i );
         }
         else {
             cond = this->move ( d->imageId );
@@ -889,7 +889,9 @@ void QtDcmMoveScu::moveCallback ( void *caller, T_DIMSE_C_MoveRQ * req, int resp
     DIMSE_dumpMessage ( temp_str, *rsp, DIMSE_INCOMING );
 
     qDebug() << "Move Response " << responseCount << ":";
-    qDebug() << QString ( temp_str.c_str() );
+    foreach (const QString &msg, QString ( temp_str.c_str() ).split('\n')) {
+        qDebug() << msg;   
+    }
 }
 
 void QtDcmMoveScu::substituteOverrideKeys ( DcmDataset & dset )

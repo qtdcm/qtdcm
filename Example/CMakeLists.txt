@@ -7,6 +7,7 @@ if(NOT MSVC)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}")
+
 set(QTDCM_DIR ${QtDcm_BINARY_DIR})
 
 find_package(QtDCM REQUIRED)
@@ -68,6 +69,6 @@ if(APPLE)
   include(FixDCMTKMacLink)
   message("${QTDCM_DIR}")
   FixDCMTKMacExeLink(dicom ${QTDCM_BINARY_DIR})
-endif(APPLE)
+endif()
 
 install(TARGETS dicom RUNTIME DESTINATION bin)
