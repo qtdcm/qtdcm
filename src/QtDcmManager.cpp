@@ -571,7 +571,7 @@ void QtDcmManager::importToDirectory ( const QString &directory )
 void QtDcmManager::onSerieMoved ( const QString &directory , const QString &serie , int number )
 {
     if ( d->useConverter ) {
-        qDebug() << "Starting reconstruction of series" << serie << directory;
+        qDebug() << "Starting reconstruction of series" << serie;
         
         QtDcmConvert converter( this );
         converter.setInputDirectory ( directory );
