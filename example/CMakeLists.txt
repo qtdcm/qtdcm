@@ -8,14 +8,15 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}")
 
-set(QTDCM_DIR ${QtDcm_BINARY_DIR})
+find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network )
+get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+get_filename_component(QT5_BINARY_DIR ${QT5_QMAKE_EXECUTABLE} PATH)
 
-find_package(QtDCM REQUIRED)
-if(QTDCM_FOUND)
-  include(${QTDCM_USE_FILE})
-endif()
-
-find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
+find_package( QtDCM REQUIRED )
+find_package( ITK REQUIRED )
+if(ITK_FOUND)
+  include(${ITK_USE_FILE})
+endif(ITK_FOUND)
 
 set(${PROJECT_NAME}_SRCS
   main.cpp
@@ -53,15 +54,15 @@ set(INCLUDE_DIRECTORIES
 )
 include_directories(${INCLUDE_DIRECTORIES})
 
-add_executable( ${PROJECT_NAME} WIN32 
-                ${${PROJECT_NAME}_HDRS}  
-                ${${PROJECT_NAME}_SRCS} 
-                ${${PROJECT_NAME}_MOC_HDRS} 
-                ${${PROJECT_NAME}_MOC_SRCS} 
-                ${${PROJECT_NAME}_UI_HDRS})
+add_executable(${PROJECT_NAME} WIN32 
+               ${${PROJECT_NAME}_HDRS}  
+               ${${PROJECT_NAME}_SRCS} 
+               ${${PROJECT_NAME}_MOC_HDRS} 
+               ${${PROJECT_NAME}_MOC_SRCS} 
+               ${${PROJECT_NAME}_UI_HDRS})
 
 target_link_libraries( ${PROJECT_NAME}
-  qtdcm
+  ${QTDCM_LIBRARIES}
   ${QT_LIBRARIES}
 )
 

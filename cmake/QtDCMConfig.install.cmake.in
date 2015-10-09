@@ -1,0 +1,16 @@
+## This file saves all the configuration of QTDCM compilation
+# This file is to be included from outside projects which uses QtDcm
+
+# The QTDCM version number
+set(QTDCM_VERSION_MAJOR "@QTDCM_VERSION_MAJOR@")
+set(QTDCM_VERSION_MINOR "@QTDCM_VERSION_MINOR@")
+set(QTDCM_VERSION_PATCH "@QTDCM_VERSION_PATCH@")
+
+# all include dirs pour QTDCM
+set(QTDCM_INCLUDE_DIRS  "@CMAKE_INSTALL_PREFIX@/include")
+
+# all QTDCM libs
+set(QTDCM_LIBRARIES   "@QTDCM_LIBRARIES@")
+
+#path to cmake files of QTDCM
+include("@CMAKE_INSTALL_PREFIX@/lib/cmake/qtdcm-@QTDCM_VERSION_MAJOR@.@QTDCM_VERSION_MINOR@/QTDCMDepends.cmake")

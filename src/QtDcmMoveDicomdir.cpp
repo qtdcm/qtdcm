@@ -237,8 +237,10 @@ void QtDcmMoveDicomdir::run()
                     emit updateProgress ( progress + ( int ) ( ( ( float ) ( step * ( i + 1 ) / d->filenames.size() ) ) ) );
                 }
             }
-            emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) , s );
+
             progress += step;
+            emit updateProgress(progress);
+            emit serieMoved ( serieDir.absolutePath(), d->series.at ( s ) , s );
         }
         else {
             if ( !d->filenames.isEmpty() ) {

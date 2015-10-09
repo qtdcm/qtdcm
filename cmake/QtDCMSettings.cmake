@@ -1,17 +1,12 @@
 ## SETTING THE INCLUDE DIRS
 set(QTDCM_INCLUDE_DIRS
-## Modules include dirs
+  ## Modules include dirs
   ${PROJECT_SOURCE_DIR}/src
-)
-
-## SETTING QTDCM LIBRARY DIRS
-set(QTDCM_LIBRARY_DIRS
-  ${LIBRARY_OUTPUT_PATH}
+  ${PROJECT_BINARY_DIR}
+  ${PROJECT_BINARY_DIR}/src
 )
 
 include_directories(${QTDCM_INCLUDE_DIRS})
 
 ## SETTING QTDCM LIBS
-set(QTDCM_LIBS
-  qtdcm
-)
+set(QTDCM_LIBRARIES qtdcm)

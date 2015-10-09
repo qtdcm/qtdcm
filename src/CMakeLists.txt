@@ -4,6 +4,9 @@ project(qtdcm)
 
 find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 
+get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+get_filename_component(QT5_BINARY_DIR ${QT5_QMAKE_EXECUTABLE} PATH)
+
 find_package(DCMTK REQUIRED)
 include_directories(${DCMTK_INCLUDE_DIRS})
 
@@ -18,10 +21,11 @@ if(ITK_FOUND)
 endif(ITK_FOUND)
 
 set(${PROJECT_NAME}_RCCS
-    ../Resources/qtdcm.qrc
+    ../resources/qtdcm.qrc
 )
 
 set(${PROJECT_NAME}_HDRS
+  qtdcmExports.h
   QtDcmImage.h
   QtDcmSerie.h
   QtDcmStudy.h
@@ -139,15 +143,19 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_
 target_link_libraries(${PROJECT_NAME} ${${PROJECT_NAME}_LIBRARIES})
 
 # Include header files for Visual Studio.
-SOURCE_GROUP("Header Files" REGULAR_EXPRESSION .*\\.h\$)
-SOURCE_GROUP("Generated Files" FILES ${${PROJECT_NAME}_MOC_SRCS})
+source_group("Header Files" REGULAR_EXPRESSION .*\\.h\$)
+source_group("Generated Files" FILES ${${PROJECT_NAME}_MOC_SRCS})
 
 if(APPLE)
   include(FixDCMTKMacLink)
   FixDCMTKMacLibLink(${PROJECT_NAME})
 endif()
 
-install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/${PROJECT_NAME})
+install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include)
+install(TARGETS ${PROJECT_NAME}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT ${PROJECT_NAME}
+        EXPORT QTDCMDepends)
 if (WIN32)
   install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin
                                   LIBRARY DESTINATION lib
