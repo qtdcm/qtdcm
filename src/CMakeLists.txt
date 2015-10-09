@@ -1,4 +1,6 @@
-include (${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMSettings.cmake)
+cmake_minimum_required(VERSION 3.1)
+
+project(qtdcm)
 
 find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 
@@ -16,7 +18,7 @@ if(ITK_FOUND)
 endif(ITK_FOUND)
 
 set(${PROJECT_NAME}_RCCS
-    ${${PROJECT_NAME}_SOURCE_DIR}/Resources/qtdcm.qrc
+    ../Resources/qtdcm.qrc
 )
 
 set(${PROJECT_NAME}_HDRS
@@ -90,13 +92,16 @@ qt5_add_resources(${PROJECT_NAME}_RCC_SRCS ${${PROJECT_NAME}_RCCS})
 qt5_wrap_ui( ${PROJECT_NAME}_UI_HDRS ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp( ${PROJECT_NAME}_MOC_SRCS ${${PROJECT_NAME}_MOC_HDRS})
 
-include_directories(
-  ${CMAKE_BINARY_DIR} 
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code 
-  ${${PROJECT_NAME}_BINARY_DIR}/Code 
-  ${ITK_INCLUDE_DIRS} 
-  ${VTK_INCLUDE_DIRS} 
-  ${DCMTK_INCLUDE_DIR}
+set(${PROJECT_NAME}_HEADERS
+  ${${PROJECT_NAME}_HDRS}
+  ${${PROJECT_NAME}_MOC_HDRS}
+  ${${PROJECT_NAME}_UI_HDRS}
+)
+
+set(${PROJECT_NAME}_SOURCES
+  ${${PROJECT_NAME}_SRCS}
+  ${${PROJECT_NAME}_MOC_SRCS}
+  ${${PROJECT_NAME}_RCC_SRCS}
 )
 
 set(${PROJECT_NAME}_LIBRARIES
@@ -122,52 +127,40 @@ set(${PROJECT_NAME}_LIBRARIES
   ITKIOMRC
 )
 
-add_library(qtdcm SHARED ${${PROJECT_NAME}_SRCS} ${${PROJECT_NAME}_HDRS} ${${PROJECT_NAME}_MOC_SRCS} ${${PROJECT_NAME}_UI_HDRS} ${${PROJECT_NAME}_RCC_SRCS})
-target_link_libraries(qtdcm
-  ${${PROJECT_NAME}_LIBRARIES}
+include_directories(
+  ${CMAKE_BINARY_DIR} 
+  ${${PROJECT_NAME}_SOURCE_DIR} 
+  ${${PROJECT_NAME}_BINARY_DIR}
+  ${ITK_INCLUDE_DIRS} 
+  ${DCMTK_INCLUDE_DIR}
 )
+
+add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
+target_link_libraries(${PROJECT_NAME} ${${PROJECT_NAME}_LIBRARIES})
+
+# Include header files for Visual Studio.
+SOURCE_GROUP("Header Files" REGULAR_EXPRESSION .*\\.h\$)
+SOURCE_GROUP("Generated Files" FILES ${${PROJECT_NAME}_MOC_SRCS})
 
 if(APPLE)
   include(FixDCMTKMacLink)
-  FixDCMTKMacLibLink(qtdcm)
+  FixDCMTKMacLibLink(${PROJECT_NAME})
 endif()
 
-# External inclusion stuff :
-set(${PROJECT_NAME}_USE_FILE ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
-
-configure_file(${${PROJECT_NAME}_SOURCE_DIR}/CMake/UseQtDCM.cmake.in
-              ${${PROJECT_NAME}_BINARY_DIR}/UseQtDCM.cmake)
-configure_file(${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMConfig.cmake.in
-              ${${PROJECT_NAME}_BINARY_DIR}/QtDCMConfig.cmake)
-
-# Create the QtDCMConfig.cmake file containing the QtDCM configuration used with make install and CPack.
-# include (${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMGenerateInstall.cmake)
-# if ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
-#   install_targets(${INSTALL_LIB} qtdcm)
-# endif ( NOT BUILD_PACKAGE OR BUILD_PACKAGE_BINARY OR BUILD_PACKAGE_SDK)
-
-set(${PROJECT_NAME}_HEADERS
-  ${${PROJECT_NAME}_HDRS}
-  ${${PROJECT_NAME}_MOC_HDRS}
-  ${${PROJECT_NAME}_UI_HDRS}
-)
-
-install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/qtdcm)
+install(FILES ${${PROJECT_NAME}_HEADERS} DESTINATION include/${PROJECT_NAME})
 if (WIN32)
-  install(TARGETS qtdcm RUNTIME DESTINATION bin
-                        LIBRARY DESTINATION lib
-                        ARCHIVE DESTINATION lib
-  )
-
+  install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin
+                                  LIBRARY DESTINATION lib
+                                  ARCHIVE DESTINATION lib)
   # Also copy dependencies when generating an auto-installer package
   if(BUILD_PACKAGE)
     include(GetPrerequisites)
-    get_prerequisites(${LIBRARY_OUTPUT_PATH}/qtdcm.dll WIN32_PREREQUISITES 1 0 "" "")
+    get_prerequisites(${LIBRARY_OUTPUT_PATH}/${PROJECT_NAME}.dll WIN32_PREREQUISITES 1 0 "" "")
     foreach(DEPENDENCY_FILE ${WIN32_PREREQUISITES})
-      gp_resolve_item("${LIBRARY_OUTPUT_PATH}/qtdcm.dll" "${DEPENDENCY_FILE}" "" "" resolved_file)
+      gp_resolve_item("${LIBRARY_OUTPUT_PATH}/${PROJECT_NAME}.dll" "${DEPENDENCY_FILE}" "" "" resolved_file)
       install(FILES ${resolved_file} DESTINATION bin)
     endforeach()
   endif()
 else ()
-  install(TARGETS qtdcm LIBRARY DESTINATION lib)
+  install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 endif ()

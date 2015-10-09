@@ -2,29 +2,29 @@
 # This file is to be included from outside projects which uses QtM3d
 
 #path to the source of QTDCM
-set(QTDCM_SOURCE_DIR "@QtDcm_SOURCE_DIR@/Code")
+set(QTDCM_SOURCE_DIR "@QTDCM_SOURCE_DIR@/src")
 
 #path to cmake files of Vistal
-set(QTDCM_CMAKE_DIR "@QtDcm_CMAKE_DIR@")
+set(QTDCM_CMAKE_DIR "@QTDCM_CMAKE_DIR@")
 
 #path to binary dir of QTDCM
-set(QTDCM_BINARY_DIR "@QtDcm_BINARY_DIR@")
+set(QTDCM_BINARY_DIR "@QTDCM_BINARY_DIR@")
 
 # all include dirs pour QTDCM
-set(QTDCM_INCLUDE_DIRS  "@QtDcm_INCLUDE_DIRS@")
+set(QTDCM_INCLUDE_DIRS  "@QTDCM_INCLUDE_DIRS@")
 
 # all library dirs pour QTDCM
-set(QTDCM_LIBRARY_DIRS  "@QtDcm_LIBRARY_DIRS@")
+set(QTDCM_LIBRARY_DIRS  "@QTDCM_LIBRARY_DIRS@")
 
-set(QTDCM_CMAKE_MODULE_PATH "@QtDcm_CMAKE_MODULE_PATH@")
+set(QTDCM_CMAKE_MODULE_PATH "@QTDCM_CMAKE_MODULE_PATH@")
 
 # The Vistal version number
-set(QTDCM_VERSION_MAJOR "@QtDcm_VERSION_MAJOR@")
-set(QTDCM_VERSION_MINOR "@QtDcm_VERSION_MINOR@")
-set(QTDCM_VERSION_PATCH "@QtDcm_VERSION_PATCH@")
+set(QTDCM_VERSION_MAJOR "@QTDCM_VERSION_MAJOR@")
+set(QTDCM_VERSION_MINOR "@QTDCM_VERSION_MINOR@")
+set(QTDCM_VERSION_PATCH "@QTDCM_VERSION_PATCH@")
 
 # The location of the UseQtDCM.cmake file.
-set(QTDCM_USE_FILE "@QtDcm_USE_FILE@")
+set(QTDCM_USE_FILE "@QTDCM_USE_FILE@")
 
 # all QTDCM libs
 set(QTDCM_LIBS "@QTDCM_LIBS@")
