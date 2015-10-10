@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(dicom VERSION "2.0.2")
+project(dicom)
 
 if(NOT MSVC)
   add_definitions( -Wno-deprecated -DHAVE_CONFIG_H -fPIC )

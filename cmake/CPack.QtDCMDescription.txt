@@ -1,6 +1,6 @@
 DESCRIPTION
 ===========
 
-Welcome in the installation process of QtDCM.
+Welcome to the installation process of QtDCM.
 
 Enjoy QtDCM !
