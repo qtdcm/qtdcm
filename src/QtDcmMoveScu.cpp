@@ -91,6 +91,10 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent )
     d->progressSerie = 0;
     d->step = 0;
 
+    d->net = 0;
+    d->assoc = 0;
+    d->params = 0;
+    d->file = 0;
     d->maxPDU = ASC_DEFAULTMAXPDU;
     d->useMetaheader = OFTrue;
     d->networkTransferSyntax = EXS_Unknown;
@@ -118,7 +122,7 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent )
 }
 
 QtDcmMoveScu::~QtDcmMoveScu()
-{   
+{
     delete d;
     d = NULL;
 }
@@ -339,7 +343,6 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
 
 void QtDcmMoveScu::addOverrideKey ( const QString & key )
 {
-    char * s = key.toUtf8().data();
     unsigned int g = 0xffff;
     unsigned int e = 0xffff;
     int n = 0;
@@ -348,8 +351,9 @@ void QtDcmMoveScu::addOverrideKey ( const QString & key )
     char msg2[200];
 
     // try to parse group and element number
-    n = sscanf ( s, "%x,%x=", &g, &e );
-    OFString toParse = s;
+    OFString toParse(key.toLatin1().data());
+    n = sscanf ( key.toLatin1().data(), "%x,%x=", &g, &e );
+
     size_t eqPos = toParse.find ( '=' );
 
     if ( n < 2 ) { // if at least no tag could be parsed
@@ -360,7 +364,7 @@ void QtDcmMoveScu::addOverrideKey ( const QString & key )
         }
         else {
             // no value given, just dictionary name
-            dicName = s; // only dictionary name given (without value)
+            dicName = key.toLatin1().data(); // only dictionary name given (without value)
         }
         
         // try to lookup in dictionary
@@ -967,7 +971,7 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
         strcpy( req.MoveDestination, d->moveDestination );
     }
 
-    OFCondition cond;
+    OFCondition cond = EC_Normal;
 
     if ( d->useStoreSCP ) {
         cond = DIMSE_moveUser ( assoc, 

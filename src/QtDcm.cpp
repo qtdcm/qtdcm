@@ -87,7 +87,7 @@ QtDcm::QtDcm ( QWidget *parent )
 
     //Initialize widgets
     QDate currentDate = QDate::currentDate();
-    startDateEdit->setDate (  currentDate.addYears(-1) );
+    startDateEdit->setDate (  currentDate.addYears(-100) );
     endDateEdit->setDate ( currentDate );
 
     QtDcmManager::instance()->setPatientsTreeWidget ( treeWidgetPatients );
