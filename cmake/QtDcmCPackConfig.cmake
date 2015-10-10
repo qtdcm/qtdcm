@@ -1,7 +1,5 @@
 #CPack config file
 if(BUILD_PACKAGE)
-  message(STATUS "Configuring CPack")
-
   set(BUILD_TESTING OFF)
   include(InstallRequiredSystemLibraries)
   set(CPACK_GENERATOR "")

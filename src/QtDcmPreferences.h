@@ -106,7 +106,7 @@ public:
     /**
      * QtDcm local AETitle setter
      *
-     * @param _aetitle as a QString
+     * @param hostname as a QString
      */
     void setHostname ( const QString & hostname );
 
@@ -115,14 +115,14 @@ public:
     /**
      * QtDcm local AETitle setter
      *
-     * @param _aetitle as a QString
+     * @param aetitle as a QString
      */
     void setAetitle ( const QString & aetitle );
 
     /**
      * QtDcm local application TCP port setter
      *
-     * @param _port as a QString
+     * @param port as a QString
      */
     void setPort ( const QString & port );
 
@@ -143,7 +143,7 @@ public:
     /**
      * Remove server from the QList at position i
      *
-     * @param i index of the server to be removed in the list
+     * @param index of the server to be removed in the list
      */
     void removeServer ( int index );
 
