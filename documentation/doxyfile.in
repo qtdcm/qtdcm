@@ -17,10 +17,9 @@ GENERATE_LATEX       = NO
 GENERATE_MAN         = NO
 GENERATE_RTF         = NO
 
-HAVE_DOT             = YES
-#HAVE_DOT            = NO
+HAVE_DOT             = ON
 DOT_IMAGE_FORMAT     = svg dot
-DOT_PATH             = "@DOT_PATH@"
+DOT_PATH             = "@DOXYGEN_DOT_EXECUTABLE@"
 CLASS_GRAPH          = YES
 COLLABORATION_GRAPH  = YES
 TEMPLATE_RELATIONS   = YES
@@ -65,8 +64,8 @@ MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES
 INCLUDE_PATH         =
 
-LAYOUT_FILE = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/DoxygenLayout.xml
+LAYOUT_FILE = @QTDCM_SOURCE_DIR@/documentation/DoxygenLayout.xml
 
-HTML_HEADER      = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/header.html
-HTML_FOOTER      = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/footer.html
-HTML_STYLESHEET  = @QTDCM_SOURCE_DIR@/Documentation/Doxygen/qtdcm_dox.css
+HTML_HEADER      = @QTDCM_SOURCE_DIR@/documentation/header.html
+HTML_FOOTER      = @QTDCM_SOURCE_DIR@/documentation/footer.html
+HTML_STYLESHEET  = @QTDCM_SOURCE_DIR@/documentation/qtdcm_dox.css
