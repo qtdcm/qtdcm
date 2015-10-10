@@ -1,16 +1,18 @@
 /**
  * \page integrationpage Integrating QtDcm in a Qt application
  *
- * The integration of QtDcm in a Qt application is very easy but you have to know how to configure the QtDcmManager class. This
- * class manage the connections between widgets, dicom communication classes and conversion classes (or command line tools).
+ * The integration of QtDcm in a Qt application is very easy but you have to know how to configure it via QtDcmManager which is in charge of the 
+ * connections between the different widgets, dicom communications, dicom images downloads and image conversions (or command line tools).
+ * 
+ * Important note: for the moment, QtDcm can only be integrated in Qt based applications and more precisely QtWidgets based applications.
  * 
  * \section basic_section Instanciating the objects
  *
  * In your application you have to first instanciate the widgets. Here we only show the case with the main QtDcm and the
- * QtDcmImportWidget.
+ * QtDcmImportWidget, assuming "this" is the parent widget embedding those widgets.
  * \code
- * QtDcm * mainWidget = new QtDcm;
- * QtDcmImportWidget * importWidget = new QtDcmImportWidget;
+ * QtDcm * mainWidget = new QtDcm(this);
+ * QtDcmImportWidget * importWidget = new QtDcmImportWidget(this);
  * \endcode
  *
  * Then you have to set the setting file. This file is stored in your personnal directory and if it doesn't exist it's created with
@@ -19,8 +21,7 @@
  * QtDcmPreferences::instance()->setIniFile("mySettings");
  * \endcode
  *
- * Then you have to give the QtDcmManager class (note that this is a singleton) the pointers to the previous widgets. QtDcmManager
- * should always be called using the QtDcmManager::instance() method. When setting the widgets, all the connexions are perfomed
+ * Set the QtDcmManager class the pointers to the main widgets (QtDcm, QtDcmImportWidget for example). All the connexions are perfomed 
  * internally by QtDcmManager.
  *
  * \code
@@ -32,8 +33,8 @@
  *
  * Depending on what you planned to do with this library, it's possible to set behaviour options to QtDcmManger. This behaviour mostly relies on
  * the way dicom data are converted and where they are stored.
- * First there's a mode that you can set if you want to control in the code where the converted data are stored. See QtDcmManager::outputdirmode enum.
- * If you choose QtDcmManager::DIALOG, the output directory will be set using a QFileDialog. If you choose QtDcmManager::CUSTOM, you will also have
+ * First there's a mode that you can set if you want to control from the code where the converted data will be stored. See QtDcmManager::outputdirmode enum.
+ * If you choose QtDcmManager::DIALOG, the output directory will be set using a QFileDialog. If you choose QtDcmManager::CUSTOM, you will have
  * to set manually the output directory.
  * \code
  * QtDcmManager::instance()->setOutputdirMode(QtDcmManager::CUSTOM);
@@ -43,13 +44,13 @@
  * QtDcmManager::instance()->importSelectedSeries();
  * \endcode
  *
- * The other useful option is the choice between using the provided converter (call to dcm2nii binary or ITK based conversion class).
+ * The other option is the choice of the provided converter : using a call to dcm2nii binary or using an ITK based conversion class.
  * \code
- * QtDcmManager::instance()->useConverter(true);
+ * QtDcmManager::instance()->setExternalUseConverter(true);
  * ...
  * or
  * ...
- * QtDcmManager::instance()->useConverter(false);
+ * QtDcmManager::instance()->setExternalUseConverter(false);
  * \endcode
  * 
  * 
@@ -60,34 +61,34 @@
  * \subsection easy_settings_subsec The easiest way: calling the QtDcmPreferencesDialog class
  * You just need to call the slot QtDcm::editPreferences()
  * \code
- * QtDcm * main = new QtDcm;
+ * QtDcm * main = new QtDcm(this);
  * main->editPreferences();
  * \endcode
  * 
  * 
  * \subsection embed_settings_subsec Used the specific settings widgets
  *
- * Theses widgets are designed to be integrate in large applications, in fact you can just add where you want. First you need to instanciate
- * them and to give them he pointer to the instance of QtDcmPreferences.
+ * These widgets are designed to be integrated in other applications/widgets, in fact you can just use them where you want, assuming the parent class is QWidget based. 
+ * You just need to instanciate them and they will internally update the QtDcmPreferences instance but the changes won't be written to the settings file.
  * \code
- * QtDcmServersDicomSettingsWidget * servers = new QtDcmServersDicomSettingsWidget;
- * servers->setPreferences(QtDcmPreferences::instance()); 
+ * p_servers = new QtDcmServersDicomSettingsWidget(this); // assuming p_servers is a member of the parent widget
  * \endcode
  *
- * In this way it's necessary to add somewhere in your application a way to store the settings. For example a "Save" button. The clicked()
- * signal of this button will be connected with a onSaveClicked() slot that will be in charge to update the settings.
+ * In this way it's necessary to add somewhere in your application a way to store the settings, e.g a "Save" button connected to an onSaveClicked() slot.
  * Here is the instanciation of the button and the signal/slot connection.
  * \code
  * //instanciate a QPushButton
- * QPushButton * save = new QPushButton;
- * QObject::connect(save, SIGNAL(clicked), this, SLOT(onSaveClicked()));
+ * QPushButton * save = new QPushButton(this);
+ * connect(save, &QPushButton::clicked, 
+ *         this, &MyParentWidget::onSaveClicked);
  * \endcode
  *
  * Here is the slot implementation:
  * \code
  * void MyClass::onSaveClicked()
  * {
- *  this->servers->updatePreferences(); //"This" is a bit tricky but this is just an example...
+ *   m_servers->updatePreferences(); // Updates preferences in memory
+ *   QtDcmPreferences::instance()->writeSettings(); // Effectively writes them to the settings file
  * }
  * \endcode
  * 

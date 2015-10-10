@@ -1,54 +1,61 @@
 /**
  * \page step2page Configuration
  *
- * The project has to be configured using CMake, see the <a href="http://www.cmake.org">CMake website</a> for more information.
- *
+ * \section supported_builds_sec Supported builds system
+ * 
+ * QtDcm can be built and run on the following systems:
+ * * GCC or CLang on Linux (Ubuntu, CentOS have been tested)
+ * * VisualStudio 2013 (2010 and 2012 should work but were not tested)
+ * * MacOS X
+ * 
  * \section dep_sec The dependencies
  *
+ * \subsection cmake_dep_sec CMake
+ * 
+ * Install <a href="http://qt.io">CMake</a><br> and choose the installer corresponding to your system. The minimum version required is 3.1 so on certain Linux
+ * it might not be availble, thus you'll have to build it on your own. 
+ * 
  * \subsection qt_dep_sec Qt
  *
- * You can get the Qt development kit from <a href="http://qt.nokia.com/downloads/">the Qt website</a><br>
- * On Ubuntu you can simply use the package manager: <a href="apt://libqt4-dev">libqt4-dev</a>
- * <div id="code">
- * $ sudo apt-get install libqt4-dev
- * </div>
+ * You can get the Qt development kit from <a href="http://qt.io">the Qt website</a><br>
+ * Take the development kit corresponding to your system and at least install Qt 5.5.
  *
  * \subsection dcmtk_dep_sec DCMTK
  *
  * Download the source code from the <a href="ftp://dicom.offis.de/pub/dicom/offis/software/dcmtk/dcmtk360/dcmtk-3.6.0.tar.gz">OFFIS website</a>
- *
- * On Linux, configure the code, compile and install using the following commands (from the source directory):
+ * Use the following CMake options values:
  * <div id="code">
- * $ CFLAGS="-fPIC" CXXFLAGS="-fPIC" AR="gcc" ARFLAGS="-shared -o" LIBEXT="so" RANLIB=":" ./configure -disable-threads --without-openssl --without-libtiff --without-libpng<br>
- * $ make && sudo make install-all
+ * BUILD_SHARED_LIBS: OFF
+ * CMAKE_BUILD_TYPE: RelWithDebInfo
  * </div>
- *
+ * 
  * \subsection itk_dep_sec The Insight Toolkit
  *
- * Download the 3.20 version of the Insight Toolkit from <a href="http://voxel.dl.sourceforge.net/sourceforge/itk/InsightToolkit-3.20.0.tar.gz">here</a>.
- *
+ * Download the 4.6 version of the Insight Toolkit from <a href="http://voxel.dl.sourceforge.net/sourceforge/itk/InsightToolkit-4.6.0.tar.gz">here</a>.
+ * Use the following CMake options values:
+ * <div id="code">
+ * BUILD_EXAMPLES: OFF
+ * BUILD_SHARED_LIBS: ON
+ * BUILD_TESTING: OFF
+ * CMAKE_BUILD_TYPE: RelWithDebInfo
+ * </div>
+ * 
  * \section config_sec Configuring QtDcm with CMake
- * Make sure to have CMake 2.8.5 minimum and then go to your local QtDcm source directory. We will perform an "out of source" build, so you have to create
- * a "build" directory and launch cmake from this place:
+ * Make sure to have CMake 3.1 minimum and then go to your local QtDcm source directory. I recommend to configure an "out of source" build, so create
+ * a "build" directory and launch cmake from there:
  * <div id="code">
  * $ cd $qtdcm_source_dir<br>
  * $ mkdir build<br>
  * $ cd build<br>
  * $ cmake ..<br>
  * </div>
- *
- * Now you have to configure some CMake variables before compiling the project. Use ccmake like this:
- * <div id="code">
- * $ cd $qtdcm_source_dir/build<br>
- * $ ccmake .
- * </div>
- *
- * Then set the variables:
+ * 
+ * Set the following CMake options values:
  * <div id="code">
  * ITK_DIR : /path/to/your/itk/build/directory<br>
- * DCMTK_DIR : /usr/local<br>
- * CMAKE_BUILD_TYPE : release<br>
- * BUILD_SHARED_LIBS : ON<br>
+ * DCMTK_DIR : /path/to/your/dcmtk/build/directory<br>
+ * DCMTK_SOURCE_DIR : /path/to/your/dcmtk/source/directory<br>
+ * CMAKE_BUILD_TYPE : RelWithDebInfo<br>
  * </div>
  *
  * If you want to play with the example or build this documentation, you can also set the following variables:

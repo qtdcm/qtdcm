@@ -63,16 +63,6 @@ public:
 
     static QtDcmManager* instance();
     static void destroy();
-    
-    /**
-     * Default constructor. Instantiate the internal pointers and create the temporary directory.
-     */
-    QtDcmManager(QObject * parent = 0);
-
-    /**
-     * The default destructor
-     */
-    virtual ~QtDcmManager();
 
     /**
      * Find SCU with Dcmtk code
@@ -198,7 +188,7 @@ public:
 
     QString patientGender() const;
 
-    void setPatientSex ( const QString &sex );
+    void setPatientGender ( const QString &sex );
 
     /**
      * Serie description getter
@@ -249,28 +239,28 @@ public:
      *
      * @param date as a QString
      */
-    void setStartDate ( const QString &date );
+    void setStartDate ( const QDate &date );
 
     /**
      * Study date getter
      *
      * @return _date as a QString
      */
-    QString startDate() const;
+    QDate startDate() const;
 
     /**
      * Study date setter
      *
      * @param date as a QString
      */
-    void setEndDate ( const QString &date );
+    void setEndDate ( const QDate &date );
 
     /**
      * Study date getter
      *
      * @return _date as a QString
      */
-    QString getEndDate() const;
+    QDate endDate() const;
 
     void addSerieToImport ( const QString &uid );
 
@@ -301,9 +291,9 @@ public:
 
 //     void setPreviewImageUID ( QString uid );
 
-    bool useConverter();
+    bool useExternalConverter() const;
 
-    void useConverter ( bool use );
+    void setUseExternalConverter ( bool use );
 
     /**
      * This method try to delete the temporary directory when closing the QtDcm widget
@@ -329,6 +319,13 @@ signals:
     void gettingPreview();
     
 private:
+    /*!
+     * \brief QtDcmManager constructor, private on purpose as it's a singleton
+     * \param parent
+     */
+    QtDcmManager(QObject * parent = 0);
+    virtual ~QtDcmManager();
+    
     void generateCurrentSerieDir();
 
     void deleteCurrentSerieDir();

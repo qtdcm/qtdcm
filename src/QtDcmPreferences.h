@@ -54,16 +54,6 @@ class QTDCM_EXPORT QtDcmPreferences : public QObject
 public:
     static QtDcmPreferences * instance();
     static void destroy();
-    
-    /**
-     * Default constructor
-     */
-    QtDcmPreferences(QObject * parent = 0);
-
-    /**
-     * Default destructor
-     */
-    virtual ~QtDcmPreferences();
 
     /**
      * Read the settings from the ini file.
@@ -159,6 +149,12 @@ signals:
     void preferencesUpdated();
 
 private:
+    /**
+     * Default constructor, private as it should be used as a singleton
+     */
+    QtDcmPreferences(QObject * parent = 0);
+    virtual ~QtDcmPreferences();
+    
     /**
      * This method create the ini file with default parameters if it doesn't exist (first execution of qtdcm)
      */

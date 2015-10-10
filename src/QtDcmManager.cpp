@@ -57,6 +57,17 @@
 
 #include <QtDcmManager.h>
 
+namespace {
+  QString dateToString(const QDate & date) {
+      if (date == QDate()) {
+          return "*";
+      }
+      
+      return date.toString("yyyyMMdd");
+  }
+  
+}
+
 class QtDcmManagerPrivate
 {
 
@@ -78,8 +89,8 @@ public:
     QString patientSex;                              /** Attribute representing the patient sex used to query PACS */
     QString patientBirthDate;                        /** Attribute representing the patient birthdate used to query PACS */
     QString modality;                                /** Attibute for the modality of the search (MR, US, CT, etc) */
-    QString date1;                                   /** Attribute for the begin date of the query (usefull for date based queries) */
-    QString date2;                                   /** Attribute for the end date of the query (usefull for date based queries) */
+    QDate date1;                                   /** Attribute for the begin date of the query (usefull for date based queries) */
+    QDate date2;                                   /** Attribute for the end date of the query (usefull for date based queries) */
     QString serieDescription;                        /** Attibute representing the serie description used for query PACS */
     QString studyDescription;                        /** Attibute representing the study description used for query PACS */
     QtDcmManager::eMoveMode mode;                    /** Mode that determine the type of media (MEDIA or PACS) */
@@ -135,8 +146,6 @@ QtDcmManager::QtDcmManager(QObject *parent)
     d->patientId = "*";
     d->patientBirthDate = "";
     d->modality = "*";
-    d->date1 = "*";
-    d->date2 = "*";
     d->serieDescription = "*";
     d->studyDescription = "*";
     d->patientSex = "*";
@@ -277,7 +286,7 @@ void QtDcmManager::findStudiesScu ( const QString &patientName )
     d->seriesToImport.clear();
 
     QtDcmFindScu * finder = new QtDcmFindScu ( this );
-    finder->findStudiesScu ( patientName, d->studyDescription, d->date1, d->date2 );
+    finder->findStudiesScu ( patientName, d->studyDescription, dateToString(d->date1), dateToString(d->date2) );
     delete finder;
 }
 
@@ -523,7 +532,7 @@ void QtDcmManager::getPreviewFromSelectedSerie ( const QString &uid, int element
 
 void QtDcmManager::importSelectedSeries()
 {
-    if ( this->useConverter() ) { //Use QtDcm convertion tool (ITK or dcm2nii)
+    if ( this->useExternalConverter() ) { //Use QtDcm convertion tool (ITK or dcm2nii)
         if ( this->seriesToImportSize() != 0 ) {
             if ( this->getOutputdirMode() == QtDcmManager::DIALOG ) {
                 QFileDialog dialog( d->mainWidget );
@@ -798,18 +807,17 @@ QString QtDcmManager::patientBirthdate() const
     if ( d->patientsTreeWidget && d->patientsTreeWidget->currentItem() ) {
         birthdate = d->patientsTreeWidget->currentItem()->data ( 2,0 ).toString();
     }
-    qDebug() << birthdate;
+    
     return birthdate;
 }
 
 QString QtDcmManager::patientGender() const 
 {
-    QString sex ( "" );
+    QString sex;
     if ( d->patientsTreeWidget && d->patientsTreeWidget->currentItem() ) {
         sex = d->patientsTreeWidget->currentItem()->data ( 3,0 ).toString();
     }
     
-    qDebug() << sex;
     return sex;
 }
 
@@ -820,11 +828,10 @@ QString QtDcmManager::examDate() const
         examDate = d->studiesTreeWidget->currentItem()->data ( 1,0 ).toString();
     }
     
-    qDebug() << examDate;
     return examDate;
 }
 
-void QtDcmManager::setPatientSex ( const QString &sex )
+void QtDcmManager::setPatientGender ( const QString &sex )
 {
     d->patientSex = sex;
 }
@@ -859,22 +866,22 @@ QString QtDcmManager::modality() const
     return d->modality;
 }
 
-void QtDcmManager::setStartDate ( const QString &date )
+void QtDcmManager::setStartDate ( const QDate &date )
 {
     d->date1 = date;
 }
 
-QString QtDcmManager::startDate() const 
+QDate QtDcmManager::startDate() const 
 {
     return d->date1;
 }
 
-void QtDcmManager::setEndDate ( const QString &date )
+void QtDcmManager::setEndDate ( const QDate &date )
 {
     d->date2 = date;
 }
 
-QString QtDcmManager::getEndDate() const 
+QDate QtDcmManager::endDate() const 
 {
     return d->date2;
 }
@@ -938,12 +945,12 @@ int QtDcmManager::seriesToImportSize()
     return d->seriesToImport.size();
 }
 
-bool QtDcmManager::useConverter()
+bool QtDcmManager::useExternalConverter() const
 {
     return d->useConverter;
 }
 
-void QtDcmManager::useConverter ( bool use )
+void QtDcmManager::setUseExternalConverter ( bool use )
 {
     d->useConverter = use;
 }
