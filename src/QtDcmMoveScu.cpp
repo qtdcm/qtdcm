@@ -73,7 +73,6 @@ public:
     OFBool abortAssociation;
     OFCmdSignedInt cancelAfterNResponses;
     OFBool ignorePendingDatasets;
-    OFBool useStoreSCP;
     DcmDataset overrideKeys;
     OFString outputDirectory;
 
@@ -115,7 +114,6 @@ QtDcmMoveScu::QtDcmMoveScu ( QObject * parent )
     d->ignorePendingDatasets = OFTrue;
     d->outputDirectory = ".";
     d->acseTimeout = 30;
-    d->useStoreSCP = true;
     d->blockMode = DIMSE_BLOCKING;
 
     d->mode = QtDcmMoveScu::IMPORT;
@@ -971,43 +969,23 @@ OFCondition QtDcmMoveScu::moveSCU ( T_ASC_Association * assoc, const char *fname
         strcpy( req.MoveDestination, d->moveDestination );
     }
 
-    OFCondition cond = EC_Normal;
 
-    if ( d->useStoreSCP ) {
-        cond = DIMSE_moveUser ( assoc, 
-                                d->presId, 
-                                &req, 
-                                file.getDataset(), 
-                                moveCallback, 
-                                ( void* ) this, 
-                                d->blockMode, 
-                                d->dimseTimeout, 
-                                d->net, 
-                                subOpCallback, 
-                                ( void* ) this, 
-                                &rsp, 
-                                &statusDetail, 
-                                &rspIds, 
-                                d->ignorePendingDatasets );
-    }
-    else {
-        cond = DIMSE_moveUser ( assoc, 
-                                d->presId, 
-                                &req, 
-                                file.getDataset(), 
-                                moveCallback, 
-                                ( void* ) this, 
-                                d->blockMode, 
-                                d->dimseTimeout, 
-                                d->net, 
-                                NULL, 
-                                ( void* ) this, 
-                                &rsp, 
-                                &statusDetail, 
-                                &rspIds, 
-                                d->ignorePendingDatasets );
-    }
-
+    const OFCondition cond = DIMSE_moveUser ( assoc, 
+                                              d->presId, 
+                                              &req, 
+                                              file.getDataset(), 
+                                              moveCallback, 
+                                              ( void* ) this, 
+                                              d->blockMode, 
+                                              d->dimseTimeout, 
+                                              d->net, 
+                                              subOpCallback, 
+                                              ( void* ) this, 
+                                              &rsp, 
+                                              &statusDetail, 
+                                              &rspIds, 
+                                              d->ignorePendingDatasets );
+    
     if ( rspIds != NULL ) delete rspIds;
 
     return cond;
