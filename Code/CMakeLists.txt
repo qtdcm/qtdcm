@@ -2,10 +2,10 @@ include (${${PROJECT_NAME}_SOURCE_DIR}/CMake/QtDCMSettings.cmake)
 
 find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 
-find_package(DCMTK REQUIRED)
+find_package(DCMTK REQUIRED ${DCMTK_FIND_PACKAGE_STATEGY})
 include_directories(${DCMTK_INCLUDE_DIRS})
 
-if(APPLE)
+if(APPLE AND NOT DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
   include(FixDCMTKMacInstall)
   FixDCMTKMacInstall()
 endif()
@@ -43,7 +43,7 @@ set(${PROJECT_NAME}_UIS
   qtdcmpreferenceswidget.ui
 )
 
-set(${PROJECT_NAME}_MOC_HDRS   
+set(${PROJECT_NAME}_MOC_HDRS
   QtDcm.h
   QtDcmImportWidget.h
   QtDcmPreviewWidget.h
@@ -91,11 +91,11 @@ qt5_wrap_ui( ${PROJECT_NAME}_UI_HDRS ${${PROJECT_NAME}_UIS})
 qt5_wrap_cpp( ${PROJECT_NAME}_MOC_SRCS ${${PROJECT_NAME}_MOC_HDRS})
 
 include_directories(
-  ${CMAKE_BINARY_DIR} 
-  ${${PROJECT_NAME}_SOURCE_DIR}/Code 
-  ${${PROJECT_NAME}_BINARY_DIR}/Code 
-  ${ITK_INCLUDE_DIRS} 
-  ${VTK_INCLUDE_DIRS} 
+  ${CMAKE_BINARY_DIR}
+  ${${PROJECT_NAME}_SOURCE_DIR}/Code
+  ${${PROJECT_NAME}_BINARY_DIR}/Code
+  ${ITK_INCLUDE_DIRS}
+  ${VTK_INCLUDE_DIRS}
   ${DCMTK_INCLUDE_DIR}
 )
 
@@ -127,7 +127,7 @@ target_link_libraries(qtdcm
   ${${PROJECT_NAME}_LIBRARIES}
 )
 
-if(APPLE)
+if(APPLE AND NOT DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
   include(FixDCMTKMacLink)
   FixDCMTKMacLibLink(qtdcm)
 endif()

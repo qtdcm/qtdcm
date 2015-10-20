@@ -23,6 +23,14 @@ if(BUILD_DOCUMENTATION)
   add_subdirectory(Documentation/Doxygen)
 endif()
 
+option(DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY 
+  "Do not use any FindDCMTK.cmake module found in the CMAKE_MODULE_PATH to find DCMTK." 
+  OFF)
+
+if(DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
+  set(DCMTK_FIND_PACKAGE_STATEGY NO_MODULE)
+endif()
+
 set (${PROJECT_NAME}_CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_CMAKE_MODULE_PATH}")
 
