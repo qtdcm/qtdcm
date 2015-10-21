@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.0.2)
 
 project(QTDCM VERSION "2.1.0")
 
@@ -13,6 +13,14 @@ else()
   set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 endif()
 mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
+
+option(DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY 
+  "Do not use any FindDCMTK.cmake module found in the CMAKE_MODULE_PATH to find DCMTK." 
+  OFF)
+
+if(DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
+  set(DCMTK_FIND_PACKAGE_STATEGY NO_MODULE)
+endif()
 
 set(${PROJECT_NAME}_CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_CMAKE_MODULE_PATH}")

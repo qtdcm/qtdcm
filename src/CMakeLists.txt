@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.0.2)
 
 project(qtdcm)
 
@@ -7,10 +7,10 @@ find_package( Qt5 REQUIRED COMPONENTS Core Widgets Network)
 get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 get_filename_component(QT5_BINARY_DIR ${QT5_QMAKE_EXECUTABLE} PATH)
 
-find_package(DCMTK REQUIRED)
+find_package(DCMTK REQUIRED ${DCMTK_FIND_PACKAGE_STATEGY})
 include_directories(${DCMTK_INCLUDE_DIRS})
 
-if(APPLE)
+if(APPLE AND NOT DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
   include(FixDCMTKMacInstall)
   FixDCMTKMacInstall()
 endif()
@@ -146,7 +146,7 @@ target_link_libraries(${PROJECT_NAME} ${${PROJECT_NAME}_LIBRARIES})
 source_group("Header Files" REGULAR_EXPRESSION .*\\.h\$)
 source_group("Generated Files" FILES ${${PROJECT_NAME}_MOC_SRCS})
 
-if(APPLE)
+if(APPLE AND NOT DCMTK_FIND_PACKAGE_USE_CONFIG_ONLY)
   include(FixDCMTKMacLink)
   FixDCMTKMacLibLink(${PROJECT_NAME})
 endif()
