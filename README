@@ -1,8 +1,4 @@
 QtDcm - version 2.1.0
-(c) Alexandre Abadie
-=============================================
-contact : alexandre.abadie@inria.fr
-=============================================
 
 1 - Presentation
 ================
@@ -25,5 +21,3 @@ QtDcm requires :
 The conversion of Dicom data to Nifti format can also be perfomed with the command line tool
 <<dcm2nii>>. This tool can be downloaded from the mricron website
 (http://www.cabiatl.com/mricro/mricron/dcm2nii.html).
-
-
