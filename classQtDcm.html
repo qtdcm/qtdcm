@@ -23,7 +23,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -45,26 +45,26 @@
  <a href="classQtDcm.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for QtDcm:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classQtDcm.png" usemap="#QtDcm_map" alt=""/>
-  <map id="QtDcm_map" name="QtDcm_map">
-</map>
- </div></div>
+
+<p>Inherits QWidget, and QtDcmWidget.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a25a14c2dfc78a19f1b31999a855dbc24"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24">eMode</a> { <a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a031928bac6b171a809d9f4af368a527d">CD</a> = 0, 
-<a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a67dd6856563b096fb9a4cbef730f8571">PACS</a>
+<tr class="memitem:a25a14c2dfc78a19f1b31999a855dbc24"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24">eMode</a> { <a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a1cafda5cb48227309a65ad24ea78f26e">CD_MODE</a> = 0, 
+<a class="el" href="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a3ab4be931b1080ed15cd99b28dcd23b0">PACS_MODE</a>
  }</td></tr>
 <tr class="separator:a25a14c2dfc78a19f1b31999a855dbc24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fc27a346dc0582c8c2fe181a0317fa6"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6">eGender</a> { <a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a8851f69faef73ed4566cd17b493b5d4f">ALL</a> = 0, 
-<a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a373d4440927931b38e816f3ecf216aba">M</a>, 
-<a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6ab6c959df4e66c36f2aebb999d3c3b2ea">F</a>
+<tr class="memitem:a6fc27a346dc0582c8c2fe181a0317fa6"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6">eGender</a> { <a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a236f80561b3f761ad76f60434d635f92">ALL_GENDER</a> = 0, 
+<a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a720e7469d8b56074751a698be3412b50">M_GENDER</a>, 
+<a class="el" href="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a86215656354a3ed4f385f9fd515143f1">F_GENDER</a>
  }</td></tr>
 <tr class="separator:a6fc27a346dc0582c8c2fe181a0317fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36a80404352d7b01225324ad848d16b0"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0">eModalities</a> { <a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0af6515c823531230dc21ab03cd30f765c">ALL_MODALITIES</a> = 0, 
+<a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0ac36dea9842aa17fec7646c760ff21ae5">MR_MODALITY</a>, 
+<a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a835dfc1d604541d53e0d1f9aac313d86">CT_MODALITY</a>, 
+<a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a603dfb56bbfbf8455d679922c1ae4bfd">PET_MODALITY</a>
+ }</td></tr>
+<tr class="separator:a36a80404352d7b01225324ad848d16b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
@@ -155,9 +155,9 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a25a14c2dfc78a19f1b31999a855dbc24a031928bac6b171a809d9f4af368a527d"></a>CD&#160;</td><td class="fielddoc">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a25a14c2dfc78a19f1b31999a855dbc24a1cafda5cb48227309a65ad24ea78f26e"></a>CD_MODE&#160;</td><td class="fielddoc">
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a25a14c2dfc78a19f1b31999a855dbc24a67dd6856563b096fb9a4cbef730f8571"></a>PACS&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="a25a14c2dfc78a19f1b31999a855dbc24a3ab4be931b1080ed15cd99b28dcd23b0"></a>PACS_MODE&#160;</td><td class="fielddoc">
 </td></tr>
 </table>
 
@@ -175,15 +175,39 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6a8851f69faef73ed4566cd17b493b5d4f"></a>ALL&#160;</td><td class="fielddoc">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6a236f80561b3f761ad76f60434d635f92"></a>ALL_GENDER&#160;</td><td class="fielddoc">
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6a373d4440927931b38e816f3ecf216aba"></a>M&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6a720e7469d8b56074751a698be3412b50"></a>M_GENDER&#160;</td><td class="fielddoc">
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6ab6c959df4e66c36f2aebb999d3c3b2ea"></a>F&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="a6fc27a346dc0582c8c2fe181a0317fa6a86215656354a3ed4f385f9fd515143f1"></a>F_GENDER&#160;</td><td class="fielddoc">
 </td></tr>
 </table>
 
 <p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00046">46</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a36a80404352d7b01225324ad848d16b0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classQtDcm.html#a36a80404352d7b01225324ad848d16b0">QtDcm::eModalities</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a36a80404352d7b01225324ad848d16b0af6515c823531230dc21ab03cd30f765c"></a>ALL_MODALITIES&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a36a80404352d7b01225324ad848d16b0ac36dea9842aa17fec7646c760ff21ae5"></a>MR_MODALITY&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a36a80404352d7b01225324ad848d16b0a835dfc1d604541d53e0d1f9aac313d86"></a>CT_MODALITY&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a36a80404352d7b01225324ad848d16b0a603dfb56bbfbf8455d679922c1ae4bfd"></a>PET_MODALITY&#160;</td><td class="fielddoc">
+</td></tr>
+</table>
+
+<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00052">52</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
 
 </div>
 </div>
@@ -237,7 +261,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>constructor </p>
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00091">91</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00102">102</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -266,7 +290,7 @@ Protected Member Functions</h2></td></tr>
 <p>Get the pointer of the treewidget. </p>
 <dl class="section return"><dt>Returns</dt><dd>the pointer on the QTreeWidget </dd></dl>
 
-<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00060">60</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00067">67</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
 
 </div>
 </div>
@@ -291,7 +315,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00062">62</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00069">69</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
 
 </div>
 </div>
@@ -316,7 +340,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00064">64</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8h_source.html#l00071">71</a> of file <a class="el" href="QtDcm_8h_source.html">QtDcm.h</a>.</p>
 
 </div>
 </div>
@@ -335,7 +359,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Updates the PACS list in combo box. </p>
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00130">130</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00141">141</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +378,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Opens the PACS preferences dialog. </p>
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00344">344</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00372">372</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +397,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Opens the dicomdir selectiondialog. </p>
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00354">354</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00382">382</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -446,7 +470,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00142">142</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00153">153</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +496,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00242">242</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00260">260</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -498,7 +522,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00275">275</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00296">296</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +548,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00295">295</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00320">320</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -550,7 +574,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00301">301</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00326">326</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -576,7 +600,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00323">323</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00349">349</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -612,7 +636,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00159">159</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00170">170</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -648,7 +672,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00178">178</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00191">191</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -684,7 +708,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00197">197</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00212">212</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -720,7 +744,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00218">218</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00234">234</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -745,7 +769,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00226">226</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00244">244</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -771,7 +795,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00381">381</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00409">409</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -797,7 +821,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00414">414</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00442">442</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -823,7 +847,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00395">395</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00423">423</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -848,7 +872,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00231">231</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00249">249</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -873,7 +897,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00237">237</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00255">255</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -898,7 +922,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00152">152</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00163">163</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
@@ -923,18 +947,17 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00097">97</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
+<p>Definition at line <a class="el" href="QtDcm_8cpp_source.html#l00108">108</a> of file <a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>C:/softs/src/qtdcm/src/<a class="el" href="QtDcm_8h_source.html">QtDcm.h</a></li>
-<li>C:/softs/src/qtdcm/src/<a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a></li>
+<li>/home/aabadie/softs/src/qtdcm/src/<a class="el" href="QtDcm_8h_source.html">QtDcm.h</a></li>
+<li>/home/aabadie/softs/src/qtdcm/src/<a class="el" href="QtDcm_8cpp_source.html">QtDcm.cpp</a></li>
 </ul>
 </div><!-- contents -->
 
 <div style="text-align:right;padding:10px;">
-Copyright INRIA, 2015
 </div>
 </body>
 </html>

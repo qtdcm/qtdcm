@@ -1,0 +1,9 @@
+digraph "/home/aabadie/softs/src/qtdcm/documentation" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_39e4254f8ffa8363579d72567b3b0afc {
+    graph [ bgcolor="#ddddee", pencolor="black", label="qtdcm" fontname="Helvetica", fontsize="10", URL="dir_39e4254f8ffa8363579d72567b3b0afc.html"]
+  dir_309919d7b647dad8981e399008c71801 [shape=box, label="documentation", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_309919d7b647dad8981e399008c71801.html"];
+  }
+}

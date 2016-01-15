@@ -26,7 +26,8 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPreferencesPrivate.html#aedc07de0566f1c059b2e3b4cba1f579c"><param name="Name" value="QtDcmPreferencesPrivate"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmServer.html#ac36100ed471d99a87b4786ea79268304"><param name="Name" value="QtDcmServer"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a8851f69faef73ed4566cd17b493b5d4f"><param name="Name" value="ALL"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a236f80561b3f761ad76f60434d635f92"><param name="Name" value="ALL_GENDER"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0af6515c823531230dc21ab03cd30f765c"><param name="Name" value="ALL_MODALITIES"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="structQtDcmMoveScu_1_1MyCallbackInfo.html#a2d362626765c9fac62f828b813b830b7"><param name="Name" value="assoc"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="structQtDcmMoveScu_1_1MyCallbackInfo.html#a2d362626765c9fac62f828b813b830b7"><param name="Name" value="QtDcmMoveScu::MyCallbackInfo"></OBJECT>
@@ -42,7 +43,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#aff8dba8130cbc120872f9268f090da14"><param name="Name" value="blockMode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmFindCallback.html#ab2826c1a559d9e9769bc8932da74d942"><param name="Name" value="callback"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a0a4cda0acb3b331865264dc7b17fddd8"><param name="Name" value="cancelAfterNResponses"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a031928bac6b171a809d9f4af368a527d"><param name="Name" value="CD"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a1cafda5cb48227309a65ad24ea78f26e"><param name="Name" value="CD_MODE"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmFindScu.html#aad5640aec0400e7c8c98493b39dd8c0d"><param name="Name" value="checkServerConnection"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#aec475f107cb5a127121d74c711861cc7"><param name="Name" value="clearDisplay"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a5ecc2522f55972d264e12ad7cdf188ac"><param name="Name" value="clearListOfImages"></OBJECT>
@@ -55,6 +56,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmConvert.html#a17b0d56302b932cd4e26de039abc003e"><param name="Name" value="convert"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#ad4f55988362c6a2a39eb7abfb87c283d"><param name="Name" value="correctUIDPadding"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="main_8cpp.html#adca078b0d51eebeb945ec5a264bcfa42"><param name="Name" value="CRITICAL_COLOR"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a835dfc1d604541d53e0d1f9aac313d86"><param name="Name" value="CT_MODALITY"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a2680a12cbee67833caba25c5e995bcc9"><param name="Name" value="currentPacs"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a2680a12cbee67833caba25c5e995bcc9"><param name="Name" value="QtDcmManager"></OBJECT>
@@ -134,7 +136,7 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a441f307650aa1a940e09e237ba8f7291"><param name="Name" value="examDate"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDicom.html#af1da562fac92a5a3085210ad0b399b13"><param name="Name" value="exportSerie"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6ab6c959df4e66c36f2aebb999d3c3b2ea"><param name="Name" value="F"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a86215656354a3ed4f385f9fd515143f1"><param name="Name" value="F_GENDER"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a7bbe241b6ad1ce145bdfd870c34f273c"><param name="Name" value="file"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmImage.html#af1759a12a14a2e03e4b3cb67d2438e52"><param name="Name" value="filename"></OBJECT>
   <UL>
@@ -261,7 +263,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#ad73b1893db60abe66fffbefc395dfd96"><param name="Name" value="listOfImages"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a91c5d315dfbe1bd6d3f0e950449401c8"><param name="Name" value="loadDicomdir"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a117baced073e4ad0db4420a4f45921ea"><param name="Name" value="loadPatientsFromDicomdir"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a373d4440927931b38e816f3ecf216aba"><param name="Name" value="M"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a720e7469d8b56074751a698be3412b50"><param name="Name" value="M_GENDER"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="main_8cpp.html"><param name="Name" value="main.cpp"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="main_8cpp.html#adca078b0d51eebeb945ec5a264bcfa42"><param name="Name" value="CRITICAL_COLOR"></OBJECT>
@@ -300,6 +302,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#abaa52b234cb080706549253fae9c57a1"><param name="Name" value="moveSelectedSeries"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a8e8c23e8df821f0ed468d522eff71632"><param name="Name" value="moveSeriesFinished"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="structQtDcmMoveScu_1_1QuerySyntax.html#a66fc777c382033998226026c5d4a9caa"><param name="Name" value="moveSyntax"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0ac36dea9842aa17fec7646c760ff21ae5"><param name="Name" value="MR_MODALITY"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPatient.html#a4300b29efc333b319ec3f394462b5b79"><param name="Name" value="name"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPatient.html#a4300b29efc333b319ec3f394462b5b79"><param name="Name" value="QtDcmPatient"></OBJECT>
@@ -348,11 +351,8 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManagerPrivate.html#a26ff186c884787ec9f4485b1e7ece566"><param name="Name" value="outputdirMode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmConvert_1_1Private.html#aed789a1d7a72be6766fce34379d07d4a"><param name="Name" value="outputFilename"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a9b4a9cc7652982f4db3cb235cf6e3a44"><param name="Name" value="overrideKeys"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a67dd6856563b096fb9a4cbef730f8571"><param name="Name" value="PACS"></OBJECT>
-  <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a67dd6856563b096fb9a4cbef730f8571"><param name="Name" value="QtDcm"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a33663f48ba03e634c4908e4a701e7a36aaec9e83068b8d9e728aba3d859d702bc"><param name="Name" value="QtDcmManager"></OBJECT>
-  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a33663f48ba03e634c4908e4a701e7a36aaec9e83068b8d9e728aba3d859d702bc"><param name="Name" value="PACS"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a3ab4be931b1080ed15cd99b28dcd23b0"><param name="Name" value="PACS_MODE"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a957a4203201050c6a2a5ff6dbdf6ddb0"><param name="Name" value="paddingType"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#af6c409ba8a0d36bfc6eb6fa832458dee"><param name="Name" value="params"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmFindCallback.html#a9c9ec2bb6697931f36032ad5fd4ad135a633d5ee7b91a75cabba13519b63a6775"><param name="Name" value="PATIENT"></OBJECT>
@@ -378,6 +378,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManagerPrivate.html#aafb6e2b6d7d566992ed98c7186a070b0"><param name="Name" value="patientSex"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a7695378643b7c3d323d162f6ce58b25b"><param name="Name" value="patientsTreeView"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManagerPrivate.html#a756f825cb1c7051bf3dedfceadf68886"><param name="Name" value="patientsTreeWidget"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a603dfb56bbfbf8455d679922c1ae4bfd"><param name="Name" value="PET_MODALITY"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPreferences.html#a3193a819f75859f77b5e47c1abee4a27"><param name="Name" value="port"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPreferences.html#a3193a819f75859f77b5e47c1abee4a27"><param name="Name" value="QtDcmPreferences"></OBJECT>
@@ -418,14 +419,17 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html"><param name="Name" value="QtDcm"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a8851f69faef73ed4566cd17b493b5d4f"><param name="Name" value="ALL"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a031928bac6b171a809d9f4af368a527d"><param name="Name" value="CD"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a236f80561b3f761ad76f60434d635f92"><param name="Name" value="ALL_GENDER"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0af6515c823531230dc21ab03cd30f765c"><param name="Name" value="ALL_MODALITIES"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a1cafda5cb48227309a65ad24ea78f26e"><param name="Name" value="CD_MODE"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#aec475f107cb5a127121d74c711861cc7"><param name="Name" value="clearDisplay"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a835dfc1d604541d53e0d1f9aac313d86"><param name="Name" value="CT_MODALITY"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a4c663c8dfbbd3cc77490e7eac7cf092b"><param name="Name" value="editPreferences"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6ab6c959df4e66c36f2aebb999d3c3b2ea"><param name="Name" value="F"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a86215656354a3ed4f385f9fd515143f1"><param name="Name" value="F_GENDER"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a3620f55c4ae067eae928a2a8e422f594"><param name="Name" value="initConnections"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a117baced073e4ad0db4420a4f45921ea"><param name="Name" value="loadPatientsFromDicomdir"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a373d4440927931b38e816f3ecf216aba"><param name="Name" value="M"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a6fc27a346dc0582c8c2fe181a0317fa6a720e7469d8b56074751a698be3412b50"><param name="Name" value="M_GENDER"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0ac36dea9842aa17fec7646c760ff21ae5"><param name="Name" value="MR_MODALITY"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a8380243ed8d2a514001d32355a076b6c"><param name="Name" value="onCurrentGenderChanged"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#aa78abdf1a6d3cd6dfd373c18ce9e4666"><param name="Name" value="onCurrentModalityChanged"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#af4bc4448590cf52e032e5e5715617fc2"><param name="Name" value="onCurrentPacsChanged"></OBJECT>
@@ -441,8 +445,9 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#aa0b93334070620ac2d6b4c69bae5e3c7"><param name="Name" value="onStudyDescriptionTextChanged"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a2fd15aeeb130014a0702b514e342e5a3"><param name="Name" value="onStudyItemSelected"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#ad94e9692da407ce6a41b2ecdcb9ce6dc"><param name="Name" value="openDicomdir"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a67dd6856563b096fb9a4cbef730f8571"><param name="Name" value="PACS"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a25a14c2dfc78a19f1b31999a855dbc24a3ab4be931b1080ed15cd99b28dcd23b0"><param name="Name" value="PACS_MODE"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a7695378643b7c3d323d162f6ce58b25b"><param name="Name" value="patientsTreeView"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a36a80404352d7b01225324ad848d16b0a603dfb56bbfbf8455d679922c1ae4bfd"><param name="Name" value="PET_MODALITY"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a91895ac45a484e1f20c522d91f498735"><param name="Name" value="QtDcm"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#aa0c7d9dff6b64b5cf6aed829fb075413"><param name="Name" value="queryPACS"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcm.html#a78633bfb332656db294f6cdeb8d1f2a2"><param name="Name" value="serieChecked"></OBJECT>
@@ -784,7 +789,6 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#adc763f23e8b5884cc54ed90e58ce07eb"><param name="Name" value="slicesCount"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#aefdd3f7dacf21e601dc216e9c9f23538"><param name="Name" value="step"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a009a7c2b152e9fb0a7e37b9843a9b7b7"><param name="Name" value="useMetaheader"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a99a7e35d38ef209686b7cd0f7dbb3ebc"><param name="Name" value="useStoreSCP"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a724415100b8ed7ffa54eee7618b28bfc"><param name="Name" value="writeTransferSyntax"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="structQtDcmMoveScu_1_1QuerySyntax.html"><param name="Name" value="QtDcmMoveScu::QuerySyntax"></OBJECT>
@@ -1251,7 +1255,6 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmManager.html#a60047a4dff45fc6e97d32a1695eb88e0"><param name="Name" value="useExternalConverter"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a009a7c2b152e9fb0a7e37b9843a9b7b7"><param name="Name" value="useMetaheader"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a99a7e35d38ef209686b7cd0f7dbb3ebc"><param name="Name" value="useStoreSCP"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="main_8cpp.html#a3a8113b2321abda8238e8e1f41c6896b"><param name="Name" value="WARNING_COLOR"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmPreferences.html#aec128cc5ef96e66c8c7f2432c010a731"><param name="Name" value="writeSettings"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQtDcmMoveScu_1_1Private.html#a724415100b8ed7ffa54eee7618b28bfc"><param name="Name" value="writeTransferSyntax"></OBJECT>
