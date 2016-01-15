@@ -7,7 +7,7 @@
  *  download page on the INRIA GForge</a></li>
  *  <li>Getting the latest version of the code from the git repository:</li>
  * </ul>
- *  <div id="code">$ git clone git://github.com/aabadie/qtdcm.git</div>
+ *  <div id="code">$ git clone git://github.com/qtdcm/qtdcm.git</div>
  *
  * <br><br>
  * 
