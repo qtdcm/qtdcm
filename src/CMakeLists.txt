@@ -131,6 +131,7 @@ set(${PROJECT_NAME}_LIBRARIES
   ITKIOTIFF
   ITKIOVTK
   ITKIOMRC
+  ${ITKIOPhilipsREC_LIBRARIES}
 )
 
 include_directories(
