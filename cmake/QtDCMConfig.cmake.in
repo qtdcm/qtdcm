@@ -4,7 +4,10 @@
 #path to binary dir of QTDCM
 set(QTDCM_BINARY_DIR "@QTDCM_BINARY_DIR@")
 
-# all include dirs pour QTDCM
+#path to library dir of QTDCM
+set(QTDCM_LIBRARY_DIR "@LIBRARY_OUTPUT_PATH@")
+
+# all include dirs for QTDCM
 set(QTDCM_INCLUDE_DIRS  "@QTDCM_INCLUDE_DIRS@")
 
 # The Vistal version number
