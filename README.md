@@ -1,4 +1,4 @@
-QtDcm - version 2.1.0
+QtDcm - version 2.1.1
 
 1 - Presentation
 ----------------
