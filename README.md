@@ -1,4 +1,3 @@
-
 [![Build Status](https://travis-ci.org/qtdcm/qtdcm.svg?branch=master)](https://travis-ci.org/qtdcm/qtdcm)
 
 1 - Presentation
