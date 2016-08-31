@@ -2,24 +2,30 @@ sudo: required
 dist: trusty
 
 language:
-      - cpp
+    - cpp
 
 compiler:
-      - gcc
-          
+    - gcc
+
+cache:
+    directories:
+        - $HOME/externals
+
 before_install:
-      - lsb_release -a
-      - sudo apt-get update
-      - sudo apt-cache search qtbase5
-      - pwd
+    - sudo apt-get update
+    - sudo apt-get install -y ninja-build
+    - sudo apt-get install -y build-essential
+    - sudo apt-get install -y cmake
+    - sudo apt-get install -y qtbase5-dev
 
 install:
-      - sudo apt-get install -y build-essential
-      - sudo apt-get install -y cmake
-      - sudo apt-get install -y qtbase5-dev
-      - pwd
-      - mkdir build && cd build
-      - cmake -D CMAKE_BUILD_TYPE=RELWITHDEBINFO ..
+    - pwd
+    - mkdir build && cd build
+    - cmake -D CONFIGURE_EXTERNALS=1 -D DCMTK_DIR=$HOME/externals/dcmtk-build -D DCMTK_SOURCE_DIR=$HOME/externals/dcmtk -D ITK_DIR=$HOME/externals/itk-build ..
+    - make
 
 script:
-    - pwd
+    - cmake -D BUILD_EXAMPLE=ON -D BUILD_DOCUMENTATION=ON 
+    - make
+    - make doc
+    - ctest .
