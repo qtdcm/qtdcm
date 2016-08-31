@@ -25,6 +25,12 @@ endif()
 set(${PROJECT_NAME}_CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_CMAKE_MODULE_PATH}")
 
+# External project configuration
+if(${CONFIGURE_EXTERNALS})
+  add_subdirectory(externals)
+  return()
+endif()
+
 # Includes
 include(GNUInstallDirs)
 include(QtDCMSettings)

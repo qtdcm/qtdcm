@@ -1,0 +1,31 @@
+sudo: required
+dist: trusty
+
+language:
+    - cpp
+
+compiler:
+    - gcc
+
+cache:
+    directories:
+        - $HOME/externals
+
+before_install:
+    - sudo apt-get update
+    - sudo apt-get install -y ninja-build
+    - sudo apt-get install -y doxygen graphviz
+    - sudo apt-get install -y build-essential
+    - sudo apt-get install -y cmake
+    - sudo apt-get install -y qtbase5-dev
+
+install:
+    - mkdir build && cd build
+    - cmake -D CONFIGURE_EXTERNALS=1 -D DCMTK_DIR=$HOME/externals/dcmtk-build -D DCMTK_SOURCE_DIR=$HOME/externals/dcmtk -D ITK_DIR=$HOME/externals/itk-build ..
+    - make
+
+script:
+    - cmake -D BUILD_EXAMPLE=ON -D BUILD_DOCUMENTATION=ON . 
+    - make
+    # - make doc
+    - ctest .

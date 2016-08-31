@@ -18,6 +18,8 @@ GENERATE_LATEX       = NO
 GENERATE_MAN         = NO
 GENERATE_RTF         = NO
 
+QUIET                = YES
+
 DOT_IMAGE_FORMAT     = svg dot
 DOT_PATH             = "@DOXYGEN_DOT_EXECUTABLE@"
 CLASS_GRAPH          = YES

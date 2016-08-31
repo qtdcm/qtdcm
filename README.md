@@ -1,4 +1,5 @@
-QtDcm - version 2.1.1
+
+[![Build Status](https://travis-ci.org/qtdcm/qtdcm.svg?branch=master)](https://travis-ci.org/qtdcm/qtdcm)
 
 1 - Presentation
 ----------------
