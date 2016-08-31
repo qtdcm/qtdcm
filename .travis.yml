@@ -14,7 +14,7 @@ cache:
 before_install:
     - sudo apt-get update
     - sudo apt-get install -y ninja-build
-    - sudo apt-get install -y doxygen
+    - sudo apt-get install -y doxygen graphviz
     - sudo apt-get install -y build-essential
     - sudo apt-get install -y cmake
     - sudo apt-get install -y qtbase5-dev
