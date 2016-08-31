@@ -7,6 +7,6 @@ string(ASCII 27 Esc)
 include(dcmtk.cmake)
 include(itk.cmake)
 
-message("${Esc}[1;32mExternal libraries configured.${Esc}[m")
+message("${Esc}[1;32mExternal libraries configuration completed.${Esc}[m")
 message("")
 set(CONFIGURE_EXTERNALS 0 CACHE BOOL INTERNAL FORCE)

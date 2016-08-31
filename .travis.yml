@@ -27,5 +27,5 @@ install:
 script:
     - cmake -D BUILD_EXAMPLE=ON -D BUILD_DOCUMENTATION=ON . 
     - make
-    - make doc
+    # - make doc
     - ctest .

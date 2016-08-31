@@ -1,5 +1,4 @@
-message("${Esc}[1;32mConfiguring DCMTK external library")
-message("-------------------------${Esc}[m")
+message("${Esc}[32mConfiguring DCMTK external library${Esc}[m")
 
 if("${DCMTK_DIR}" STREQUAL "")
   set(DCMTK_DIR ${PROJECT_BINARY_DIR}/externals/dcmtk-build)
@@ -26,6 +25,5 @@ ExternalProject_Add(
   TEST_COMMAND ""
 )
 
-message("${Esc}[1;32mDone")
-message("-------------------------${Esc}[m")
+message("${Esc}[32mConfiguring DCMTK external library -- ${Esc}[1;32mDone${Esc}[m")
 message("")

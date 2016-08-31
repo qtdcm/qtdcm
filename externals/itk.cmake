@@ -1,5 +1,4 @@
-message("${Esc}[1;32mConfiguring ITK thirdparty")
-message("--------------------------${Esc}[m")
+message("${Esc}[32mConfiguring ITK external library${Esc}[m")
 
 if("${ITK_DIR}" STREQUAL "")
   set(ITK_DIR ${PROJECT_BINARY_DIR}/externals/itk-build)
@@ -21,6 +20,5 @@ ExternalProject_Add(
   TEST_COMMAND ""
 )
 
-message("${Esc}[1;32mDone")
-message("-------------------------${Esc}[m")
+message("${Esc}[32mConfiguring ITK external library -- ${Esc}[1;32mDone${Esc}[m")
 message("")
