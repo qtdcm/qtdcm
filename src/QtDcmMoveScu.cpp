@@ -396,7 +396,7 @@ void QtDcmMoveScu::addOverrideKey ( const QString & key )
         qDebug() << QString ( msg2 );
     }
 
-    DcmElement *elem = newDicomElement ( tag );
+    DcmElement *elem = DcmDataset::newDicomElement ( tag );
     if ( elem == NULL ) {
         sprintf ( msg2, "cannot create element for tag: (%04x,%04x)", g, e );
         qDebug() << QString ( msg2 );
@@ -659,7 +659,7 @@ OFCondition QtDcmMoveScu::acceptSubAssoc ( T_ASC_Network * aNet, T_ASC_Associati
             /* the array of Storage SOP Class UIDs comes from dcuid.h */
             cond = ASC_acceptContextsWithPreferredTransferSyntaxes (
                         ( *assoc )->params,
-                        dcmAllStorageSOPClassUIDs, numberOfAllDcmStorageSOPClassUIDs,
+                        dcmAllStorageSOPClassUIDs, numberOfDcmAllStorageSOPClassUIDs,
                         transferSyntaxes, numTransferSyntaxes );
         }
     }
