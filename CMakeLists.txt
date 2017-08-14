@@ -56,6 +56,9 @@ install(FILES
 install(EXPORT ${PROJECT_NAME}Depends DESTINATION  ${CMAKE_INSTALL_LIBDIR}/cmake/qtdcm-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR})
 
 add_definitions(-DQT_MESSAGELOGCONTEXT)
+if (WIN32)
+  add_definitions(-DNOMINMAX)
+endif()
 
 add_subdirectory(src)
 if (BUILD_EXAMPLE)
