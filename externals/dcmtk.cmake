@@ -13,7 +13,7 @@ ExternalProject_Add(
   dcmtk 
  
   GIT_REPOSITORY git://git.dcmtk.org/dcmtk.git
-  GIT_TAG DCMTK-3.6.1_20150924
+  GIT_TAG DCMTK-3.6.2
 
   CMAKE_GENERATOR Ninja
   
