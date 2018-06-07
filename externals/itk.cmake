@@ -9,7 +9,7 @@ set(ITK_DIR "${ITK_DIR}" CACHE PATH "" FORCE)
 ExternalProject_Add(
   itk
  
-  URL https://sourceforge.net/projects/itk/files/itk/4.10/InsightToolkit-4.10.0.tar.gz
+  URL https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.0.tar.gz
 
   CMAKE_GENERATOR Ninja
   
