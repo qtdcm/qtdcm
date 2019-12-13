@@ -435,7 +435,6 @@ void QtDcmManager::moveSelectedSeries()
         break;
     case PACS: 
     {
-            qDebug() << "Output dir " << d->tempDir.absolutePath() << d->outputDir;
         QtDcmMoveScu * mover = new QtDcmMoveScu ( this );
         mover->setOutputDir ( d->tempDir.absolutePath() );
         mover->setSeries ( d->seriesToImport );
@@ -580,7 +579,6 @@ void QtDcmManager::importToDirectory ( const QString &directory )
 
 void QtDcmManager::onSerieMoved ( const QString &directory , const QString &serie , int number )
 {
-    qDebug() << "On serie moved " << d->useConverter << directory;
     if ( d->useConverter ) {
         qDebug() << "Starting reconstruction of series" << serie;
         

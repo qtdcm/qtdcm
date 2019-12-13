@@ -167,7 +167,6 @@ void QtDcmMoveScu::run()
         d->currentSerie = d->series.at ( i );
         const QDir serieDir ( d->outputDir + QDir::separator() + d->series.at ( i ) );
 
-        qDebug() << "Run import" << serieDir.absolutePath();
         if ( !serieDir.exists() ) {
             QDir ( d->outputDir ).mkdir ( d->series.at ( i ) );
         }
@@ -175,7 +174,6 @@ void QtDcmMoveScu::run()
         d->outputDirectory = QString ( d->outputDir + QDir::separator() + d->currentSerie ).toUtf8().constData();
 
         if ( d->mode == IMPORT ) {
-            qDebug() << "plop";
             cond = this->move ( d->series.at ( i ) );
             emit updateProgress ( ( int ) ( 100.0 * ( i+1 ) / d->series.size() ) );
             d->progressTotal += d->step;
