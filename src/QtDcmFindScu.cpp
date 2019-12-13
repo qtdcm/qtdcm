@@ -93,6 +93,11 @@ void QtDcmFindScu::findStudiesScu (const QString &patientName, const QString &st
     overrideKeys.push_back ( ( QString ( "PatientName=" ) + patientName ).toUtf8().data() );
     overrideKeys.push_back ( ( QString ( "StudyDescription=" ) + studyDescription ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "StudyDate=" + startDate + "-" + endDate ).toUtf8().data() );
+    overrideKeys.push_back(QString("StudyID").toUtf8().data());
+    overrideKeys.push_back(QString("AccessionNumber").toUtf8().data());
+    overrideKeys.push_back(QString("NumberOfStudyRelatedSeries").toUtf8().data());
+    overrideKeys.push_back(QString("NumberOfStudyRelatedInstances").toUtf8().data());
+    overrideKeys.push_back(QString("PatientID=*").toUtf8().data());
 
     //Study level
     overrideKeys.push_back ( QString ( "StudyInstanceUID" ).toUtf8().data() );
@@ -120,6 +125,7 @@ void QtDcmFindScu::findSeriesScu (const QString &patientName, const QString &stu
     overrideKeys.push_back ( QString ( "StudyDescription=" + studyDescription ).toUtf8().data() );
     overrideKeys.push_back ( ( QString ( "SeriesDescription=" ) + serieDescription ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "Modality=" + modality ).toUtf8().data() );
+    overrideKeys.push_back ( QString("PatientID=*").toUtf8().data());
 
     //Study level
     overrideKeys.push_back ( QString ( "StudyDate" ).toUtf8().data() );
@@ -140,6 +146,8 @@ void QtDcmFindScu::findImagesScu (const QString &seriesUID)
     OFList<OFString> overrideKeys;
     overrideKeys.push_back ( ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) ).toUtf8().data() );
     overrideKeys.push_back ( QString ( "SeriesInstanceUID=" + seriesUID ).toUtf8().data() );
+    overrideKeys.push_back(QString("PatientID=*").toUtf8().data());
+    overrideKeys.push_back(QString("StudyInstanceUID=*").toUtf8().data());
 
     //Image level
     overrideKeys.push_back ( QString ( "SOPInstanceUID" ).toUtf8().data() );

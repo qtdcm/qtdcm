@@ -202,6 +202,8 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
     };
 
     OFCondition cond;
+    this->addOverrideKey(QString("PatientID=*"));
+    this->addOverrideKey(QString("StudyInstanceUID=*"));
 
     if ( d->mode == IMPORT ) {
         this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) );
@@ -210,6 +212,7 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
     else {
         this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "IMAGE" "" ) );
         this->addOverrideKey ( QString ( "SOPInstanceUID=" + uid ) );
+        this->addOverrideKey (QString  ( "SeriesInstanceUID=*" ) );
     }
 
     cond = ASC_initializeNetwork ( NET_ACCEPTORREQUESTOR, QtDcmPreferences::instance()->port().toInt(), d->acseTimeout, &d->net );

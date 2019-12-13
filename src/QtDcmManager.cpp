@@ -592,9 +592,12 @@ void QtDcmManager::onSerieMoved ( const QString &directory , const QString &seri
         qDebug() << "Conversion complete";
         
         if ( number == this->seriesToImportSize() - 1 ) {
-            emit importFinished();
+            emit importFinished(directory);
         }
     }
+
+    if ( number == this->seriesToImportSize() - 1 )
+        emit importFinished(directory);
 }
 
 void QtDcmManager::moveSeriesFinished()
