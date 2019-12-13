@@ -315,7 +315,7 @@ public slots:
 
 signals:
     void serieMoved ( const QString &directory );
-    void importFinished();
+    void importFinished(const QString &directory);
     void gettingPreview();
     
 private:
