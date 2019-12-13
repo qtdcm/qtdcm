@@ -202,6 +202,8 @@ OFCondition QtDcmMoveScu::move ( const QString & uid )
     };
 
     OFCondition cond;
+    this->addOverrideKey(QString("PatientID=*"));
+    this->addOverrideKey(QString("StudyInstanceUID=*"));
 
     if ( d->mode == IMPORT ) {
         this->addOverrideKey ( QString ( "QueryRetrieveLevel=" ) + QString ( "" "SERIES" "" ) );
